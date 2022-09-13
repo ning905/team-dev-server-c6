@@ -23,6 +23,5 @@ export const getAll = async (req, res) => {
       user: true
     }
   })
-  // console.log(posts)
   return sendDataResponse(res, 200, posts)
 }
