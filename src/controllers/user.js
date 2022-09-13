@@ -14,8 +14,10 @@ export const create = async (req, res) => {
     const createdUser = await userToCreate.save()
 
     return sendDataResponse(res, 201, createdUser)
-  } catch (error) {
-    return sendMessageResponse(res, 500, 'Unable to create new user')
+  } catch (err) {
+    // Send an error response back to the client then let the error handling middleware log to the terminal
+    sendMessageResponse(res, 500, 'Unable to create new user')
+    throw err
   }
 }
 
@@ -31,7 +33,8 @@ export const getById = async (req, res) => {
 
     return sendDataResponse(res, 200, foundUser)
   } catch (e) {
-    return sendMessageResponse(res, 500, 'Unable to get user')
+    sendMessageResponse(res, 500, 'Unable to get user')
+    throw e
   }
 }
 
