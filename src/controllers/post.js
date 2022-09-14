@@ -19,7 +19,7 @@ export const create = async (req, res) => {
     })
     return sendDataResponse(res, 201, { post: createdPost })
   } catch (err) {
-    return sendMessageResponse(res, 500, err.message)
+    return sendMessageResponse(res, 500, 'Unable to create post')
   }
 }
 
