@@ -16,8 +16,10 @@ export const create = async (req, res) => {
     const createdUser = await userToCreate.save()
 
     return sendDataResponse(res, 201, createdUser)
-  } catch (error) {
-    return sendMessageResponse(res, 500, 'Unable to create new user')
+  } catch (err) {
+    // Send an error response back to the client then let the error handling middleware log to the terminal
+    sendMessageResponse(res, 500, 'Unable to create new user')
+    throw err
   }
 }
 
@@ -33,7 +35,8 @@ export const getById = async (req, res) => {
 
     return sendDataResponse(res, 200, foundUser)
   } catch (e) {
-    return sendMessageResponse(res, 500, 'Unable to get user')
+    sendMessageResponse(res, 500, 'Unable to get user')
+    throw e
   }
 }
 
@@ -59,11 +62,22 @@ export const getAll = async (req, res) => {
 }
 
 export const updateById = async (req, res) => {
-  const { cohort_id: cohortId } = req.body
+  const cohortId = parseInt(req.body.cohort_id)
+  const id = parseInt(req.params.id)
 
   if (!cohortId) {
     return sendDataResponse(res, 400, { cohort_id: 'Cohort ID is required' })
   }
 
-  return sendDataResponse(res, 201, { user: { cohort_id: cohortId } })
+  const foundUser = await User.findById(id)
+
+  if (!foundUser) {
+    return sendDataResponse(res, 404, { id: 'User not found' })
+  }
+
+  const updatedUser = await foundUser.update({ cohortId })
+
+  return sendDataResponse(res, 201, {
+    user: { cohort_id: updatedUser.cohortId }
+  })
 }
