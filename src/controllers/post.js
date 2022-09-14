@@ -1,15 +1,27 @@
-import { sendDataResponse } from '../utils/responses.js'
+import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export const create = async (req, res) => {
   const { content } = req.body
+  const { id } = req.user
 
   if (!content) {
-    return sendDataResponse(res, 400, { content: 'Must provide content' })
+    return sendMessageResponse(res, 400, 'Must provide content')
   }
 
-  return sendDataResponse(res, 201, { post: { id: 1, content } })
+  try {
+    const createdPost = await prisma.post.create({
+      data: {
+        content,
+        userId: id
+      }
+    })
+    return sendDataResponse(res, 201, { post: createdPost })
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Unable to create post')
+    throw err
+  }
 }
 
 export const getAll = async (req, res) => {
