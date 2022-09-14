@@ -13,7 +13,7 @@ export const create = async (req, res) => {
 }
 
 export const getAll = async (req, res) => {
-  const posts = await prisma.posts.findMany({
+  const posts = await prisma.post.findMany({
     skip: 0,
     take: 100,
     orderBy: {
