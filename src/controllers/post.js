@@ -29,10 +29,18 @@ export const getAll = async (req, res) => {
     skip: 0,
     take: 100,
     orderBy: {
-      time: 'asc'
+      createdAt: 'asc'
     },
     include: {
-      user: true
+      user: {
+        select: {
+          email: true,
+          id: true,
+          cohortId: true,
+          role: true,
+          profile: true
+        }
+      }
     }
   })
   return sendDataResponse(res, 200, posts)
