@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
+import 'express-async-errors'
 import cors from 'cors'
 import userRouter from './routes/user.js'
 import postRouter from './routes/post.js'
@@ -28,6 +29,10 @@ app.get('*', (req, res) => {
       resource: 'Not found'
     }
   })
+})
+
+app.use((error, req, res, next) => {
+  console.error(error)
 })
 
 const port = process.env.PORT || 4000
