@@ -16,7 +16,15 @@ async function seed() {
     }
   })
 
-  console.log('user', createdUser, secondUser)
+  const teacherUser = await prisma.user.create({
+    data: {
+      email: 'teacher@teacher.com',
+      password: 'teacher',
+      role: 'TEACHER'
+    }
+  })
+
+  console.log('users', createdUser, secondUser, teacherUser)
 
   const createdProfile = await prisma.profile.create({
     data: {
@@ -34,7 +42,15 @@ async function seed() {
     }
   })
 
-  console.log('profile', createdProfile, secondProfile)
+  const teacherProfile = await prisma.profile.create({
+    data: {
+      userId: teacherUser.id,
+      firstName: 'Teacher',
+      lastName: 'Boolean'
+    }
+  })
+
+  console.log('profiles', createdProfile, secondProfile, teacherProfile)
 
   const createdPost = await prisma.post.create({
     data: {
@@ -50,7 +66,14 @@ async function seed() {
     }
   })
 
-  console.log('post created', createdPost, secondPost)
+  const teacherPost = await prisma.post.create({
+    data: {
+      content: 'This students are driving me crazy!',
+      userId: teacherUser.id
+    }
+  })
+
+  console.log('posts created', createdPost, secondPost, teacherPost)
 }
 
 seed().catch(async (error) => {
