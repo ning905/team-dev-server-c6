@@ -60,7 +60,7 @@ export const getAll = async (req, res) => {
 }
 
 export const updateById = async (req, res) => {
-  const { cohort_id: cohortId } = req.body
+  const cohortId = parseInt(req.body.cohort_id)
   const id = parseInt(req.params.id)
 
   if (!cohortId) {
