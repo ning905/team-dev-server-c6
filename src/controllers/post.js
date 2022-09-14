@@ -1,23 +1,20 @@
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import { PrismaClient } from '@prisma/client'
-import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from '../utils/config.js'
 const prisma = new PrismaClient()
 
 export const create = async (req, res) => {
   const { content } = req.body
-  const token = req.headers.authorization.split(' ')
+  const { id } = req.user
 
   if (!content) {
     return sendMessageResponse(res, 400, 'Must provide content')
   }
 
   try {
-    const user = jwt.verify(token[1], JWT_SECRET)
     const createdPost = await prisma.post.create({
       data: {
         content,
-        userId: user.userId
+        userId: id
       }
     })
     return sendDataResponse(res, 201, { post: createdPost })
