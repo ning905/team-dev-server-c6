@@ -9,6 +9,9 @@
     "dev": "nodemon src/index.js",
     "prepare": "husky install"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/boolean-uk/team-dev-server.git"
