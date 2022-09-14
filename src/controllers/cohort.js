@@ -12,7 +12,7 @@ export const create = async (req, res) => {
   }
 }
 
-export const get = async (req, res) => {
+export const getAll = async (req, res) => {
   try {
     const foundCohorts = await getAllCohorts()
 
