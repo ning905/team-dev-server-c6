@@ -1,25 +1,29 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcrypt'
+
 const prisma = new PrismaClient()
 
 async function seed() {
+  const password = await bcrypt.hash('123', 8)
+
   const createdUser = await prisma.user.create({
     data: {
       email: 'notmyrealemail@email.com',
-      password: 'test'
+      password
     }
   })
 
   const secondUser = await prisma.user.create({
     data: {
       email: 'blah@blah',
-      password: 'test2'
+      password
     }
   })
 
   const teacherUser = await prisma.user.create({
     data: {
       email: 'teacher@teacher.com',
-      password: 'teacher',
+      password,
       role: 'TEACHER'
     }
   })
