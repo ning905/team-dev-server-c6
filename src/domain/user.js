@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import dbClient from '../utils/dbClient.js'
 import bcrypt from 'bcrypt'
 
@@ -25,9 +26,15 @@ export default class User {
   }
 
   static async fromJson(json) {
-    // eslint-disable-next-line camelcase
-    const { first_name, last_name, email, biography, github_url, password } =
-      json
+    const {
+      first_name,
+      last_name,
+      email,
+      biography,
+      github_url,
+      password,
+      role
+    } = json
 
     const passwordHash = await bcrypt.hash(password, 8)
 
@@ -39,7 +46,8 @@ export default class User {
       email,
       biography,
       github_url,
-      passwordHash
+      passwordHash,
+      role
     )
   }
 
