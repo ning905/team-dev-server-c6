@@ -45,3 +45,45 @@ export const getAll = async (req, res) => {
   })
   return sendDataResponse(res, 200, posts)
 }
+
+export const edit = async (req, res) => {
+  const id = Number(req.params.id)
+  const { content } = req.body
+
+  if (!content) {
+    return sendMessageResponse(res, 400, 'Must provide content')
+  }
+
+  try {
+    const foundPost = await prisma.post.findUnique({
+      where: { id },
+      include: { user: true }
+    })
+
+    if (!foundPost) {
+      return sendMessageResponse(
+        res,
+        404,
+        'The post with the provided id does not exist'
+      )
+    }
+
+    if (foundPost.user.id !== req.user.id) {
+      return sendMessageResponse(
+        res,
+        403,
+        'Only the post author can edit the post'
+      )
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: { id },
+      data: { content },
+      include: { user: true }
+    })
+    return sendDataResponse(res, 201, updatedPost)
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Internal server error')
+    throw err
+  }
+}
