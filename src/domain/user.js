@@ -8,7 +8,7 @@ export default class User {
    * take as inputs, what types they return, and other useful information that JS doesn't have built in
    * @tutorial https://www.valentinog.com/blog/jsdoc
    *
-   * @param { { id: int, cohortId: int, email: string, profile: { firstName: string, lastName: string, bio: string, githubUrl: string } } } user
+   * @param { { id: int, cohortId: int, email: string, profile: { firstName: string, lastName: string, bio: string, githubUrl: string, profileImageUrl: string } } } user
    * @returns {User}
    */
   static fromDb(user) {
@@ -20,6 +20,7 @@ export default class User {
       user.email,
       user.profile.bio,
       user.profile.githubUrl,
+      user.profile.profileImageUrl,
       user.password,
       user.role
     )
@@ -32,6 +33,7 @@ export default class User {
       email,
       biography,
       github_url,
+      profile_image_url,
       password,
       role
     } = json
@@ -46,6 +48,7 @@ export default class User {
       email,
       biography,
       github_url,
+      profile_image_url,
       passwordHash,
       role
     )
@@ -59,6 +62,7 @@ export default class User {
     email,
     bio,
     githubUrl,
+    profileImageUrl = 'https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png',
     passwordHash = null,
     role = 'STUDENT'
   ) {
@@ -69,6 +73,7 @@ export default class User {
     this.email = email
     this.bio = bio
     this.githubUrl = githubUrl
+    this.profileImageUrl = profileImageUrl
     this.passwordHash = passwordHash
     this.role = role
   }
@@ -83,7 +88,8 @@ export default class User {
         last_name: this.lastName,
         email: this.email,
         biography: this.bio,
-        github_url: this.githubUrl
+        github_url: this.githubUrl,
+        profile_image_url: this.profileImageUrl
       }
     }
   }
@@ -104,7 +110,8 @@ export default class User {
             firstName: this.firstName,
             lastName: this.lastName,
             bio: this.bio,
-            githubUrl: this.githubUrl
+            githubUrl: this.githubUrl,
+            profileImageUrl: this.profileImageUrl
           }
         }
       },
@@ -137,7 +144,8 @@ export default class User {
             firstName,
             lastName,
             bio,
-            githubUrl
+            githubUrl,
+            profileImageUrl
           }
         }
       },
