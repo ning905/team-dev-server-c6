@@ -1,4 +1,3 @@
-// import { prisma } from '@prisma/client'
 import User from '../domain/user.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
