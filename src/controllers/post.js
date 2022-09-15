@@ -29,7 +29,7 @@ export const getAll = async (req, res) => {
     skip: 0,
     take: 100,
     orderBy: {
-      createdAt: 'asc'
+      createdAt: 'desc'
     },
     include: {
       user: {
