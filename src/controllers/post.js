@@ -1,6 +1,5 @@
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import dbClient from '../utils/dbClient.js'
 
 export const create = async (req, res) => {
   const { content } = req.body
@@ -11,7 +10,7 @@ export const create = async (req, res) => {
   }
 
   try {
-    const createdPost = await prisma.post.create({
+    const createdPost = await dbClient.post.create({
       data: {
         content,
         userId: id
@@ -25,7 +24,7 @@ export const create = async (req, res) => {
 }
 
 export const getAll = async (req, res) => {
-  const posts = await prisma.post.findMany({
+  const posts = await dbClient.post.findMany({
     skip: 0,
     take: 100,
     orderBy: {
