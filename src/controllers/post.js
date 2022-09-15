@@ -86,3 +86,39 @@ export const edit = async (req, res) => {
     throw err
   }
 }
+
+export const deletePost = async (req, res) => {
+  const id = Number(req.params.id)
+
+  try {
+    const foundPost = await dbClient.post.findUnique({
+      where: {
+        id
+      },
+      include: {
+        user: true
+      }
+    })
+
+    if (!foundPost) {
+      return sendMessageResponse(res, 404, 'Error in retriving post')
+    }
+
+    if (foundPost.user.id !== req.user.id) {
+      return sendMessageResponse(
+        res,
+        403,
+        'Request authorization to delete post'
+      )
+    }
+    const deletePost = await dbClient.post.delete({
+      where: {
+        id
+      }
+    })
+
+    return sendDataResponse(res, 201, deletePost)
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Unable to delete post')
+  }
+}
