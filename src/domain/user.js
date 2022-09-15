@@ -116,7 +116,15 @@ export default class User {
     return User.fromDb(createdUser)
   }
 
-  async update({ firstName, lastName, email, bio, githubUrl, cohortId }) {
+  async update({
+    firstName,
+    lastName,
+    email,
+    bio,
+    githubUrl,
+    profileImageUrl,
+    cohortId
+  }) {
     const updatedUser = await dbClient.user.update({
       where: {
         id: this.id
