@@ -83,7 +83,7 @@ export default class User {
         last_name: this.lastName,
         email: this.email,
         biography: this.bio,
-        github_url: this.githubUrl
+        github_url: this.githubUrl,
       }
     }
   }
@@ -104,7 +104,7 @@ export default class User {
             firstName: this.firstName,
             lastName: this.lastName,
             bio: this.bio,
-            githubUrl: this.githubUrl
+            githubUrl: this.githubUrl,
           }
         }
       },
@@ -116,7 +116,7 @@ export default class User {
     return User.fromDb(createdUser)
   }
 
-  async update({ firstName, lastName, email, bio, githubUrl, cohortId }) {
+  async update({ firstName, lastName, email, bio, githubUrl, profileImageUrl, cohortId }) {
     const updatedUser = await dbClient.user.update({
       where: {
         id: this.id
@@ -129,7 +129,7 @@ export default class User {
             firstName,
             lastName,
             bio,
-            githubUrl
+            githubUrl,
           }
         }
       },
