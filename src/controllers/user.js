@@ -80,6 +80,12 @@ export const updateById = async (req, res) => {
   })
 }
 
+export const updateLoggedInUser = async (req, res) => {
+  req.params.id = req.user.id
+
+  return updateUserById(req, res)
+}
+
 export const updateUserById = async (req, res) => {
   const id = parseInt(req.params.id)
 
