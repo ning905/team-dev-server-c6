@@ -88,11 +88,9 @@ export const edit = async (req, res) => {
 }
 
 export const deletePost = async (req, res) => {
-  // GET the post ID we want to delete from req.param
-  // Convert post id from string to number
   const id = Number(req.params.id)
   console.log('id', id)
-  // get the post from database
+
   try {
     const foundPost = await dbClient.post.findUnique({
       where: {
@@ -102,12 +100,10 @@ export const deletePost = async (req, res) => {
         user: true
       }
     })
-    console.log('found Post', foundPost)
-    // if no post, throw error
+
     if (!foundPost) {
       return sendMessageResponse(res, 404, 'Error in retriving post')
     }
-    // if post user id does not match request user id, throw error
 
     if (foundPost.user.id !== req.user.id) {
       return sendMessageResponse(
@@ -116,7 +112,6 @@ export const deletePost = async (req, res) => {
         'Request authorization to delete post'
       )
     }
-    // if all good, call deletepost on prisma
     const deletePost = await dbClient.post.delete({
       where: {
         id
