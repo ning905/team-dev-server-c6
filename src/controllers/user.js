@@ -79,3 +79,25 @@ export const updateById = async (req, res) => {
     user: { cohort_id: updatedUser.cohortId }
   })
 }
+
+export const updateUserById = async (req, res) => {
+  const id = parseInt(req.params.id)
+
+  const { firstName, lastName, bio, githubUrl, profileImageUrl } = req.body
+
+  const foundUser = await User.findById(id)
+
+  if (!foundUser) {
+    return sendDataResponse(res, 404, { id: 'User not found' })
+  } else {
+    const updateUser = await foundUser.update({
+      firstName,
+      lastName,
+      bio,
+      githubUrl,
+      profileImageUrl
+    })
+
+    return sendDataResponse(res, 201, updateUser)
+  }
+}
