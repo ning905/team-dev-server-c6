@@ -50,7 +50,7 @@ model Post {
   userId      Int
   user        User          @relation(fields: [userId], references: [id])
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  updatedAt   DateTime?     @updatedAt
 }
 
 model DeliveryLog {
