@@ -89,7 +89,6 @@ export const edit = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   const id = Number(req.params.id)
-  console.log('id', id)
 
   try {
     const foundPost = await dbClient.post.findUnique({
@@ -117,7 +116,7 @@ export const deletePost = async (req, res) => {
         id
       }
     })
-    console.log('delete post', deletePost)
+
     return sendDataResponse(res, 201, deletePost)
   } catch (err) {
     sendMessageResponse(res, 500, 'Unable to delete post')
