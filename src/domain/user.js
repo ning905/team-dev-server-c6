@@ -62,7 +62,7 @@ export default class User {
     email,
     bio,
     githubUrl,
-    profileImageUrl = 'https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png',
+    profileImageUrl,
     passwordHash = null,
     role = 'STUDENT'
   ) {
