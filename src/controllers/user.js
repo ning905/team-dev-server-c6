@@ -93,16 +93,19 @@ export const updateUserById = async (req, res) => {
     req.body
 
   const foundUser = await User.findById(id)
-  const foundUserByEmail = await User.findByEmail(email)
+
+  if (email) {
+    const foundUserByEmail = await User.findByEmail(email)
+
+    if (foundUserByEmail) {
+      return sendDataResponse(res, 400, {
+        id: 'A user with this email already exists'
+      })
+    }
+  }
 
   if (!foundUser) {
     return sendDataResponse(res, 404, { id: 'User not found' })
-  }
-
-  if (foundUserByEmail) {
-    return sendDataResponse(res, 400, {
-      id: 'A user with this email already exists'
-    })
   }
 
   if (foundUser.email === email) {
