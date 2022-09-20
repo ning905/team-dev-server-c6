@@ -26,6 +26,7 @@ model User {
   cohort       Cohort?       @relation(fields: [cohortId], references: [id])
   posts        Post[]
   deliveryLogs DeliveryLog[]
+  comments     Comment[]
 }
 
 model Profile {
@@ -46,12 +47,13 @@ model Cohort {
 }
 
 model Post {
-  id          Int           @id @default(autoincrement())
-  content     String
-  userId      Int
-  user        User          @relation(fields: [userId], references: [id])
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime?     @updatedAt
+  id        Int       @id @default(autoincrement())
+  content   String
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  comments  Comment[]
 }
 
 model DeliveryLog {
@@ -69,4 +71,15 @@ model DeliveryLogLine {
   content String
   logId   Int
   log     DeliveryLog @relation(fields: [logId], references: [id])
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String    @db.VarChar(150)
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  postId    Int
+  post      Post      @relation(fields: [postId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
