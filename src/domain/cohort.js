@@ -9,11 +9,7 @@ export async function createCohort(name) {
     data: { name: `${name}` }
   })
 
-  return new Cohort(
-    createdCohort.id,
-    createdCohort.name,
-    createdCohort.deliveryLog
-  )
+  return new Cohort(createdCohort.id, createdCohort.name)
 }
 
 export async function getAllCohorts() {
@@ -22,23 +18,24 @@ export async function getAllCohorts() {
 }
 
 export async function getCohortById(Id) {
-  const foundCohort = await dbClient.cohort.findUnique({ where: { id: Id } })
+  const foundCohort = await dbClient.cohort.findUnique({
+    where: { id: Id },
+    include: { deliveryLogs: true, users: true }
+  })
   return foundCohort
 }
 
 export class Cohort {
-  constructor(id = null, name = null, deliveryLog = []) {
+  constructor(id = null, name = null) {
     this.id = id
     this.name = name
-    this.deliveryLog = deliveryLog
   }
 
   toJSON() {
     return {
       cohort: {
         id: this.id,
-        name: this.name,
-        deliveryLog: this.deliveryLog
+        name: this.name
       }
     }
   }

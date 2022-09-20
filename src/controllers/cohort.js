@@ -23,7 +23,6 @@ export const getAll = async (req, res) => {
 
 export const getById = async (req, res) => {
   const Id = parseInt(req.params.id)
-  console.log(Id)
   const foundCohort = await getCohortById(Id)
   return sendDataResponse(res, 200, { foundCohort })
 }
