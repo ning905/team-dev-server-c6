@@ -42,7 +42,7 @@ export const getAll = async (req, res) => {
       },
       likes: {
         include: {
-          likedBy: {
+          user: {
             include: { profile: true }
           }
         }
@@ -89,7 +89,7 @@ export const edit = async (req, res) => {
         user: true,
         likes: {
           include: {
-            likedBy: {
+            user: {
               include: { profile: true }
             }
           }

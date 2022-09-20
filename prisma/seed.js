@@ -82,22 +82,22 @@ async function seed() {
   await prisma.like.createMany({
     data: [
       {
-        likedById: createdUser.id,
-        likedPostId: createdPost.id
+        userId: createdUser.id,
+        postId: createdPost.id
       },
       {
-        likedById: secondUser.id,
-        likedPostId: createdPost.id
+        userId: secondUser.id,
+        postId: createdPost.id
       }
     ]
   })
 
   const likes = await prisma.like.findMany({
     include: {
-      likedBy: {
+      user: {
         include: { profile: true }
       },
-      likedPost: true
+      post: true
     }
   })
 
