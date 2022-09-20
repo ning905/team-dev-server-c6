@@ -1,10 +1,9 @@
-import { createCohort, getAllCohorts } from '../domain/cohort.js'
+import { createCohort, getAllCohorts, getCohortById } from '../domain/cohort.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const create = async (req, res) => {
   try {
-    const createdCohort = await createCohort()
-
+    const createdCohort = await createCohort(req.body.name)
     return sendDataResponse(res, 201, createdCohort)
   } catch (e) {
     sendMessageResponse(res, 500, 'Unable to create cohort')
@@ -20,4 +19,11 @@ export const getAll = async (req, res) => {
   } catch (e) {
     sendMessageResponse(res, 500, 'Unable to fetch Cohorts')
   }
+}
+
+export const getById = async (req, res) => {
+  const Id = parseInt(req.params.id)
+  console.log(Id)
+  const foundCohort = await getCohortById(Id)
+  return sendDataResponse(res, 201, { id: Id })
 }
