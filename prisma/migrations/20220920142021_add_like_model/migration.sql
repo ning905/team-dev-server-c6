@@ -12,17 +12,17 @@ ALTER TABLE "User" ALTER COLUMN "password" SET DATA TYPE VARCHAR(250);
 
 -- CreateTable
 CREATE TABLE "Like" (
-    "likedById" INTEGER NOT NULL,
-    "likedPostId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "postId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Like_likedById_likedPostId_key" ON "Like"("likedById", "likedPostId");
+CREATE UNIQUE INDEX "Like_userId_postId_key" ON "Like"("userId", "postId");
 
 -- AddForeignKey
-ALTER TABLE "Like" ADD CONSTRAINT "Like_likedById_fkey" FOREIGN KEY ("likedById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Like" ADD CONSTRAINT "Like_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Like" ADD CONSTRAINT "Like_likedPostId_fkey" FOREIGN KEY ("likedPostId") REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Like" ADD CONSTRAINT "Like_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE CASCADE ON UPDATE CASCADE;
