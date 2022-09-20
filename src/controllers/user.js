@@ -1,4 +1,5 @@
 import User from '../domain/user.js'
+import bcrypt from 'bcrypt'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const create = async (req, res) => {
@@ -92,7 +93,15 @@ export const updateUserById = async (req, res) => {
   const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
     req.body
 
+  const unhashedPassword = req.body.password
+
+  let password = ''
+
   const foundUser = await User.findById(id)
+
+  if (unhashedPassword) {
+    password = await bcrypt.hash(unhashedPassword, 8)
+  }
 
   if (email) {
     const foundUserByEmail = await User.findByEmail(email)
@@ -115,6 +124,7 @@ export const updateUserById = async (req, res) => {
   } else {
     const updateUser = await foundUser.update({
       email,
+      password,
       firstName,
       lastName,
       bio,
