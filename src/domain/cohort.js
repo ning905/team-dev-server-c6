@@ -6,7 +6,7 @@ import dbClient from '../utils/dbClient.js'
  */
 export async function createCohort(name) {
   const createdCohort = await dbClient.cohort.create({
-    data: { name: `${name}` }
+    data: { name: name }
   })
 
   return new Cohort(createdCohort.id, createdCohort.name)
@@ -17,17 +17,17 @@ export async function getAllCohorts() {
   return foundCohorts
 }
 
-export async function getCohortById(Id) {
+export async function getCohortById(id) {
   const foundCohort = await dbClient.cohort.findUnique({
-    where: { id: Id },
+    where: { id },
     include: { deliveryLogs: true, users: true }
   })
   return foundCohort
 }
 
-export async function updateCohortNameByID(Id, name) {
+export async function updateCohortNameByID(id, name) {
   const updateCohort = await dbClient.cohort.update({
-    where: { id: Id },
+    where: { id },
     data: { name: name }
   })
 

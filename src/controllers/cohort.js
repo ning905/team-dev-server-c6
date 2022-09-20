@@ -8,6 +8,9 @@ import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const create = async (req, res) => {
   try {
+    if (!req.body.name) {
+      sendDataResponse(res, 400, 'missing cohort name')
+    }
     const createdCohort = await createCohort(req.body.name)
     return sendDataResponse(res, 201, createdCohort)
   } catch (e) {
