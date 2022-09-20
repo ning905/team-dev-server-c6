@@ -150,3 +150,118 @@ export const deletePost = async (req, res) => {
     sendMessageResponse(res, 500, 'Unable to delete post')
   }
 }
+
+export const createLike = async (req, res) => {
+  const postId = Number(req.params.id)
+
+  try {
+    const foundPost = await dbClient.post.findUnique({
+      where: { id: postId },
+      include: { user: true }
+    })
+    if (!foundPost) {
+      return sendMessageResponse(
+        res,
+        404,
+        'The post with the provided id does not exist'
+      )
+    }
+
+    const foundLike = await dbClient.like.findUnique({
+      where: {
+        userId_postId: {
+          userId: req.user.id,
+          postId: postId
+        }
+      }
+    })
+    if (foundLike) {
+      return sendMessageResponse(res, 409, 'This user already liked this post')
+    }
+
+    await dbClient.like.create({
+      data: {
+        userId: req.user.id,
+        postId: postId
+      }
+    })
+
+    const likes = await dbClient.like.findMany({
+      where: { postId },
+      include: {
+        user: {
+          select: {
+            email: true,
+            id: true,
+            cohortId: true,
+            role: true,
+            profile: true
+          }
+        }
+      }
+    })
+    return sendDataResponse(res, 201, likes)
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Internal server error')
+    throw err
+  }
+}
+
+export const deleteLike = async (req, res) => {
+  const postId = Number(req.params.id)
+
+  try {
+    const foundPost = await dbClient.post.findUnique({
+      where: { id: postId },
+      include: { user: true }
+    })
+    if (!foundPost) {
+      return sendMessageResponse(
+        res,
+        404,
+        'The post with the provided id does not exist'
+      )
+    }
+
+    const foundLike = await dbClient.like.findUnique({
+      where: {
+        userId_postId: {
+          userId: req.user.id,
+          postId: postId
+        }
+      }
+    })
+    if (!foundLike) {
+      return sendMessageResponse(res, 409, 'This user has not liked this post')
+    }
+
+    await dbClient.like.delete({
+      where: {
+        userId_postId: {
+          userId: req.user.id,
+          postId: postId
+        }
+      }
+    })
+
+    const likes = await dbClient.like.findMany({
+      where: { postId },
+      include: {
+        user: {
+          select: {
+            email: true,
+            id: true,
+            cohortId: true,
+            role: true,
+            profile: true
+          }
+        }
+      }
+    })
+    return sendDataResponse(res, 201, likes)
+  } catch (err) {
+    console.error(err)
+    sendMessageResponse(res, 500, 'Internal server error')
+    throw err
+  }
+}
