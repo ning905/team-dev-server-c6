@@ -39,6 +39,19 @@ export const getAll = async (req, res) => {
           role: true,
           profile: true
         }
+      },
+      likes: {
+        include: {
+          user: {
+            select: {
+              email: true,
+              id: true,
+              cohortId: true,
+              role: true,
+              profile: true
+            }
+          }
+        }
       }
     }
   })
@@ -78,7 +91,22 @@ export const edit = async (req, res) => {
     const updatedPost = await dbClient.post.update({
       where: { id },
       data: { content },
-      include: { user: true }
+      include: {
+        user: true,
+        likes: {
+          include: {
+            user: {
+              select: {
+                email: true,
+                id: true,
+                cohortId: true,
+                role: true,
+                profile: true
+              }
+            }
+          }
+        }
+      }
     })
     return sendDataResponse(res, 201, updatedPost)
   } catch (err) {
