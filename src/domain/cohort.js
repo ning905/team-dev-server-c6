@@ -20,7 +20,10 @@ export async function getAllCohorts() {
 export async function getCohortById(id) {
   const foundCohort = await dbClient.cohort.findUnique({
     where: { id },
-    include: { deliveryLogs: true, users: true }
+    include: {
+      deliveryLogs: true,
+      users: { select: { id: true, email: true }, include: { profile: true } }
+    }
   })
   return foundCohort
 }
