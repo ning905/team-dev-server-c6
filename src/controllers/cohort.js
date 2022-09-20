@@ -1,4 +1,9 @@
-import { createCohort, getAllCohorts, getCohortById } from '../domain/cohort.js'
+import {
+  createCohort,
+  getAllCohorts,
+  getCohortById,
+  updateCohortNameByID
+} from '../domain/cohort.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const create = async (req, res) => {
@@ -25,4 +30,12 @@ export const getById = async (req, res) => {
   const Id = parseInt(req.params.id)
   const foundCohort = await getCohortById(Id)
   return sendDataResponse(res, 200, { foundCohort })
+}
+
+export const updateCohortName = async (req, res) => {
+  const Id = parseInt(req.params.id)
+  const newName = req.body
+  const updatedCohort = await updateCohortNameByID(Id, newName)
+
+  return sendMessageResponse(res, 201, { cohort: updatedCohort })
 }

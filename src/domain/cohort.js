@@ -25,6 +25,15 @@ export async function getCohortById(Id) {
   return foundCohort
 }
 
+export async function updateCohortNameByID(Id, name) {
+  const updateCohort = await dbClient.cohort.update({
+    where: { id: Id },
+    data: { name: name }
+  })
+
+  return updateCohort
+}
+
 export class Cohort {
   constructor(id = null, name = null) {
     this.id = id
