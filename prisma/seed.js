@@ -78,6 +78,30 @@ async function seed() {
   })
 
   console.log('posts created', createdPost, secondPost, teacherPost)
+
+  await prisma.like.createMany({
+    data: [
+      {
+        likedById: createdUser.id,
+        likedPostId: createdPost.id
+      },
+      {
+        likedById: secondUser.id,
+        likedPostId: createdPost.id
+      }
+    ]
+  })
+
+  const likes = await prisma.like.findMany({
+    include: {
+      likedBy: {
+        include: { profile: true }
+      },
+      likedPost: true
+    }
+  })
+
+  console.log('likes created', likes)
 }
 
 seed().catch(async (error) => {
