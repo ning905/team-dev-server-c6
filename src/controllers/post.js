@@ -171,7 +171,7 @@ export const createLike = async (req, res) => {
       where: {
         userId_postId: {
           userId: req.user.id,
-          postId
+          postId: postId
         }
       }
     })
@@ -182,7 +182,7 @@ export const createLike = async (req, res) => {
     await dbClient.like.create({
       data: {
         userId: req.user.id,
-        postId
+        postId: postId
       }
     })
 
@@ -227,7 +227,7 @@ export const deleteLike = async (req, res) => {
       where: {
         userId_postId: {
           userId: req.user.id,
-          postId
+          postId: postId
         }
       }
     })
@@ -239,7 +239,7 @@ export const deleteLike = async (req, res) => {
       where: {
         userId_postId: {
           userId: req.user.id,
-          postId
+          postId: postId
         }
       }
     })
@@ -260,6 +260,7 @@ export const deleteLike = async (req, res) => {
     })
     return sendDataResponse(res, 201, likes)
   } catch (err) {
+    console.error(err)
     sendMessageResponse(res, 500, 'Internal server error')
     throw err
   }
