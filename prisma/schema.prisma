@@ -26,6 +26,7 @@ model User {
   cohort       Cohort?       @relation(fields: [cohortId], references: [id])
   posts        Post[]
   deliveryLogs DeliveryLog[]
+  likes        Like[]
 }
 
 model Profile {
@@ -49,8 +50,11 @@ model Cohort {
 model Post {
   id        Int       @id @default(autoincrement())
   content   String
-  userId    Int
+
   user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  likes     Like[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 }
@@ -70,4 +74,15 @@ model DeliveryLogLine {
   content String
   logId   Int
   log     DeliveryLog @relation(fields: [logId], references: [id])
+}
+
+model Like {
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, postId])
 }
