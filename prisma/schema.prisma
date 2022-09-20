@@ -44,14 +44,17 @@ model Cohort {
   id           Int           @id @default(autoincrement())
   users        User[]
   deliveryLogs DeliveryLog[]
+  name         String?       @unique
 }
 
 model Post {
   id        Int       @id @default(autoincrement())
   content   String
+
   user      User      @relation(fields: [userId], references: [id])
   userId    Int
   likes     Like[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 }
