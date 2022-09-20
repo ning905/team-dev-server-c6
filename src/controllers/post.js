@@ -122,3 +122,7 @@ export const deletePost = async (req, res) => {
     sendMessageResponse(res, 500, 'Unable to delete post')
   }
 }
+
+export const createLike = async (req, res) => {}
+
+export const deleteLike = async (req, res) => {}
