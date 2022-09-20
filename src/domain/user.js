@@ -169,6 +169,10 @@ export default class User {
     return User._findMany('firstName', firstName)
   }
 
+  static async findManyByCohortId(cohortId) {
+    return User._findManyThroughUser('cohortId', cohortId)
+  }
+
   static async findAll() {
     return User._findMany()
   }
@@ -202,6 +206,24 @@ export default class User {
         profile: {
           [key]: value
         }
+      }
+    }
+
+    const foundUsers = await dbClient.user.findMany(query)
+
+    return foundUsers.map((user) => User.fromDb(user))
+  }
+
+  static async _findManyThroughUser(key, value) {
+    const query = {
+      include: {
+        profile: true
+      }
+    }
+
+    if (key !== undefined && value !== undefined) {
+      query.where = {
+        [key]: value
       }
     }
 

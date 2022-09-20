@@ -40,6 +40,16 @@ export const getById = async (req, res) => {
 }
 
 export const getAll = async (req, res) => {
+  // console.log("quest", req.query.cohort_id)
+
+  if (req.query.cohort_id) {
+    return getAllByCohortId(req, res)
+  } else {
+    return getAllByFirstName(req, res)
+  }
+}
+
+export const getAllByFirstName = async (req, res) => {
   // eslint-disable-next-line camelcase
   const { first_name: firstName } = req.query
 
@@ -47,6 +57,29 @@ export const getAll = async (req, res) => {
 
   if (firstName) {
     foundUsers = await User.findManyByFirstName(firstName)
+  } else {
+    foundUsers = await User.findAll()
+  }
+
+  const formattedUsers = foundUsers.map((user) => {
+    return {
+      ...user.toJSON().user
+    }
+  })
+
+  return sendDataResponse(res, 200, { users: formattedUsers })
+}
+
+export const getAllByCohortId = async (req, res) => {
+  // eslint-disable-next-line camelcase
+  const { cohort_id: cohortId } = req.query
+
+  const parsedId = Number(cohortId)
+
+  let foundUsers
+
+  if (parsedId) {
+    foundUsers = await User.findManyByCohortId(parsedId)
   } else {
     foundUsers = await User.findAll()
   }
