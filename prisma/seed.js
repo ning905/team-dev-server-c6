@@ -102,6 +102,31 @@ async function seed() {
   })
 
   console.log('likes created', likes)
+
+  const createdComments = await prisma.comment.createMany({
+    data: [
+      {
+        content: 'I really like it!',
+        userId: createdUser.id,
+        postId: createdPost.id
+      },
+      {
+        content: 'Yeah, its really interestng',
+        userId: createdUser.id,
+        postId: createdPost.id
+      }
+    ]
+  })
+  console.log('created comments', { createdComments })
+
+  const createFirstComment = await prisma.comment.create({
+    data: {
+      content: 'Hi there',
+      userId: createdUser.id,
+      postId: createdPost.id
+    }
+  })
+  console.log('first comment', createFirstComment)
 }
 
 seed().catch(async (error) => {

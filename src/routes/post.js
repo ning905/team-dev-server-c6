@@ -5,7 +5,8 @@ import {
   deletePost,
   edit,
   createLike,
-  deleteLike
+  deleteLike,
+  createComment
 } from '../controllers/post.js'
 import { validateAuthentication } from '../middleware/auth.js'
 
@@ -15,6 +16,7 @@ router.post('/', validateAuthentication, create)
 router.get('/', validateAuthentication, getAll)
 router.patch('/:id', validateAuthentication, edit)
 router.delete('/:id', validateAuthentication, deletePost)
+router.post('/:id/comment', validateAuthentication, createComment)
 router.post('/:id/like', validateAuthentication, createLike)
 router.delete('/:id/like', validateAuthentication, deleteLike)
 

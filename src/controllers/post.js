@@ -52,7 +52,8 @@ export const getAll = async (req, res) => {
             }
           }
         }
-      }
+      },
+      comments: true
     }
   })
   return sendDataResponse(res, 200, posts)
@@ -148,6 +149,39 @@ export const deletePost = async (req, res) => {
     return sendDataResponse(res, 201, deletePost)
   } catch (err) {
     sendMessageResponse(res, 500, 'Unable to delete post')
+  }
+}
+
+export const createComment = async (req, res) => {
+  const { content } = req.body
+  const postId = Number(req.params.id)
+  const userId = req.user.id
+
+  const findPostById = await dbClient.post.findUnique({
+    where: {
+      id: postId
+    }
+  })
+
+  if (!findPostById) {
+    return sendMessageResponse(res, 404, 'No post found')
+  }
+
+  if (!content) {
+    return sendMessageResponse(res, 400, 'Must provide content')
+  }
+  try {
+    const createdComment = await dbClient.comment.create({
+      data: {
+        content,
+        userId,
+        postId
+      }
+    })
+    return sendDataResponse(res, 201, { post: createdComment })
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Unable to create comment')
+    throw err
   }
 }
 
