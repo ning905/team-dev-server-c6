@@ -22,7 +22,7 @@ export async function getCohortById(id) {
     where: { id },
     include: {
       deliveryLogs: true,
-      users: { select: { id: true, email: true }, include: { profile: true } }
+      users: { select: { id: true, email: true, profile: true } }
     }
   })
   return foundCohort
