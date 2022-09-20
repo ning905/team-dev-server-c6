@@ -39,6 +39,13 @@ export const getAll = async (req, res) => {
           role: true,
           profile: true
         }
+      },
+      likes: {
+        include: {
+          likedBy: {
+            include: { profile: true }
+          }
+        }
       }
     }
   })
@@ -78,7 +85,16 @@ export const edit = async (req, res) => {
     const updatedPost = await dbClient.post.update({
       where: { id },
       data: { content },
-      include: { user: true }
+      include: {
+        user: true,
+        likes: {
+          include: {
+            likedBy: {
+              include: { profile: true }
+            }
+          }
+        }
+      }
     })
     return sendDataResponse(res, 201, updatedPost)
   } catch (err) {
