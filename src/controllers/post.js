@@ -56,7 +56,6 @@ export const getAll = async (req, res) => {
       comments: true
     }
   })
-  console.log('post', posts)
   return sendDataResponse(res, 200, posts)
 }
 
@@ -163,10 +162,9 @@ export const createComment = async (req, res) => {
       id: postId
     }
   })
-  console.log('find post by id', findPostById)
 
   if (!findPostById) {
-    return sendMessageResponse(res, 500, 'No post found')
+    return sendMessageResponse(res, 404, 'No post found')
   }
 
   if (!content) {
@@ -180,7 +178,6 @@ export const createComment = async (req, res) => {
         postId
       }
     })
-    console.log('created Comment', createdComment)
     return sendDataResponse(res, 201, { post: createdComment })
   } catch (err) {
     sendMessageResponse(res, 500, 'Unable to create comment')
