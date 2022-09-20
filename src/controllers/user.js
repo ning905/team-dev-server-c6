@@ -40,8 +40,6 @@ export const getById = async (req, res) => {
 }
 
 export const getAll = async (req, res) => {
-  // console.log("quest", req.query.cohort_id)
-
   if (req.query.cohort_id) {
     return getAllByCohortId(req, res)
   } else {
@@ -74,12 +72,12 @@ export const getAllByCohortId = async (req, res) => {
   // eslint-disable-next-line camelcase
   const { cohort_id: cohortId } = req.query
 
-  const parsedId = Number(cohortId)
+  const cohortIdNumber = Number(cohortId)
 
   let foundUsers
 
-  if (parsedId) {
-    foundUsers = await User.findManyByCohortId(parsedId)
+  if (cohortIdNumber) {
+    foundUsers = await User.findManyByCohortId(cohortIdNumber)
   } else {
     foundUsers = await User.findAll()
   }
