@@ -7,13 +7,11 @@ async function seed() {
   const password = await bcrypt.hash('123', 8)
 
   const cohort1 = await prisma.cohort.create({
-    data: {
-    }
+    data: {}
   })
 
   const cohort2 = await prisma.cohort.create({
-    data: {
-    }
+    data: {}
   })
 
   const createdUser = await prisma.user.create({
