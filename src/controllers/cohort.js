@@ -38,8 +38,7 @@ export const getById = async (req, res) => {
 
 export const updateCohortName = async (req, res) => {
   const Id = parseInt(req.params.id)
-  const newName = req.body
+  const newName = req.body.name
   const updatedCohort = await updateCohortNameByID(Id, newName)
-
   return sendMessageResponse(res, 201, { cohort: updatedCohort })
 }
