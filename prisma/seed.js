@@ -20,7 +20,7 @@ async function seed() {
     data: {
       email: 'notmyrealemail@email.com',
       password,
-      cohortId: 1
+      cohortId: cohort1.id
     }
   })
 
@@ -28,7 +28,7 @@ async function seed() {
     data: {
       email: 'blah@blah',
       password,
-      cohortId: 2
+      cohortId: cohort2.id
     }
   })
 
