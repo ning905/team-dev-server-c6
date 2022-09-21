@@ -29,9 +29,10 @@ export async function getCohortById(id) {
 }
 
 export async function updateCohortNameByID(id, name) {
+  console.log('name', name)
   const updateCohort = await dbClient.cohort.update({
     where: { id },
-    data: { name: name }
+    data: { name }
   })
 
   return updateCohort
