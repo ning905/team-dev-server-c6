@@ -53,7 +53,19 @@ export const getAll = async (req, res) => {
           }
         }
       },
-      comments: true
+      comments: {
+        include: {
+          user: {
+            select: {
+              email: true,
+              id: true,
+              cohortId: true,
+              role: true,
+              profile: true
+            }
+          }
+        }
+      }
     }
   })
   return sendDataResponse(res, 200, posts)
@@ -176,6 +188,17 @@ export const createComment = async (req, res) => {
         content,
         userId,
         postId
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+            id: true,
+            cohortId: true,
+            role: true,
+            profile: true
+          }
+        }
       }
     })
     return sendDataResponse(res, 201, { post: createdComment })
