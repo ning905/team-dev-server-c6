@@ -38,16 +38,21 @@ export async function validateAuthentication(req, res, next) {
   const isTokenValid = validateToken(token)
   if (!isTokenValid) {
     return sendDataResponse(res, 401, {
-      authentication: 'Invalid or missing access token'
+      authentication: 'Missing access token'
+    })
+  }
+  if (isTokenValid.name === 'TokenExpiredError') {
+    return sendDataResponse(res, 401, {
+      authentication: 'Token has expired'
+    })
+  }
+  if (isTokenValid.name) {
+    return sendDataResponse(res, 401, {
+      authentication: 'Invalid access token'
     })
   }
 
   const decodedToken = jwt.decode(token)
-
-  const expiryCheck = tokenExpiryCheck(decodedToken, res)
-  if (expiryCheck) {
-    return expiryCheck
-  }
 
   const foundUser = await User.findById(decodedToken.userId)
   delete foundUser.passwordHash
@@ -63,6 +68,10 @@ function validateToken(token) {
   }
 
   return jwt.verify(token, JWT_SECRET, (error) => {
+    if (error) {
+      return error
+    }
+
     return !error
   })
 }
@@ -77,26 +86,4 @@ function validateTokenType(type) {
   }
 
   return true
-}
-
-function tokenExpiryCheck(decodedToken, res) {
-  if (!decodedToken.iat) {
-    return sendDataResponse(res, 401, {
-      authentication: 'Token is missing an iat'
-    })
-  }
-
-  if (!decodedToken.exp) {
-    return sendDataResponse(res, 401, {
-      authentication: 'Token is missing an exp'
-    })
-  }
-
-  const currentTime = new Date().getTime() / 1000
-
-  if (currentTime > decodedToken.exp) {
-    return sendDataResponse(res, 401, {
-      authentication: 'Token has expired'
-    })
-  }
 }
