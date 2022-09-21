@@ -152,13 +152,20 @@ export const deletePost = async (req, res) => {
         'Request authorization to delete post'
       )
     }
-    const deletePost = await dbClient.post.delete({
+
+    const deletedComments = await dbClient.comment.deleteMany({
+      where: {
+        postId: id
+      }
+    })
+
+    const deletedPost = await dbClient.post.delete({
       where: {
         id
       }
     })
 
-    return sendDataResponse(res, 201, deletePost)
+    return sendDataResponse(res, 201, { deletedPost, deletedComments })
   } catch (err) {
     sendMessageResponse(res, 500, 'Unable to delete post')
   }
