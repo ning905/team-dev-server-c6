@@ -153,19 +153,19 @@ export const deletePost = async (req, res) => {
       )
     }
 
-    const deleteComments = await dbClient.comment.deleteMany({
+    const deletedComments = await dbClient.comment.deleteMany({
       where: {
         postId: id
       }
     })
 
-    const deletePost = await dbClient.post.delete({
+    const deletedPost = await dbClient.post.delete({
       where: {
         id
       }
     })
 
-    return sendDataResponse(res, 201, deleteComments, deletePost)
+    return sendDataResponse(res, 201, { deletedPost, deletedComments })
   } catch (err) {
     sendMessageResponse(res, 500, 'Unable to delete post')
   }
