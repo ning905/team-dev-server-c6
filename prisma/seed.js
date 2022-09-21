@@ -6,17 +6,29 @@ const prisma = new PrismaClient()
 async function seed() {
   const password = await bcrypt.hash('123', 8)
 
+  const cohort1 = await prisma.cohort.create({
+    data: {
+    }
+  })
+
+  const cohort2 = await prisma.cohort.create({
+    data: {
+    }
+  })
+
   const createdUser = await prisma.user.create({
     data: {
       email: 'notmyrealemail@email.com',
-      password
+      password,
+      cohortId: cohort1.id
     }
   })
 
   const secondUser = await prisma.user.create({
     data: {
       email: 'blah@blah',
-      password
+      password,
+      cohortId: cohort2.id
     }
   })
 
