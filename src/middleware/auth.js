@@ -43,6 +43,12 @@ export async function validateAuthentication(req, res, next) {
   }
 
   const decodedToken = jwt.decode(token)
+
+  const expiryCheck = tokenExpiryCheck(decodedToken, res)
+  if (expiryCheck) {
+    return expiryCheck
+  }
+
   const foundUser = await User.findById(decodedToken.userId)
   delete foundUser.passwordHash
 
@@ -71,4 +77,26 @@ function validateTokenType(type) {
   }
 
   return true
+}
+
+function tokenExpiryCheck(decodedToken, res) {
+  if (!decodedToken.iat) {
+    return sendDataResponse(res, 401, {
+      authentication: 'Token is missing an iat'
+    })
+  }
+
+  if (!decodedToken.exp) {
+    return sendDataResponse(res, 401, {
+      authentication: 'Token is missing an exp'
+    })
+  }
+
+  const currentTime = new Date().getTime() / 1000
+
+  if (currentTime > decodedToken.exp) {
+    return sendDataResponse(res, 401, {
+      authentication: 'Token has expired'
+    })
+  }
 }
