@@ -12,7 +12,6 @@ import {
 
 const router = Router()
 
-// need both of these routes?
 router.post('/log', validateAuthentication, validateTeacherRole, createLog)
 router.delete(
   '/log/:id',
