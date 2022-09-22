@@ -1,6 +1,6 @@
 import { sendDataResponse } from '../utils/responses.js'
 
-export const create = async (req, res) => {
+export const createLog = async (req, res) => {
   const { date, cohort_id: cohortId, lines } = req.body
 
   return sendDataResponse(res, 201, {
@@ -22,3 +22,9 @@ export const create = async (req, res) => {
     }
   })
 }
+
+export const deleteLog = async (req, res) => {}
+
+export const createLine = async (req, res) => {}
+
+export const deleteLine = async (req, res) => {}
