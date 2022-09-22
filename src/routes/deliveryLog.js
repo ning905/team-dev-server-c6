@@ -12,21 +12,16 @@ import {
 
 const router = Router()
 
-router.post('/log', validateAuthentication, validateTeacherRole, createLog)
+router.post('/', validateAuthentication, validateTeacherRole, createLog)
 router.delete(
-  '/log/:id',
+  '/:id',
   validateAuthentication,
   validateTeacherRole,
   deleteLogById
 )
-router.post(
-  '/log/line',
-  validateAuthentication,
-  validateTeacherRole,
-  createLine
-)
+router.post('/line', validateAuthentication, validateTeacherRole, createLine)
 router.delete(
-  '/log/line/:id',
+  '/line/:id',
   validateAuthentication,
   validateTeacherRole,
   deleteLineById

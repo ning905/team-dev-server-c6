@@ -61,7 +61,7 @@ model Post {
 
 model DeliveryLog {
   id       Int               @id @default(autoincrement())
-  date     DateTime
+  date     DateTime?         @default(now())
   userId   Int
   user     User              @relation(fields: [userId], references: [id])
   cohortId Int
@@ -73,7 +73,7 @@ model DeliveryLogLine {
   id      Int         @id @default(autoincrement())
   content String
   logId   Int
-  log     DeliveryLog @relation(fields: [logId], references: [id])
+  log     DeliveryLog @relation(fields: [logId], references: [id], onDelete: Cascade)
 }
 
 model Comment {

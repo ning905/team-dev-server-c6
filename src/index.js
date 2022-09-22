@@ -33,6 +33,7 @@ app.get('*', (req, res) => {
 
 app.use((error, req, res, next) => {
   console.error(error)
+  return res.sendStatus(500)
 })
 
 const port = process.env.PORT || 4000
