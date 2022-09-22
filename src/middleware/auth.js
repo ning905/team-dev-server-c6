@@ -38,11 +38,22 @@ export async function validateAuthentication(req, res, next) {
   const isTokenValid = validateToken(token)
   if (!isTokenValid) {
     return sendDataResponse(res, 401, {
-      authentication: 'Invalid or missing access token'
+      authentication: 'Missing access token'
+    })
+  }
+  if (isTokenValid.name === 'TokenExpiredError') {
+    return sendDataResponse(res, 401, {
+      authentication: 'Token has expired'
+    })
+  }
+  if (isTokenValid.name) {
+    return sendDataResponse(res, 401, {
+      authentication: 'Invalid access token'
     })
   }
 
   const decodedToken = jwt.decode(token)
+
   const foundUser = await User.findById(decodedToken.userId)
   delete foundUser.passwordHash
 
@@ -57,6 +68,10 @@ function validateToken(token) {
   }
 
   return jwt.verify(token, JWT_SECRET, (error) => {
+    if (error) {
+      return error
+    }
+
     return !error
   })
 }
