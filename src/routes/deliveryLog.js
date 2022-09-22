@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { create } from '../controllers/deliveryLog.js'
+import {
+  createLog,
+  deleteLogById,
+  createLine,
+  deleteLineById
+} from '../controllers/deliveryLog.js'
 import {
   validateAuthentication,
   validateTeacherRole
@@ -7,6 +12,19 @@ import {
 
 const router = Router()
 
-router.post('/', validateAuthentication, validateTeacherRole, create)
+router.post('/', validateAuthentication, validateTeacherRole, createLog)
+router.delete(
+  '/:id',
+  validateAuthentication,
+  validateTeacherRole,
+  deleteLogById
+)
+router.post('/line', validateAuthentication, validateTeacherRole, createLine)
+router.delete(
+  '/line/:id',
+  validateAuthentication,
+  validateTeacherRole,
+  deleteLineById
+)
 
 export default router

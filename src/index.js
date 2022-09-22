@@ -7,6 +7,7 @@ import postRouter from './routes/post.js'
 import authRouter from './routes/auth.js'
 import cohortRouter from './routes/cohort.js'
 import deliveryLogRouter from './routes/deliveryLog.js'
+import { sendDataResponse } from './utils/responses.js'
 
 const app = express()
 app.disable('x-powered-by')
@@ -33,6 +34,7 @@ app.get('*', (req, res) => {
 
 app.use((error, req, res, next) => {
   console.error(error)
+  return sendDataResponse(res, 500)
 })
 
 const port = process.env.PORT || 4000
