@@ -7,8 +7,8 @@ import {
 import { sendDataResponse } from '../utils/responses.js'
 
 export const createLog = async (req, res) => {
-  const userId = req.user.id
-  const { cohortId } = req.body
+  const userId = parseInt(req.user.id)
+  const cohortId = parseInt(req.body.cohortId)
   const newLog = await dbCreateLog(userId, cohortId)
 
   return sendDataResponse(res, 201, {
@@ -16,10 +16,13 @@ export const createLog = async (req, res) => {
       id: newLog.id,
       cohortId,
       date: newLog.date,
-      author: {
-        id: userId,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName
+      user: {
+        profile: {
+          id: userId,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          profileImageUrl: req.user.profileImageUrl
+        }
       },
       lines: newLog.lines
     }
@@ -38,7 +41,6 @@ export const createLine = async (req, res) => {
   const logId = parseInt(req.body.logId)
 
   const newLine = await dbCreateLine(logId, content)
-  console.log(newLine)
 
   return sendDataResponse(res, 201, { line: newLine })
 }
