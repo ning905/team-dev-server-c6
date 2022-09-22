@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { create } from '../controllers/deliveryLog.js'
+import {
+  createLog,
+  deleteLogById,
+  createLine,
+  deleteLineById
+} from '../controllers/deliveryLog.js'
 import {
   validateAuthentication,
   validateTeacherRole
@@ -7,6 +12,25 @@ import {
 
 const router = Router()
 
-router.post('/', validateAuthentication, validateTeacherRole, create)
+// need both of these routes?
+router.post('/log', validateAuthentication, validateTeacherRole, createLog)
+router.delete(
+  '/log/:id',
+  validateAuthentication,
+  validateTeacherRole,
+  deleteLogById
+)
+router.post(
+  '/log/line',
+  validateAuthentication,
+  validateTeacherRole,
+  createLine
+)
+router.delete(
+  '/log/line/:id',
+  validateAuthentication,
+  validateTeacherRole,
+  deleteLineById
+)
 
 export default router
