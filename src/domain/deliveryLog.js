@@ -18,12 +18,31 @@ export async function dbCreateLog(userId, cohortId) {
   return newLog
 }
 
-export async function dbDeleteLogById(deliveryLogId) {
+export async function dbDeleteLogById(id) {
   const deleteLog = await dbClient.deliveryLog.delete({
     where: {
-      id: deliveryLogId
+      id
     }
   })
-  console.log(deleteLog)
   return deleteLog
+}
+
+export async function dbCreateLine(logId, content) {
+  const newLine = await dbClient.deliveryLogLine.create({
+    data: {
+      logId,
+      content
+    }
+  })
+
+  return newLine
+}
+
+export async function dbDeleteLineById(id) {
+  const deletedLine = await dbClient.deliveryLogLine.delete({
+    where: {
+      id
+    }
+  })
+  return deletedLine
 }
