@@ -255,13 +255,6 @@ async function seed() {
     }
   })
 
-  const teacherPost = await prisma.post.create({
-    data: {
-      content: 'This students are driving me crazy!',
-      userId: teacherUser.id
-    }
-  })
-
   const thirdPost = await prisma.post.create({
     data: {
       content: 'Woah! Next week they are going to shuffle the groups!',
@@ -290,6 +283,13 @@ async function seed() {
     }
   })
 
+  const teacherPost = await prisma.post.create({
+    data: {
+      content: 'This students are driving me crazy!',
+      userId: teacherUser.id
+    }
+  })
+
   const posts = [
     createdPost,
     secondPost,
@@ -303,10 +303,6 @@ async function seed() {
 
   const likes = await prisma.like.createMany({
     data: [
-      {
-        userId: createdUser.id,
-        postId: teacherPost.id
-      },
       {
         userId: secondUser.id,
         postId: teacherPost.id
