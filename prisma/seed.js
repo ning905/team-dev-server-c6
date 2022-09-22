@@ -34,7 +34,7 @@ async function seed() {
       data: {
         email: `${i}test@test.com`,
         password,
-        cohortId: cohorts[1].id,
+        cohortId: cohorts[0].id,
         profile: {
           create: {
             firstName: `${i}name`,
@@ -106,7 +106,7 @@ async function seed() {
     const post = await prisma.post.create({
       data: {
         content: content[i],
-        userId: users[i]
+        userId: users[i].id
       }
     })
 
@@ -134,7 +134,7 @@ async function seed() {
   for (let i = 0; i <= 9; i++) {
     const like = await prisma.like.create({
       data: {
-        userId: users[i],
+        userId: users[i].id,
         postId: teacherPost.id
       }
     })
