@@ -55,6 +55,7 @@ export const getAll = async (req, res) => {
       },
       comments: {
         include: {
+          likes: true,
           user: {
             select: {
               email: true,
@@ -341,7 +342,7 @@ export const createCommentLike = async (req, res) => {
       commentId
     },
     include: {
-      Comment: {
+      comment: {
         select: {
           _count: true
         }
@@ -353,7 +354,35 @@ export const createCommentLike = async (req, res) => {
     like: {
       userId: like.userId,
       commentId: like.commentId,
-      commentLikes: like.Comment._count.likes
+      commentLikes: like.comment._count.likes
+    }
+  })
+}
+
+export const deleteCommentLike = async (req, res) => {
+  const userId = req.user.id
+  const commentId = Number(req.params.commentId)
+
+  const like = await dbClient.commentLike.delete({
+    where: {
+      userId_commentId: {
+        commentId,
+        userId
+      }
+    },
+    include: {
+      comment: {
+        select: {
+          _count: true
+        }
+      }
+    }
+  })
+
+  return sendDataResponse(res, 200, {
+    like: {
+      userId: like.userId,
+      commentId: like.commentId
     }
   })
 }
