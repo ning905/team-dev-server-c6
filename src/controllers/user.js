@@ -1,5 +1,7 @@
 import User from '../domain/user.js'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import { JWT_EXPIRY, JWT_SECRET } from '../utils/config.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const create = async (req, res) => {
@@ -14,12 +16,18 @@ export const create = async (req, res) => {
 
     const createdUser = await userToCreate.save()
 
-    return sendDataResponse(res, 201, createdUser)
+    const token = generateJwt(createdUser.id)
+
+    return sendDataResponse(res, 201, { token, createdUser })
   } catch (err) {
     // Send an error response back to the client then let the error handling middleware log to the terminal
     sendMessageResponse(res, 500, 'Unable to create new user')
     throw err
   }
+}
+
+function generateJwt(userId) {
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY })
 }
 
 export const getById = async (req, res) => {
