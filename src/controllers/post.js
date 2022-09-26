@@ -329,3 +329,31 @@ export const deleteLike = async (req, res) => {
     throw err
   }
 }
+
+export const createCommentLike = async (req, res) => {
+  const userId = req.user.id
+
+  const commentId = Number(req.params.commentId)
+
+  const like = await dbClient.commentLike.create({
+    data: {
+      userId,
+      commentId
+    },
+    include: {
+      Comment: {
+        select: {
+          _count: true
+        }
+      }
+    }
+  })
+
+  return sendDataResponse(res, 201, {
+    like: {
+      userId: like.userId,
+      commentId: like.commentId,
+      commentLikes: like.Comment._count.likes
+    }
+  })
+}
