@@ -28,6 +28,7 @@ model User {
   deliveryLogs DeliveryLog[]
   comments     Comment[]
   likes        Like[]
+  commentLikes CommentLike[]
 }
 
 model Profile {
@@ -77,14 +78,15 @@ model DeliveryLogLine {
 }
 
 model Comment {
-  id        Int       @id @default(autoincrement())
-  content   String    @db.VarChar(150)
+  id        Int           @id @default(autoincrement())
+  content   String        @db.VarChar(150)
   userId    Int
-  user      User      @relation(fields: [userId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
   postId    Int
-  post      Post      @relation(fields: [postId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  post      Post          @relation(fields: [postId], references: [id])
+  likes     CommentLike[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime?     @updatedAt
 }
 
 model Like {
@@ -96,4 +98,13 @@ model Like {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, postId])
+}
+
+model CommentLike {
+  userId    Int
+  User      User    @relation(fields: [userId], references: [id])
+  commentId Int
+  Comment   Comment @relation(fields: [commentId], references: [id])
+
+  @@unique([userId, commentId])
 }
