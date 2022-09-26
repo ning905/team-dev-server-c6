@@ -102,9 +102,9 @@ model Like {
 
 model CommentLike {
   userId    Int
-  User      User    @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
   commentId Int
-  Comment   Comment @relation(fields: [commentId], references: [id])
+  comment   Comment @relation(fields: [commentId], references: [id])
 
   @@unique([userId, commentId])
 }
