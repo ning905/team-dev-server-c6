@@ -331,6 +331,38 @@ export const deleteLike = async (req, res) => {
   }
 }
 
+export const setIsPrivate = async (req, res) => {
+  const postId = Number(req.params.id)
+
+  try {
+    const foundPost = await dbClient.post.findUnique({
+      where: { id: postId }
+    })
+    if (!foundPost) {
+      return sendMessageResponse(
+        res,
+        404,
+        'The post with the provided id does not exist'
+      )
+    }
+
+    const isPrivateCheck = foundPost.isPrivate
+
+    const togglePrivate = await dbClient.post.update({
+      where: {
+        id: postId
+      },
+      data: {
+        isPrivate: !isPrivateCheck
+      }
+    })
+
+    return sendDataResponse(res, 201, togglePrivate)
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Internal server error')
+  }
+}
+
 export const createCommentLike = async (req, res) => {
   const userId = req.user.id
 
