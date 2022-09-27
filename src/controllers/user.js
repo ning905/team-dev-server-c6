@@ -127,10 +127,20 @@ export const updateLoggedInUser = async (req, res) => {
 }
 
 export const updateUserById = async (req, res) => {
+  console.log('log')
   const id = parseInt(req.params.id)
 
-  const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
-    req.body
+  const {
+    email,
+    firstName,
+    lastName,
+    bio,
+    githubUrl,
+    profileImageUrl,
+    privatePosts
+  } = req.body
+
+  console.log('privacyPref', privatePosts)
 
   const unhashedPassword = req.body.password
 
@@ -168,8 +178,11 @@ export const updateUserById = async (req, res) => {
       lastName,
       bio,
       githubUrl,
-      profileImageUrl
+      profileImageUrl,
+      privatePosts
     })
+
+    console.log('updateUser', updateUser)
 
     return sendDataResponse(res, 201, updateUser)
   }
