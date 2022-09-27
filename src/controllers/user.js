@@ -166,7 +166,6 @@ export const updateUserById = async (req, res) => {
       role: 'Only admins can modify this content'
     })
   }
-  console.log('role', req.user.role)
 
   if (foundUser.email === email) {
     return sendDataResponse(res, 400, {
