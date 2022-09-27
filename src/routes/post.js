@@ -7,6 +7,7 @@ import {
   createLike,
   deleteLike,
   createComment,
+  setIsPrivate,
   createCommentLike,
   deleteCommentLike
 } from '../controllers/post.js'
@@ -17,6 +18,7 @@ const router = Router()
 router.post('/', validateAuthentication, create)
 router.get('/', validateAuthentication, getAll)
 router.patch('/:id', validateAuthentication, edit)
+router.patch('/:id/status', validateAuthentication, setIsPrivate)
 router.delete('/:id', validateAuthentication, deletePost)
 router.post('/:id/comment', validateAuthentication, createComment)
 router.post('/:id/like', validateAuthentication, createLike)
