@@ -17,6 +17,20 @@ export async function validateTeacherRole(req, res, next) {
   next()
 }
 
+export async function validateAdminRole(req, res, next) {
+  if (!req.user) {
+    return sendMessageResponse(res, 500, 'Unable to verify user')
+  }
+
+  if (req.user.role !== 'ADMIN') {
+    return sendDataResponse(res, 403, {
+      authorization: 'You are not authorized to perform this action'
+    })
+  }
+
+  next()
+}
+
 export async function validateAuthentication(req, res, next) {
   const header = req.header('authorization')
 
