@@ -55,6 +55,7 @@ export const getAll = async (req, res) => {
       },
       comments: {
         include: {
+          likes: true,
           user: {
             select: {
               email: true,
@@ -328,4 +329,60 @@ export const deleteLike = async (req, res) => {
     sendMessageResponse(res, 500, 'Internal server error')
     throw err
   }
+}
+
+export const createCommentLike = async (req, res) => {
+  const userId = req.user.id
+
+  const commentId = Number(req.params.commentId)
+
+  const like = await dbClient.commentLike.create({
+    data: {
+      userId,
+      commentId
+    },
+    include: {
+      comment: {
+        select: {
+          _count: true
+        }
+      }
+    }
+  })
+
+  return sendDataResponse(res, 201, {
+    like: {
+      userId: like.userId,
+      commentId: like.commentId,
+      commentLikes: like.comment._count.likes
+    }
+  })
+}
+
+export const deleteCommentLike = async (req, res) => {
+  const userId = req.user.id
+  const commentId = Number(req.params.commentId)
+
+  const like = await dbClient.commentLike.delete({
+    where: {
+      userId_commentId: {
+        commentId,
+        userId
+      }
+    },
+    include: {
+      comment: {
+        select: {
+          _count: true
+        }
+      }
+    }
+  })
+
+  return sendDataResponse(res, 200, {
+    like: {
+      userId: like.userId,
+      commentId: like.commentId
+    }
+  })
 }
