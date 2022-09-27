@@ -155,6 +155,18 @@ async function seed() {
         content: 'Yeah, its really interestng',
         userId: createdUser.id,
         postId: createdPost.id
+      },
+      {
+        content: 'Reply',
+        userId: createdUser.id,
+        postId: createdPost.id,
+        parentId: 1
+      },
+      {
+        content: 'Reply to reply',
+        userId: createdUser.id,
+        postId: createdPost.id,
+        parentId: 3
       }
     ]
   })

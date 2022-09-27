@@ -161,6 +161,7 @@ export const createComment = async (req, res) => {
   const { content } = req.body
   const postId = Number(req.params.id)
   const userId = req.user.id
+  const parentId = parseInt(req.body.parentId)
 
   const findPostById = await dbClient.post.findUnique({
     where: {
@@ -180,7 +181,8 @@ export const createComment = async (req, res) => {
     data: {
       content,
       userId,
-      postId
+      postId,
+      parentId
     },
     include: {
       user: {
