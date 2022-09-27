@@ -128,6 +128,11 @@ export const updateLoggedInUser = async (req, res) => {
 
 export const updateUserById = async (req, res) => {
   const id = parseInt(req.params.id)
+  // const role = req.body.role
+  // console.log('role', req.body.role)
+
+  // if req.user is admin, allow updating role for another user, ie. to make htem admin
+  // if req.user is not admin (ie student), if I am trying to update role
 
   const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
     req.body
@@ -155,6 +160,13 @@ export const updateUserById = async (req, res) => {
   if (!foundUser) {
     return sendDataResponse(res, 404, { id: 'User not found' })
   }
+
+  if (req.user.role !== 'ADMIN') {
+    return sendDataResponse(res, 403, {
+      role: 'Only admins can modify this content'
+    })
+  }
+  console.log('role', req.user.role)
 
   if (foundUser.email === email) {
     return sendDataResponse(res, 400, {

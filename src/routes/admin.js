@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { updateById } from '../controllers/user.js'
+import { updateUserById } from '../controllers/user.js'
 import {
   validateAuthentication,
   validateAdminRole
@@ -7,6 +7,11 @@ import {
 
 const router = Router()
 
-router.put('/user/:id', validateAuthentication, validateAdminRole, updateById)
+router.put(
+  '/user/:id',
+  validateAuthentication,
+  validateAdminRole,
+  updateUserById
+)
 
 export default router
