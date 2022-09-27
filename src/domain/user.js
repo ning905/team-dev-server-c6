@@ -8,7 +8,7 @@ export default class User {
    * take as inputs, what types they return, and other useful information that JS doesn't have built in
    * @tutorial https://www.valentinog.com/blog/jsdoc
    *
-   * @param { { id: int, cohortId: int, email: string, profile: { firstName: string, lastName: string, bio: string, githubUrl: string, profileImageUrl: string } } } user
+   * @param { { id: int, cohortId: int, email: string, profile: { firstName: string, lastName: string, bio: string, githubUrl: string, profileImageUrl: string, privacyPref: string } } } user
    * @returns {User}
    */
   static fromDb(user) {
@@ -22,7 +22,8 @@ export default class User {
       user.profile.githubUrl,
       user.profile.profileImageUrl,
       user.password,
-      user.role
+      user.role,
+      user.privacyPref
     )
   }
 
@@ -35,7 +36,8 @@ export default class User {
       github_url,
       profile_image_url,
       password,
-      role
+      role,
+      privacyPref
     } = json
 
     const passwordHash = await bcrypt.hash(password, 8)
@@ -50,7 +52,8 @@ export default class User {
       github_url,
       profile_image_url,
       passwordHash,
-      role
+      role,
+      privacyPref
     )
   }
 
@@ -64,7 +67,8 @@ export default class User {
     githubUrl,
     profileImageUrl,
     passwordHash = null,
-    role = 'STUDENT'
+    role = 'STUDENT',
+    privacyPref = 'PUBLIC'
   ) {
     this.id = id
     this.cohortId = cohortId
@@ -76,6 +80,7 @@ export default class User {
     this.profileImageUrl = profileImageUrl
     this.passwordHash = passwordHash
     this.role = role
+    this.privacyPref = privacyPref
   }
 
   toJSON() {
@@ -89,7 +94,8 @@ export default class User {
         email: this.email,
         biography: this.bio,
         github_url: this.githubUrl,
-        profile_image_url: this.profileImageUrl
+        profile_image_url: this.profileImageUrl,
+        privacyPref: this.privacyPref
       }
     }
   }
@@ -111,7 +117,8 @@ export default class User {
             lastName: this.lastName,
             bio: this.bio,
             githubUrl: this.githubUrl,
-            profileImageUrl: this.profileImageUrl
+            profileImageUrl: this.profileImageUrl,
+            privacyPref: this.privacyPref
           }
         }
       },
@@ -130,8 +137,10 @@ export default class User {
     bio,
     githubUrl,
     profileImageUrl,
-    cohortId
+    cohortId,
+    privacyPref
   }) {
+    console.log('privacyPrefXX', privacyPref)
     const updatedUser = await dbClient.user.update({
       where: {
         id: this.id
@@ -145,7 +154,8 @@ export default class User {
             lastName,
             bio,
             githubUrl,
-            profileImageUrl
+            profileImageUrl,
+            privacyPref: pr
           }
         }
       },
