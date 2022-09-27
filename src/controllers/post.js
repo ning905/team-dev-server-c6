@@ -1,3 +1,6 @@
+/* eslint-disable no-undef */
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-unused-vars */
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 
@@ -327,5 +330,37 @@ export const deleteLike = async (req, res) => {
     console.error(err)
     sendMessageResponse(res, 500, 'Internal server error')
     throw err
+  }
+}
+
+export const setIsPrivate = async (req, res) => {
+  const postId = Number(req.params.id)
+
+  try {
+    const foundPost = await dbClient.post.findUnique({
+      where: { id: postId }
+    })
+    if (!foundPost) {
+      return sendMessageResponse(
+        res,
+        404,
+        'The post with the provided id does not exist'
+      )
+    }
+
+    const isPrivateCheck = foundPost.isPrivate
+
+    const togglePrivate = await dbClient.post.update({
+      where: {
+        id: postId
+      },
+      data: {
+        isPrivate: !isPrivateCheck
+      }
+    })
+
+    return sendDataResponse(res, 201, togglePrivate)
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Internal server error')
   }
 }

@@ -32,13 +32,14 @@ async function seed() {
 
     const user = await prisma.user.create({
       data: {
-        email: `${i}test@test.com`,
+        email: `test${i}@test.com`,
         password,
         cohortId: cohorts[0].id,
         profile: {
           create: {
-            firstName: `${i}name`,
-            lastName: `${i}surname`,
+            firstName: `name${i}`,
+            lastName: `surname${i}`,
+            bio: `Here i am, coding like a hurricane`,
             profileImageUrl: profileImages[i]
           }
         }
@@ -78,6 +79,7 @@ async function seed() {
       userId: teacherUser.id,
       firstName: 'Teacher',
       lastName: 'Boolean',
+      bio: `If dinosaurs are so great how come more sweeties are based on aliens?`,
       profileImageUrl:
         'https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=972&q=80'
     }
