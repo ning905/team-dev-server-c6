@@ -1,6 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-unused-vars */
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 
