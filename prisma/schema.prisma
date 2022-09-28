@@ -85,15 +85,20 @@ model DeliveryLogLine {
 }
 
 model Comment {
-  id        Int           @id @default(autoincrement())
-  content   String        @db.VarChar(150)
-  userId    Int
-  user      User          @relation(fields: [userId], references: [id])
-  postId    Int
-  post      Post          @relation(fields: [postId], references: [id])
-  likes     CommentLike[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime?     @updatedAt
+  id      Int           @id @default(autoincrement())
+  content String        @db.VarChar(150)
+  userId  Int
+  user    User          @relation(fields: [userId], references: [id])
+  postId  Int
+  post    Post          @relation(fields: [postId], references: [id])
+  likes   CommentLike[]
+
+  parentId Int?
+  parent   Comment?  @relation("replies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("replies")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model Like {
