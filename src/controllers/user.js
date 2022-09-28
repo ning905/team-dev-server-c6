@@ -128,15 +128,25 @@ export const updateLoggedInUser = async (req, res) => {
 
 export const updateUserById = async (req, res) => {
   const id = parseInt(req.params.id)
+  const foundUser = await User.findById(id)
 
-  const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
-    req.body
+  if (!foundUser) {
+    return sendDataResponse(res, 404, { id: 'User not found' })
+  }
+
+  const {
+    email,
+    firstName,
+    lastName,
+    bio,
+    githubUrl,
+    profileImageUrl,
+    privatePosts
+  } = req.body
 
   const unhashedPassword = req.body.password
 
   let password = ''
-
-  const foundUser = await User.findById(id)
 
   if (unhashedPassword) {
     password = await bcrypt.hash(unhashedPassword, 8)
@@ -152,10 +162,6 @@ export const updateUserById = async (req, res) => {
     }
   }
 
-  if (!foundUser) {
-    return sendDataResponse(res, 404, { id: 'User not found' })
-  }
-
   if (foundUser.email === email) {
     return sendDataResponse(res, 400, {
       id: 'New email is the same as current'
@@ -168,7 +174,8 @@ export const updateUserById = async (req, res) => {
       lastName,
       bio,
       githubUrl,
-      profileImageUrl
+      profileImageUrl,
+      privatePosts
     })
 
     return sendDataResponse(res, 201, updateUser)

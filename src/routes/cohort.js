@@ -5,21 +5,13 @@ import {
   getById,
   updateCohortName
 } from '../controllers/cohort.js'
-import {
-  validateAuthentication,
-  validateTeacherRole
-} from '../middleware/auth.js'
+import { validateAuthentication, validateRole } from '../middleware/auth.js'
 
 const router = Router()
 
-router.post('/', validateAuthentication, validateTeacherRole, create)
-router.get('/', validateAuthentication, validateTeacherRole, getAll)
-router.get('/:id', validateAuthentication, validateTeacherRole, getById)
-router.patch(
-  '/:id',
-  validateAuthentication,
-  validateTeacherRole,
-  updateCohortName
-)
+router.post('/', validateAuthentication, validateRole, create)
+router.get('/', validateAuthentication, validateRole, getAll)
+router.get('/:id', validateAuthentication, validateRole, getById)
+router.patch('/:id', validateAuthentication, validateRole, updateCohortName)
 
 export default router

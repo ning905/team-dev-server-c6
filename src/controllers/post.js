@@ -2,21 +2,26 @@ import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 
 export const create = async (req, res) => {
-  const { content } = req.body
+  const { content, isPrivate } = req.body
   const { id } = req.user
 
   if (!content) {
     return sendMessageResponse(res, 400, 'Must provide content')
   }
 
-  const createdPost = await dbClient.post.create({
-    data: {
-      content,
-      userId: id
-    }
-  })
-
-  return sendDataResponse(res, 201, { post: createdPost })
+  try {
+    const createdPost = await dbClient.post.create({
+      data: {
+        content,
+        isPrivate,
+        userId: id
+      }
+    })
+    return sendDataResponse(res, 201, { post: createdPost })
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Unable to create post')
+    throw err
+  }
 }
 
 export const getAll = async (req, res) => {
