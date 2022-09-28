@@ -140,7 +140,6 @@ export default class User {
     cohortId,
     privatePosts
   }) {
-    console.log('privacyPrefXX', privatePosts)
     const updatedUser = await dbClient.user.update({
       where: {
         id: this.id
