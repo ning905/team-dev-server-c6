@@ -128,6 +128,11 @@ export const updateLoggedInUser = async (req, res) => {
 
 export const updateUserById = async (req, res) => {
   const id = parseInt(req.params.id)
+  const foundUser = await User.findById(id)
+
+  if (!foundUser) {
+    return sendDataResponse(res, 404, { id: 'User not found' })
+  }
 
   const {
     email,
@@ -143,8 +148,6 @@ export const updateUserById = async (req, res) => {
 
   let password = ''
 
-  const foundUser = await User.findById(id)
-
   if (unhashedPassword) {
     password = await bcrypt.hash(unhashedPassword, 8)
   }
@@ -157,10 +160,6 @@ export const updateUserById = async (req, res) => {
         id: 'A user with this email already exists'
       })
     }
-  }
-
-  if (!foundUser) {
-    return sendDataResponse(res, 404, { id: 'User not found' })
   }
 
   if (foundUser.email === email) {

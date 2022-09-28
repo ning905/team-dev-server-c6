@@ -66,6 +66,26 @@ async function seed() {
     }
   })
 
+  const adminUser = await prisma.user.create({
+    data: {
+      email: 'admin@admin.com',
+      password,
+      role: 'ADMIN'
+    }
+  })
+
+  const adminProfile = await prisma.profile.create({
+    data: {
+      userId: adminUser.id,
+      firstName: 'Admin',
+      lastName: 'Boolean',
+      profileImageUrl:
+        'https://images.takeshape.io/86ce9525-f5f2-4e97-81ba-54e8ce933da7/dev/2a6f37ce-a2f9-4f31-a854-b38c4412baac/819%20sand%20cat%20WC%20Cle%CC%81ment%20Bardot.jpeg?auto=compress%2Cformat&w=1200'
+    }
+  })
+
+  users.push(createdUser, adminUser)
+
   const teacherUser = await prisma.user.create({
     data: {
       email: 'teacher@teacher.com',
@@ -87,7 +107,7 @@ async function seed() {
 
   users.push(createdUser, teacherUser)
 
-  console.log(cohorts, users, userProfile, teacherProfile)
+  console.log(cohorts, users, userProfile, teacherProfile, adminProfile)
 
   const createdPost = await prisma.post.create({
     data: {
