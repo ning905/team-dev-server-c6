@@ -140,7 +140,7 @@ export const deletePost = async (req, res) => {
   })
 
   if (!foundPost) {
-    return sendMessageResponse(res, 404, 'Error in retriving post')
+    return sendMessageResponse(res, 404, 'Error in retrieving post')
   }
 
   if (foundPost.user.id !== req.user.id) {
