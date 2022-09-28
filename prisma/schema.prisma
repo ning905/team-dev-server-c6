@@ -48,7 +48,7 @@ model Profile {
   bio             String?
   githubUrl       String?
   profileImageUrl String?    @default("https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png")
-  visibility      Visibility @default(PUBLIC)
+  postPrivacyPref Visibility @default(PUBLIC)
 }
 
 model Cohort {
