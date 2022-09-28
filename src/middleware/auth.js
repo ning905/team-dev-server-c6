@@ -3,12 +3,12 @@ import { JWT_SECRET } from '../utils/config.js'
 import jwt from 'jsonwebtoken'
 import User from '../domain/user.js'
 
-export async function validateTeacherRole(req, res, next) {
+export async function validateRole(req, res, next) {
   if (!req.user) {
     return sendMessageResponse(res, 401, 'Unable to verify user')
   }
 
-  if (req.user.role !== 'TEACHER') {
+  if (req.user.role !== 'TEACHER' && req.user.role !== 'ADMIN') {
     return sendDataResponse(res, 403, {
       authorization: 'You are not authorized to perform this action'
     })
