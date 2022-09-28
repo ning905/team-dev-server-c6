@@ -3,16 +3,16 @@ import dbClient from '../utils/dbClient.js'
 
 export const updateUserRoleById = async (req, res) => {
   const id = Number(req.params.id)
-  const { content } = req.body
   const foundUserRole = req.user.role
 
   const foundUser = await dbClient.user.findUnique({
-    where: { id, content }
+    where: { id }
   })
 
   if (!foundUser) {
-    return sendDataResponse(res, 404, 'User not found')
+    return sendMessageResponse(res, 404, 'User not found')
   }
+
   if (foundUserRole === 'ADMIN') {
     try {
       const updateUserRole = await dbClient.user.update({
