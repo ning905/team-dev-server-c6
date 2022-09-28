@@ -128,11 +128,11 @@ export const updateLoggedInUser = async (req, res) => {
 
 export const updateUserById = async (req, res) => {
   const id = parseInt(req.params.id)
-  // const role = req.body.role
-  // console.log('role', req.body.role)
+  const foundUser = await User.findById(id)
 
-  // if req.user is admin, allow updating role for another user, ie. to make htem admin
-  // if req.user is not admin (ie student), if I am trying to update role
+  if (!foundUser) {
+    return sendDataResponse(res, 404, { id: 'User not found' })
+  }
 
   const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
     req.body
@@ -140,8 +140,6 @@ export const updateUserById = async (req, res) => {
   const unhashedPassword = req.body.password
 
   let password = ''
-
-  const foundUser = await User.findById(id)
 
   if (unhashedPassword) {
     password = await bcrypt.hash(unhashedPassword, 8)
@@ -155,16 +153,6 @@ export const updateUserById = async (req, res) => {
         id: 'A user with this email already exists'
       })
     }
-  }
-
-  if (!foundUser) {
-    return sendDataResponse(res, 404, { id: 'User not found' })
-  }
-
-  if (req.user.role !== 'ADMIN') {
-    return sendDataResponse(res, 403, {
-      role: 'Only admins can modify this content'
-    })
   }
 
   if (foundUser.email === email) {

@@ -27,7 +27,6 @@ export async function validateAdminRole(req, res, next) {
       authorization: 'You are not authorized to perform this action'
     })
   }
-
   next()
 }
 
@@ -72,7 +71,6 @@ export async function validateAuthentication(req, res, next) {
   delete foundUser.passwordHash
 
   req.user = foundUser
-
   next()
 }
 

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { updateUserById } from '../controllers/user.js'
+import { updateUserRoleById } from '../controllers/admin.js'
 import {
   validateAuthentication,
   validateAdminRole
@@ -11,7 +11,7 @@ router.put(
   '/user/:id',
   validateAuthentication,
   validateAdminRole,
-  updateUserById
+  updateUserRoleById
 )
 
 export default router
