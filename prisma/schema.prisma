@@ -23,18 +23,19 @@ enum Visibility {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  email        String        @unique
-  password     String        @db.VarChar(250)
-  role         Role          @default(STUDENT)
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  password     String         @db.VarChar(250)
+  role         Role           @default(STUDENT)
   profile      Profile?
   cohortId     Int?
-  cohort       Cohort?       @relation(fields: [cohortId], references: [id])
+  cohort       Cohort?        @relation(fields: [cohortId], references: [id])
   posts        Post[]
   deliveryLogs DeliveryLog[]
   comments     Comment[]
   likes        Like[]
   commentLikes CommentLike[]
+  exercises    ExerciseUser[]
 }
 
 model Profile {
@@ -120,4 +121,21 @@ model CommentLike {
   comment   Comment @relation(fields: [commentId], references: [id])
 
   @@unique([userId, commentId])
+}
+
+model Exercise {
+  id         Int            @id @default(autoincrement())
+  name       String         @db.VarChar(255)
+  gitHubUrl  String         @db.VarChar(255)
+  objectives String[]
+  users      ExerciseUser[]
+}
+
+model ExerciseUser {
+  userId     Int
+  users      User     @relation(fields: [userId], references: [id])
+  exerciseId Int
+  exercises  Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
 }
