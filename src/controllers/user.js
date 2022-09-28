@@ -134,8 +134,15 @@ export const updateUserById = async (req, res) => {
     return sendDataResponse(res, 404, { id: 'User not found' })
   }
 
-  const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
-    req.body
+  const {
+    email,
+    firstName,
+    lastName,
+    bio,
+    githubUrl,
+    profileImageUrl,
+    privatePosts
+  } = req.body
 
   const unhashedPassword = req.body.password
 
@@ -167,7 +174,8 @@ export const updateUserById = async (req, res) => {
       lastName,
       bio,
       githubUrl,
-      profileImageUrl
+      profileImageUrl,
+      privatePosts
     })
 
     return sendDataResponse(res, 201, updateUser)

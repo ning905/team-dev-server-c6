@@ -17,6 +17,11 @@ enum Role {
   ADMIN
 }
 
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
 model User {
   id           Int           @id @default(autoincrement())
   email        String        @unique
@@ -33,14 +38,15 @@ model User {
 }
 
 model Profile {
-  id              Int     @id @default(autoincrement())
-  userId          Int     @unique
-  user            User    @relation(fields: [userId], references: [id])
+  id              Int        @id @default(autoincrement())
+  userId          Int        @unique
+  user            User       @relation(fields: [userId], references: [id])
   firstName       String
   lastName        String
   bio             String?
   githubUrl       String?
-  profileImageUrl String? @default("https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png")
+  profileImageUrl String?    @default("https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png")
+  visibility      Visibility @default(PUBLIC)
 }
 
 model Cohort {
@@ -80,15 +86,20 @@ model DeliveryLogLine {
 }
 
 model Comment {
-  id        Int           @id @default(autoincrement())
-  content   String        @db.VarChar(150)
-  userId    Int
-  user      User          @relation(fields: [userId], references: [id])
-  postId    Int
-  post      Post          @relation(fields: [postId], references: [id])
-  likes     CommentLike[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime?     @updatedAt
+  id      Int           @id @default(autoincrement())
+  content String        @db.VarChar(150)
+  userId  Int
+  user    User          @relation(fields: [userId], references: [id])
+  postId  Int
+  post    Post          @relation(fields: [postId], references: [id])
+  likes   CommentLike[]
+
+  parentId Int?
+  parent   Comment?  @relation("replies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("replies")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model Like {
