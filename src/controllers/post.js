@@ -52,6 +52,19 @@ export const getAll = async (req, res) => {
       comments: {
         include: {
           likes: true,
+          replies: {
+            include: {
+              user: {
+                select: {
+                  email: true,
+                  id: true,
+                  cohortId: true,
+                  role: true,
+                  profile: true
+                }
+              }
+            }
+          },
           user: {
             select: {
               email: true,
