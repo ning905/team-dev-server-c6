@@ -2,7 +2,7 @@ import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 
 export const create = async (req, res) => {
-  const { content } = req.body
+  const { content, isPrivate } = req.body
   const { id } = req.user
 
   if (!content) {
@@ -13,6 +13,7 @@ export const create = async (req, res) => {
     const createdPost = await dbClient.post.create({
       data: {
         content,
+        isPrivate,
         userId: id
       }
     })

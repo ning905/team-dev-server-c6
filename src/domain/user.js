@@ -23,7 +23,7 @@ export default class User {
       user.profile.profileImageUrl,
       user.password,
       user.role,
-      user.privatePosts
+      user.profile.privatePosts
     )
   }
 
@@ -155,7 +155,7 @@ export default class User {
             bio,
             githubUrl,
             profileImageUrl,
-            privatePosts
+            privatePosts: privatePosts
           }
         }
       },

@@ -15,6 +15,12 @@ enum Role {
   STUDENT
   TEACHER
 }
+
+enum PrivatePosts {
+  PUBLIC
+  PRIVATE
+}
+
 model User {
   id           Int           @id @default(autoincrement())
   email        String        @unique
@@ -31,15 +37,15 @@ model User {
 }
 
 model Profile {
-  id              Int         @id @default(autoincrement())
-  userId          Int         @unique
-  user            User        @relation(fields: [userId], references: [id])
+  id              Int          @id @default(autoincrement())
+  userId          Int          @unique
+  user            User         @relation(fields: [userId], references: [id])
   firstName       String
   lastName        String
   bio             String?
   githubUrl       String?
-  profileImageUrl String?     @default("https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png")
-  privatePosts     Boolean     @default(false)
+  profileImageUrl String?      @default("https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png")
+  privatePosts    PrivatePosts @default(PUBLIC)
 }
 
 model Cohort {
