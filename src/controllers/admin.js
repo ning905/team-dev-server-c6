@@ -27,5 +27,11 @@ export const updateUserRoleById = async (req, res) => {
     } catch (err) {
       return sendMessageResponse(res, 401, 'no update done')
     }
+  } else {
+    return sendMessageResponse(
+      res,
+      403,
+      'You do not have persimmsion to change this'
+    )
   }
 }
