@@ -141,7 +141,7 @@ export const updateUserById = async (req, res) => {
     bio,
     githubUrl,
     profileImageUrl,
-    privatePosts
+    postPrivacyPref
   } = req.body
 
   const unhashedPassword = req.body.password
@@ -175,7 +175,7 @@ export const updateUserById = async (req, res) => {
       bio,
       githubUrl,
       profileImageUrl,
-      privatePosts
+      postPrivacyPref
     })
 
     return sendDataResponse(res, 201, updateUser)
