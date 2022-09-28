@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { getEvents } from '../controllers/event'
-import { validateAuthentication } from '../middleware/auth'
+import { getEvents } from '../controllers/event.js'
+import { validateAuthentication } from '../middleware/auth.js'
 
 const router = Router()
 
