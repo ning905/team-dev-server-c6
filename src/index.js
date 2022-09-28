@@ -8,6 +8,7 @@ import authRouter from './routes/auth.js'
 import cohortRouter from './routes/cohort.js'
 import adminRouter from './routes/admin.js'
 import deliveryLogRouter from './routes/deliveryLog.js'
+import eventRouter from './routes/event.js'
 import { sendDataResponse } from './utils/responses.js'
 
 const app = express()
@@ -24,6 +25,7 @@ app.use('/cohort', cohortRouter)
 app.use('/log', deliveryLogRouter)
 app.use('/', authRouter)
 app.use('/admin', adminRouter)
+app.use('/events', eventRouter)
 
 app.get('*', (req, res) => {
   res.status(404).json({
