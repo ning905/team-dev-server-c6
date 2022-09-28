@@ -42,7 +42,16 @@ async function seed() {
             bio: `Here i am, coding like a hurricane`,
             profileImageUrl: profileImages[i]
           }
+        },
+        receivedEvents: {
+          create: {
+            type: 'USER',
+            topic: 'registration'
+          }
         }
+      },
+      include: {
+        receivedEvents: true
       }
     })
     users.push(user)
