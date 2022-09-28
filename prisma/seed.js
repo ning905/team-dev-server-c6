@@ -21,10 +21,37 @@ async function seed() {
     'https://images.unsplash.com/photo-1572252821143-035a024857ac?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=772&q=80'
   ]
 
+  const teacherUser = await prisma.user.create({
+    data: {
+      email: 'teacher@teacher.com',
+      password,
+      role: 'TEACHER'
+    }
+  })
+
+  const teacherProfile = await prisma.profile.create({
+    data: {
+      userId: teacherUser.id,
+      firstName: 'Teacher',
+      lastName: 'Boolean',
+      bio: `If dinosaurs are so great how come more sweeties are based on aliens?`,
+      profileImageUrl:
+        'https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=972&q=80'
+    }
+  })
+
   for (let i = 0; i <= 9; i++) {
     if (i <= 3) {
       const cohort = await prisma.cohort.create({
-        data: {}
+        data: {
+          event: {
+            create: {
+              type: 'COHORT',
+              topic: 'create',
+              createdById: teacherUser.id
+            }
+          }
+        }
       })
 
       cohorts.push(cohort)
@@ -93,28 +120,7 @@ async function seed() {
     }
   })
 
-  users.push(createdUser, adminUser)
-
-  const teacherUser = await prisma.user.create({
-    data: {
-      email: 'teacher@teacher.com',
-      password,
-      role: 'TEACHER'
-    }
-  })
-
-  const teacherProfile = await prisma.profile.create({
-    data: {
-      userId: teacherUser.id,
-      firstName: 'Teacher',
-      lastName: 'Boolean',
-      bio: `If dinosaurs are so great how come more sweeties are based on aliens?`,
-      profileImageUrl:
-        'https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=972&q=80'
-    }
-  })
-
-  users.push(createdUser, teacherUser)
+  users.push(createdUser, adminUser, teacherUser)
 
   console.log(cohorts, users, userProfile, teacherProfile, adminProfile)
 
