@@ -56,7 +56,7 @@ model Cohort {
   users        User[]
   deliveryLogs DeliveryLog[]
   name         String?       @unique
-  Event        Event[]
+  event        Event[]
 }
 
 model Post {
