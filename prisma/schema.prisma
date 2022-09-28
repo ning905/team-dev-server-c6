@@ -139,8 +139,8 @@ model Event {
   content      String?
   createdBy    User?     @relation("createdEvents", fields: [createdById], references: [id], onDelete: Cascade)
   createdById  Int?
-  receivedBy   User      @relation("receivedEvents", fields: [receivedById], references: [id], onDelete: Cascade)
-  receivedById Int
+  receivedBy   User?     @relation("receivedEvents", fields: [receivedById], references: [id], onDelete: Cascade)
+  receivedById Int?
   cohort       Cohort?   @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   cohortId     Int?
   createdAt    DateTime  @default(now())

@@ -8,7 +8,7 @@ CREATE TABLE "Event" (
     "topic" TEXT,
     "content" TEXT,
     "createdById" INTEGER,
-    "receivedById" INTEGER NOT NULL,
+    "receivedById" INTEGER,
     "cohortId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
