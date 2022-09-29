@@ -474,12 +474,9 @@ export const deleteComment = async (req, res) => {
     )
   }
 
-  if (
-    req.user.role === 'TEACHER' ||
-    req.user.role === 'ADMIN' ||
-    foundComment.user.id === req.user.id ||
-    foundComment.post.user.id === req.user.id
-  ) {
+  const hasDeletePermission = commentDeletePermission(foundComment, req.user)
+
+  if (hasDeletePermission) {
     const deletedComment = await dbClient.comment.delete({
       where: { id },
       include: {
@@ -504,4 +501,16 @@ export const deleteComment = async (req, res) => {
   } else {
     return sendMessageResponse(res, 403, 'Unauthorised to delete this comment')
   }
+}
+
+const commentDeletePermission = (comment, user) => {
+  if (
+    user.role === 'TEACHER' ||
+    user.role === 'ADMIN' ||
+    comment.user.id === user.id ||
+    comment.post.user.id === user.id
+  ) {
+    return true
+  }
+  return false
 }
