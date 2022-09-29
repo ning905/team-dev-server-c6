@@ -23,20 +23,21 @@ enum Visibility {
 }
 
 model User {
-  id             Int           @id @default(autoincrement())
-  email          String        @unique
-  password       String        @db.VarChar(250)
-  role           Role          @default(STUDENT)
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  password       String         @db.VarChar(250)
+  role           Role           @default(STUDENT)
   profile        Profile?
   cohortId       Int?
-  cohort         Cohort?       @relation(fields: [cohortId], references: [id])
+  cohort         Cohort?        @relation(fields: [cohortId], references: [id])
   posts          Post[]
   deliveryLogs   DeliveryLog[]
   comments       Comment[]
   likes          Like[]
   commentLikes   CommentLike[]
-  createdEvents  Event[]       @relation("createdEvents")
-  receivedEvents Event[]       @relation("receivedEvents")
+  exercises      ExerciseUser[]
+  createdEvents  Event[]        @relation("createdEvents")
+  receivedEvents Event[]        @relation("receivedEvents")
 }
 
 model Profile {
@@ -120,9 +121,26 @@ model CommentLike {
   userId    Int
   user      User    @relation(fields: [userId], references: [id])
   commentId Int
-  comment   Comment @relation(fields: [commentId], references: [id])
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([userId, commentId])
+}
+
+model Exercise {
+  id         Int            @id @default(autoincrement())
+  name       String         @db.VarChar(255)
+  gitHubUrl  String         @db.VarChar(255)
+  objectives String[]
+  users      ExerciseUser[]
+}
+
+model ExerciseUser {
+  userId     Int
+  users      User     @relation(fields: [userId], references: [id])
+  exerciseId Int
+  exercises  Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
 }
 
 enum EventType {

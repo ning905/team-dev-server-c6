@@ -9,7 +9,9 @@ import {
   createComment,
   setIsPrivate,
   createCommentLike,
-  deleteCommentLike
+  deleteCommentLike,
+  deleteComment,
+  updateComment
 } from '../controllers/post.js'
 import { validateAuthentication } from '../middleware/auth.js'
 
@@ -20,9 +22,10 @@ router.get('/', validateAuthentication, getAll)
 router.patch('/:id', validateAuthentication, edit)
 router.patch('/:id/status', validateAuthentication, setIsPrivate)
 router.delete('/:id', validateAuthentication, deletePost)
-router.post('/:id/comment', validateAuthentication, createComment)
+
 router.post('/:id/like', validateAuthentication, createLike)
 router.delete('/:id/like', validateAuthentication, deleteLike)
+
 router.post(
   '/:postId/comment/:commentId/like',
   validateAuthentication,
@@ -32,6 +35,17 @@ router.delete(
   '/:postId/comment/:commentId/like',
   validateAuthentication,
   deleteCommentLike
+)
+router.post('/:id/comment', validateAuthentication, createComment)
+router.delete(
+  '/:postId/comment/:commentId',
+  validateAuthentication,
+  deleteComment
+)
+router.patch(
+  '/:postId/comment/:commentId',
+  validateAuthentication,
+  updateComment
 )
 
 export default router
