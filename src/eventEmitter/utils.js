@@ -150,3 +150,14 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
     }
   })
 }
+
+export const createErrorEvent = async (topic, user, errorMsg) => {
+  await dbClient.event.create({
+    data: {
+      type: 'ERROR',
+      topic: topic,
+      content: errorMsg,
+      receivedById: user.id
+    }
+  })
+}

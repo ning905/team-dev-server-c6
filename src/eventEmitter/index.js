@@ -46,3 +46,5 @@ myEmitter.on('add-to-cohort', (admin, student, cohort) =>
 myEmitter.on('add-to-cohort', (admin, student, cohort) =>
   createRemoveFromCohortEvent(admin, student, cohort)
 )
+
+myEmitter.on('error')
