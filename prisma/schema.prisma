@@ -118,7 +118,7 @@ model CommentLike {
   userId    Int
   user      User    @relation(fields: [userId], references: [id])
   commentId Int
-  comment   Comment @relation(fields: [commentId], references: [id])
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([userId, commentId])
 }

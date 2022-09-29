@@ -404,3 +404,113 @@ export const deleteCommentLike = async (req, res) => {
     }
   })
 }
+
+export const updateComment = async (req, res) => {
+  const id = Number(req.params.commentId)
+  const { content } = req.body
+
+  if (!content) {
+    return sendMessageResponse(res, 400, 'Must provide content')
+  }
+
+  const foundComment = await dbClient.comment.findUnique({
+    where: { id },
+    include: { user: true }
+  })
+
+  if (!foundComment) {
+    return sendMessageResponse(
+      res,
+      404,
+      'The comment with the provided id does not exist'
+    )
+  }
+
+  if (foundComment.user.id !== req.user.id) {
+    return sendMessageResponse(
+      res,
+      403,
+      'Only the comment author can edit the comment'
+    )
+  }
+
+  const updatedComment = await dbClient.comment.update({
+    where: { id },
+    data: { content },
+    include: {
+      user: true,
+      likes: {
+        include: {
+          user: {
+            select: {
+              email: true,
+              id: true,
+              cohortId: true,
+              role: true,
+              profile: true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  return sendDataResponse(res, 200, updatedComment)
+}
+
+export const deleteComment = async (req, res) => {
+  const id = Number(req.params.commentId)
+
+  const foundComment = await dbClient.comment.findUnique({
+    where: { id },
+    include: { user: true, post: { include: { user: true } } }
+  })
+
+  if (!foundComment) {
+    return sendMessageResponse(
+      res,
+      404,
+      'The comment with the provided id does not exist'
+    )
+  }
+
+  const hasDeletePermission = commentDeletePermission(foundComment, req.user)
+
+  if (hasDeletePermission) {
+    const deletedComment = await dbClient.comment.delete({
+      where: { id },
+      include: {
+        user: true,
+        likes: {
+          include: {
+            user: {
+              select: {
+                email: true,
+                id: true,
+                cohortId: true,
+                role: true,
+                profile: true
+              }
+            }
+          }
+        }
+      }
+    })
+
+    return sendDataResponse(res, 200, deletedComment)
+  } else {
+    return sendMessageResponse(res, 403, 'Unauthorised to delete this comment')
+  }
+}
+
+const commentDeletePermission = (comment, user) => {
+  if (
+    user.role === 'TEACHER' ||
+    user.role === 'ADMIN' ||
+    comment.user.id === user.id ||
+    comment.post.user.id === user.id
+  ) {
+    return true
+  }
+  return false
+}
