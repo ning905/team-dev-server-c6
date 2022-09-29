@@ -202,6 +202,21 @@ async function seed() {
     }
   })
   console.log('first comment', createFirstComment)
+
+  await prisma.exercise.createMany({
+    data: [
+      {
+        name: 'Exercise 1',
+        gitHubUrl: 'https://www.google.com',
+        objectives: ['Objective 1', 'Objective 2', 'Objective 3']
+      },
+      {
+        name: 'Exercise 2',
+        gitHubUrl: 'https://www.youtube.com',
+        objectives: ['Objective A', 'Objective B', 'Objective C']
+      }
+    ]
+  })
 }
 
 seed().catch(async (error) => {
