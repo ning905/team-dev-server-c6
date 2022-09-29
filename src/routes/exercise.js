@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import {
-    createExercise,
-    getAllExercises,
-    deleteExercise,
-    getExerciseById
+  createExercise,
+  getAllExercises,
+  deleteExercise,
+  getExerciseById
 } from '../controllers/exercise.js'
 
 const router = Router()

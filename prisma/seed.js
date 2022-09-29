@@ -208,16 +208,12 @@ async function seed() {
       {
         name: 'Exercise 1',
         gitHubUrl: 'https://www.google.com',
-        objectives: [
-          'Objective 1', 'Objective 2', 'Objective 3'
-        ]
+        objectives: ['Objective 1', 'Objective 2', 'Objective 3']
       },
       {
         name: 'Exercise 2',
         gitHubUrl: 'https://www.youtube.com',
-        objectives: [
-          'Objective A', 'Objective B', 'Objective C'
-        ]
+        objectives: ['Objective A', 'Objective B', 'Objective C']
       }
     ]
   })
