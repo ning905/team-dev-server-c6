@@ -57,12 +57,14 @@ export const getAll = async (req, res) => {
 
 export const getAllByFirstName = async (req, res) => {
   // eslint-disable-next-line camelcase
-  const { first_name: firstName } = req.query
+  const [key] = Object.keys(req.query)
+  const [value] = Object.values(req.query)
 
+  console.log('inside getAllbyFirstName', key, value)
   let foundUsers
 
-  if (firstName) {
-    foundUsers = await User.findManyByFirstName(firstName)
+  if (value) {
+    foundUsers = await User.findManyByFirstName(key, value)
   } else {
     foundUsers = await User.findAll()
   }
