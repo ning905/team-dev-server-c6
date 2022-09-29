@@ -60,7 +60,6 @@ export const getAllByFirstName = async (req, res) => {
   const [key] = Object.keys(req.query)
   const [value] = Object.values(req.query)
 
-  console.log('inside getAllbyFirstName', key, value)
   let foundUsers
 
   if (value) {
