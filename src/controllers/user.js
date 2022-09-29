@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { JWT_EXPIRY, JWT_SECRET } from '../utils/config.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
+import { myEmitter } from '../eventEmitter/index.js'
 
 export const create = async (req, res) => {
   const userToCreate = await User.fromJson(req.body)
@@ -18,6 +19,7 @@ export const create = async (req, res) => {
 
     const token = generateJwt(createdUser.id)
 
+    myEmitter.emit('register', createdUser)
     return sendDataResponse(res, 201, { token, createdUser })
   } catch (err) {
     // Send an error response back to the client then let the error handling middleware log to the terminal
@@ -37,11 +39,25 @@ export const getById = async (req, res) => {
     const foundUser = await User.findById(id)
 
     if (!foundUser) {
+      myEmitter.emit(
+        'error',
+        req.user,
+        `fetch-user-${id}`,
+        404,
+        'User not found'
+      )
       return sendDataResponse(res, 404, { id: 'User not found' })
     }
 
     return sendDataResponse(res, 200, foundUser)
   } catch (e) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `fetch-user-${id}`,
+      500,
+      'Unable to get user'
+    )
     sendMessageResponse(res, 500, 'Unable to get user')
     throw e
   }
@@ -110,10 +126,18 @@ export const updateById = async (req, res) => {
   const foundUser = await User.findById(id)
 
   if (!foundUser) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `add-${id}to-cohort${cohortId}`,
+      404,
+      'User not found'
+    )
     return sendDataResponse(res, 404, { id: 'User not found' })
   }
 
   const updatedUser = await foundUser.update({ cohortId })
+  myEmitter.emit('add-to-cohort', req.user, updatedUser, updatedUser.cohort)
 
   return sendDataResponse(res, 201, {
     user: { cohort_id: updatedUser.cohortId }
@@ -131,8 +155,18 @@ export const updateUserById = async (req, res) => {
   const foundUser = await User.findById(id)
 
   if (!foundUser) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `update-user-${id}`,
+      404,
+      'User not found'
+    )
     return sendDataResponse(res, 404, { id: 'User not found' })
   }
+
+  const oldEmail = foundUser.email
+  const oldPostPrivacyPref = foundUser.postPrivacyPref
 
   const {
     email,
@@ -177,6 +211,14 @@ export const updateUserById = async (req, res) => {
       profileImageUrl,
       postPrivacyPref
     })
+
+    if (email) {
+      myEmitter.emit('update-email', updateUser, oldEmail)
+    }
+
+    if (postPrivacyPref) {
+      myEmitter.emit('update-privacy', updateUser, oldPostPrivacyPref)
+    }
 
     return sendDataResponse(res, 201, updateUser)
   }

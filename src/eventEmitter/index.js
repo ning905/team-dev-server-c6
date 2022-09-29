@@ -1,20 +1,20 @@
-const EventEmitter = require('events')
-const {
+import EventEmitter from 'events'
+import {
   createCohortCreatedEvent,
   createRegisterEvent,
   createUpdateEmailEvent,
   createUpdatePrivacyEvent,
   createUpdateActivateEvent,
-  createChangeRoleEvent,
+  createUpdateRoleEvent,
   createRenameCohortEvent,
   createDeleteCohortEvent,
   createAddToCohortEvent,
   createRemoveFromCohortEvent,
   createErrorEvent
-} = require('./utils')
+} from './utils.js'
 
 class MyEventEmitter extends EventEmitter {}
-const myEmitter = new MyEventEmitter()
+export const myEmitter = new MyEventEmitter()
 
 myEmitter.on('register', (user, admin = null) =>
   createRegisterEvent(user, (admin = null))
@@ -22,14 +22,14 @@ myEmitter.on('register', (user, admin = null) =>
 myEmitter.on('update-email', (user, oldEmail, admin = null) =>
   createUpdateEmailEvent(user, oldEmail, (admin = null))
 )
-myEmitter.on('update-privacy', (user, admin = null) =>
+myEmitter.on('update-privacy', (user, oldPref, admin = null) =>
   createUpdatePrivacyEvent(user, (admin = null))
 )
-myEmitter.on('update-account-activate', (user, admin = null) =>
-  createUpdateActivateEvent(user, (admin = null))
-)
-myEmitter.on('change-role', (assignee, oldRole, assigner) =>
-  createChangeRoleEvent(assignee, oldRole, assigner)
+// myEmitter.on('update-account-activate', (user, admin = null) =>
+//   createUpdateActivateEvent(user, (admin = null))
+// )
+myEmitter.on('update-role', (assignee, oldRole, assigner) =>
+  createUpdateRoleEvent(assignee, oldRole, assigner)
 )
 
 myEmitter.on('create-cohort', (cohort, admin) =>
@@ -38,16 +38,16 @@ myEmitter.on('create-cohort', (cohort, admin) =>
 myEmitter.on('rename-cohort', (cohort, oldName, admin) =>
   createRenameCohortEvent(cohort, oldName, admin)
 )
-myEmitter.on('delete-cohort', (cohort, admin) =>
-  createDeleteCohortEvent(cohort, admin)
-)
+// myEmitter.on('delete-cohort', (cohort, admin) =>
+//   createDeleteCohortEvent(cohort, admin)
+// )
 myEmitter.on('add-to-cohort', (admin, student, cohort) =>
   createAddToCohortEvent(admin, student, cohort)
 )
-myEmitter.on('add-to-cohort', (admin, student, cohort) =>
-  createRemoveFromCohortEvent(admin, student, cohort)
-)
+// myEmitter.on('remove-from-cohort', (admin, student, cohort) =>
+//   createRemoveFromCohortEvent(admin, student, cohort)
+// )
 
-myEmitter.on('error', (user, topic, errorMsg) =>
-  createErrorEvent(user, topic, errorMsg)
+myEmitter.on('error', (user, topic, errorCode, errorMsg) =>
+  createErrorEvent(user, topic, errorCode, errorMsg)
 )

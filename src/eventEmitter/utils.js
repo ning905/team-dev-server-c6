@@ -1,4 +1,4 @@
-import dbClient from '../utils/dbClient'
+import dbClient from '../utils/dbClient.js'
 
 export const createRegisterEvent = async (user, admin = null) => {
   let type = 'USER'
@@ -34,7 +34,7 @@ export const createUpdateEmailEvent = async (user, oldEmail, admin = null) => {
   })
 }
 
-export const createUpdatePrivacyEvent = async (user, admin = null) => {
+export const createUpdatePrivacyEvent = async (user, oldPref, admin = null) => {
   const topic = 'set-post-privacy-preference-to-' + user.profile.postPrivacyPref
   let type = 'USER'
   if (user.role === 'ADMIN' || admin) {
@@ -45,6 +45,7 @@ export const createUpdatePrivacyEvent = async (user, admin = null) => {
     data: {
       type: type,
       topic: topic,
+      content: oldPref,
       createdById: admin.id,
       receivedById: user.id,
       createdAt: user.profile.updatedAt
@@ -75,11 +76,11 @@ export const createUpdateActivateEvent = async (user, admin = null) => {
   })
 }
 
-export const createChangeRoleEvent = async (assignee, oldRole, assigner) => {
+export const createUpdateRoleEvent = async (assignee, oldRole, assigner) => {
   dbClient.event.create({
     data: {
       type: 'ADMIN',
-      topic: 'change-role',
+      topic: 'update-role',
       content: `from ${oldRole} to ${assignee.role}`,
       createdById: assigner.id,
       receivedById: assignee.id,
@@ -151,12 +152,12 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
   })
 }
 
-export const createErrorEvent = async (user, topic, errorMsg) => {
+export const createErrorEvent = async (user, topic, errorCode, errorMsg) => {
   await dbClient.event.create({
     data: {
       type: 'ERROR',
       topic: topic,
-      content: errorMsg,
+      content: `${errorCode} ${errorMsg}`,
       receivedById: user.id
     }
   })

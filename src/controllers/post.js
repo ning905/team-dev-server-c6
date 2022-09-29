@@ -1,5 +1,6 @@
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
+import { myEmitter } from '../eventEmitter/index.js'
 
 export const create = async (req, res) => {
   const { content, isPrivate } = req.body
@@ -19,6 +20,13 @@ export const create = async (req, res) => {
     })
     return sendDataResponse(res, 201, { post: createdPost })
   } catch (err) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      'create-post',
+      500,
+      'Unable to create post'
+    )
     sendMessageResponse(res, 500, 'Unable to create post')
     throw err
   }
@@ -101,6 +109,13 @@ export const edit = async (req, res) => {
   })
 
   if (!foundPost) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `edit-post-${id}`,
+      404,
+      'The post with the provided id does not exist'
+    )
     return sendMessageResponse(
       res,
       404,
@@ -109,6 +124,13 @@ export const edit = async (req, res) => {
   }
 
   if (foundPost.user.id !== req.user.id) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `edit-post-${foundPost.id}`,
+      403,
+      'Only the post author can edit the post'
+    )
     return sendMessageResponse(
       res,
       403,
@@ -153,10 +175,24 @@ export const deletePost = async (req, res) => {
   })
 
   if (!foundPost) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `delete-post-${id}`,
+      404,
+      'Error in retrieving post'
+    )
     return sendMessageResponse(res, 404, 'Error in retrieving post')
   }
 
   if (foundPost.user.id !== req.user.id) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `delete-post-${foundPost.id}`,
+      403,
+      'Request authorization to delete post'
+    )
     return sendMessageResponse(res, 403, 'Request authorization to delete post')
   }
 
@@ -188,6 +224,13 @@ export const createComment = async (req, res) => {
   })
 
   if (!findPostById) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `comment-on-post-${postId}`,
+      404,
+      'No post found'
+    )
     return sendMessageResponse(res, 404, 'No post found')
   }
 
@@ -226,6 +269,13 @@ export const createLike = async (req, res) => {
     include: { user: true }
   })
   if (!foundPost) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `like-post-${postId}`,
+      404,
+      'The post with the provided id does not exist'
+    )
     return sendMessageResponse(
       res,
       404,
@@ -242,6 +292,13 @@ export const createLike = async (req, res) => {
     }
   })
   if (foundLike) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `like-post-${postId}`,
+      409,
+      'This user already liked this post'
+    )
     return sendMessageResponse(res, 409, 'This user already liked this post')
   }
 
@@ -278,6 +335,13 @@ export const deleteLike = async (req, res) => {
     include: { user: true }
   })
   if (!foundPost) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `unlike-post-${postId}`,
+      404,
+      'The post with the provided id does not exist'
+    )
     return sendMessageResponse(
       res,
       404,
@@ -294,6 +358,13 @@ export const deleteLike = async (req, res) => {
     }
   })
   if (!foundLike) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `unlike-post-${postId}`,
+      409,
+      'This user has not liked this post'
+    )
     return sendMessageResponse(res, 409, 'This user has not liked this post')
   }
 
@@ -327,31 +398,58 @@ export const deleteLike = async (req, res) => {
 export const setIsPrivate = async (req, res) => {
   const postId = Number(req.params.id)
 
+  const foundPost = await dbClient.post.findUnique({
+    where: { id: postId }
+  })
+  if (!foundPost) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `update-post-${postId}-privacy`,
+      404,
+      'The post with the provided id does not exist'
+    )
+    return sendMessageResponse(
+      res,
+      404,
+      'The post with the provided id does not exist'
+    )
+  }
+
+  if (foundPost.user.id !== req.user.id) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `update-post-${postId}-privacy`,
+      403,
+      'Only the post author can edit the post'
+    )
+    return sendMessageResponse(
+      res,
+      403,
+      'Only the post author can edit the post'
+    )
+  }
+
   try {
-    const foundPost = await dbClient.post.findUnique({
-      where: { id: postId }
-    })
-    if (!foundPost) {
-      return sendMessageResponse(
-        res,
-        404,
-        'The post with the provided id does not exist'
-      )
-    }
-
-    const isPrivateCheck = foundPost.isPrivate
-
-    const togglePrivate = await dbClient.post.update({
+    const updatedPost = await dbClient.post.update({
       where: {
         id: postId
       },
       data: {
-        isPrivate: !isPrivateCheck
+        isPrivate: !foundPost.isPrivate
       }
     })
 
-    return sendDataResponse(res, 201, togglePrivate)
+    return sendDataResponse(res, 201, updatedPost)
   } catch (err) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `update-post-${postId}-privacy`,
+      500,
+      'Internal server error'
+    )
     sendMessageResponse(res, 500, 'Internal server error')
   }
 }
@@ -419,6 +517,13 @@ export const updateComment = async (req, res) => {
   })
 
   if (!foundComment) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `update-comment-${id}`,
+      404,
+      'The comment with the provided id does not exist'
+    )
     return sendMessageResponse(
       res,
       404,
@@ -427,6 +532,13 @@ export const updateComment = async (req, res) => {
   }
 
   if (foundComment.user.id !== req.user.id) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `update-comment-${id}`,
+      403,
+      'Only the comment author can edit the comment'
+    )
     return sendMessageResponse(
       res,
       403,
@@ -467,6 +579,13 @@ export const deleteComment = async (req, res) => {
   })
 
   if (!foundComment) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      `delete-comment-${id}`,
+      404,
+      'The comment with the provided id does not exist'
+    )
     return sendMessageResponse(
       res,
       404,
@@ -499,7 +618,14 @@ export const deleteComment = async (req, res) => {
 
     return sendDataResponse(res, 200, deletedComment)
   } else {
-    return sendMessageResponse(res, 403, 'Unauthorised to delete this comment')
+    myEmitter.emit(
+      'error',
+      req.user,
+      `delete-comment-${id}`,
+      403,
+      'Unauthorized to delete this comment'
+    )
+    return sendMessageResponse(res, 403, 'Unauthorized to delete this comment')
   }
 }
 
