@@ -9,7 +9,8 @@ const {
   createRenameCohortEvent,
   createDeleteCohortEvent,
   createAddToCohortEvent,
-  createRemoveFromCohortEvent
+  createRemoveFromCohortEvent,
+  createErrorEvent
 } = require('./utils')
 
 class MyEventEmitter extends EventEmitter {}
@@ -45,4 +46,8 @@ myEmitter.on('add-to-cohort', (admin, student, cohort) =>
 )
 myEmitter.on('add-to-cohort', (admin, student, cohort) =>
   createRemoveFromCohortEvent(admin, student, cohort)
+)
+
+myEmitter.on('error', (user, topic, errorMsg) =>
+  createErrorEvent(user, topic, errorMsg)
 )
