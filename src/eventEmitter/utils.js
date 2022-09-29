@@ -1,8 +1,8 @@
 import dbClient from '../utils/dbClient.js'
 
-export const createRegisterEvent = async (user, admin = null) => {
+export const createRegisterEvent = async (user) => {
   let type = 'USER'
-  if (user.role === 'ADMIN' || admin) {
+  if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
   await dbClient.event.create({
@@ -11,15 +11,14 @@ export const createRegisterEvent = async (user, admin = null) => {
       topic: 'register',
       content: user.role,
       receivedById: user.id,
-      createdById: admin.id,
       createdAt: user.createdAt
     }
   })
 }
 
-export const createUpdateEmailEvent = async (user, oldEmail, admin = null) => {
+export const createUpdateEmailEvent = async (user, oldEmail) => {
   let type = 'USER'
-  if (user.role === 'ADMIN' || admin) {
+  if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
   await dbClient.event.create({
@@ -27,17 +26,16 @@ export const createUpdateEmailEvent = async (user, oldEmail, admin = null) => {
       type: type,
       topic: 'update-email-address',
       content: `from ${oldEmail} to ${user.email}`,
-      createdById: admin.id,
       receivedById: user.id,
       createdAt: user.profile.updatedAt
     }
   })
 }
 
-export const createUpdatePrivacyEvent = async (user, oldPref, admin = null) => {
+export const createUpdatePrivacyEvent = async (user, oldPref) => {
   const topic = 'set-post-privacy-preference-to-' + user.profile.postPrivacyPref
   let type = 'USER'
-  if (user.role === 'ADMIN' || admin) {
+  if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
 
@@ -46,17 +44,16 @@ export const createUpdatePrivacyEvent = async (user, oldPref, admin = null) => {
       type: type,
       topic: topic,
       content: oldPref,
-      createdById: admin.id,
       receivedById: user.id,
       createdAt: user.profile.updatedAt
     }
   })
 }
 
-export const createUpdateActivateEvent = async (user, admin = null) => {
+export const createUpdateActivateEvent = async (user) => {
   let type = 'USER'
   let topic = ''
-  if (user.role === 'ADMIN' || admin) {
+  if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
   if (user.isActivate) {
@@ -69,7 +66,6 @@ export const createUpdateActivateEvent = async (user, admin = null) => {
     data: {
       type: type,
       topic: topic,
-      createdById: admin.id,
       receivedById: user.id,
       createdAt: user.profile.updatedAt
     }

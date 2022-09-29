@@ -4,26 +4,24 @@ import {
   createRegisterEvent,
   createUpdateEmailEvent,
   createUpdatePrivacyEvent,
-  createUpdateActivateEvent,
+  // createUpdateActivateEvent,
   createUpdateRoleEvent,
   createRenameCohortEvent,
-  createDeleteCohortEvent,
+  // createDeleteCohortEvent,
   createAddToCohortEvent,
-  createRemoveFromCohortEvent,
+  // createRemoveFromCohortEvent,
   createErrorEvent
 } from './utils.js'
 
 class MyEventEmitter extends EventEmitter {}
 export const myEmitter = new MyEventEmitter()
 
-myEmitter.on('register', (user, admin = null) =>
-  createRegisterEvent(user, (admin = null))
+myEmitter.on('register', (user) => createRegisterEvent(user))
+myEmitter.on('update-email', (user, oldEmail) =>
+  createUpdateEmailEvent(user, oldEmail)
 )
-myEmitter.on('update-email', (user, oldEmail, admin = null) =>
-  createUpdateEmailEvent(user, oldEmail, (admin = null))
-)
-myEmitter.on('update-privacy', (user, oldPref, admin = null) =>
-  createUpdatePrivacyEvent(user, (admin = null))
+myEmitter.on('update-privacy', (user, oldPref) =>
+  createUpdatePrivacyEvent(user, oldPref)
 )
 // myEmitter.on('update-account-activate', (user, admin = null) =>
 //   createUpdateActivateEvent(user, (admin = null))
