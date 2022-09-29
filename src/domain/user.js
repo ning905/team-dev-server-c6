@@ -214,11 +214,13 @@ export default class User {
     if (key !== undefined && value !== undefined) {
       query.where = {
         profile: {
-          [key]: value
+          [key]: {
+            contains: value,
+            mode: 'insensitive'
+          }
         }
       }
     }
-
     const foundUsers = await dbClient.user.findMany(query)
 
     return foundUsers.map((user) => User.fromDb(user))

@@ -67,6 +67,7 @@ export const getAll = async (req, res) => {
           likes: true,
           replies: {
             include: {
+              likes: true,
               user: {
                 select: {
                   email: true,
