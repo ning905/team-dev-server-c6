@@ -174,8 +174,8 @@ export default class User {
     return User._findByUnique('id', id)
   }
 
-  static async findManyByFirstName(key, value) {
-    return User._findMany(key, value)
+  static async findManyByFirstName(firstName) {
+    return User._findMany('firstName', firstName)
   }
 
   static async findManyByCohortId(cohortId) {
