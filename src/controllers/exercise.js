@@ -30,9 +30,15 @@ export const getAllExercises = async (req, res) => {
 }
 
 export const deleteExercise = async (req, res) => {
-  const id = +req.params.id
-  const deletedExercise = await dbClient.exercise.delete({ where: { id } })
-  return sendDataResponse(res, 201, { exercise: deletedExercise })
+  try {
+    const id = +req.params.id
+    const deletedExercise = await dbClient.exercise.delete({ where: { id } })
+    return sendDataResponse(res, 201, { exercise: deletedExercise })
+  } catch (error) {
+    if (error.code === 'P2025') {
+      sendMessageResponse(res, 404, 'Exercise with that id does not exist')
+    }
+  }
 }
 
 export const getExerciseById = async (req, res) => {
