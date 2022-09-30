@@ -23,19 +23,21 @@ enum Visibility {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
-  password     String         @db.VarChar(250)
-  role         Role           @default(STUDENT)
-  profile      Profile?
-  cohortId     Int?
-  cohort       Cohort?        @relation(fields: [cohortId], references: [id])
-  posts        Post[]
-  deliveryLogs DeliveryLog[]
-  comments     Comment[]
-  likes        Like[]
-  commentLikes CommentLike[]
-  exercises    ExerciseUser[]
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  password       String         @db.VarChar(250)
+  role           Role           @default(STUDENT)
+  profile        Profile?
+  cohortId       Int?
+  cohort         Cohort?        @relation(fields: [cohortId], references: [id])
+  posts          Post[]
+  deliveryLogs   DeliveryLog[]
+  comments       Comment[]
+  likes          Like[]
+  commentLikes   CommentLike[]
+  exercises      ExerciseUser[]
+  createdEvents  Event[]        @relation("createdEvents")
+  receivedEvents Event[]        @relation("receivedEvents")
 }
 
 model Profile {
@@ -55,6 +57,7 @@ model Cohort {
   users        User[]
   deliveryLogs DeliveryLog[]
   name         String?       @unique
+  event        Event[]
 }
 
 model Post {
@@ -138,4 +141,26 @@ model ExerciseUser {
   exercises  Exercise @relation(fields: [exerciseId], references: [id])
 
   @@unique([userId, exerciseId])
+}
+
+enum EventType {
+  ERROR
+  USER
+  ADMIN
+  COHORT
+}
+
+model Event {
+  id           Int       @id @default(autoincrement())
+  type         EventType
+  topic        String?
+  content      String?
+  createdBy    User?     @relation("createdEvents", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById  Int?
+  receivedBy   User?     @relation("receivedEvents", fields: [receivedById], references: [id], onDelete: Cascade)
+  receivedById Int?
+  cohort       Cohort?   @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+  cohortId     Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
 }

@@ -4,6 +4,7 @@ import {
   getCohortById,
   updateCohortNameByID
 } from '../domain/cohort.js'
+import { myEmitter } from '../eventEmitter/index.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const create = async (req, res) => {
@@ -12,8 +13,17 @@ export const create = async (req, res) => {
       return sendDataResponse(res, 400, 'missing cohort name')
     }
     const createdCohort = await createCohort(req.body.name)
+    myEmitter.emit('create-cohort', createdCohort, req.user)
+
     return sendDataResponse(res, 201, createdCohort)
   } catch (e) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      'create-cohort',
+      500,
+      'Unable to create cohort'
+    )
     sendMessageResponse(res, 500, 'Unable to create cohort')
     throw e
   }
@@ -25,6 +35,13 @@ export const getAll = async (req, res) => {
 
     return sendDataResponse(res, 201, { cohorts: foundCohorts })
   } catch (e) {
+    myEmitter.emit(
+      'error',
+      req.user,
+      'fetch-cohorts',
+      500,
+      'Unable to fetch Cohorts'
+    )
     sendMessageResponse(res, 500, 'Unable to fetch Cohorts')
   }
 }
