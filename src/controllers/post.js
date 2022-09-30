@@ -275,7 +275,7 @@ export const createLike = async (req, res) => {
     }
   })
   if (foundLike) {
-    const error = OtherErrorEvent(
+    const error = new OtherErrorEvent(
       req.user,
       `like-post-${postId}`,
       409,
@@ -336,7 +336,7 @@ export const deleteLike = async (req, res) => {
     }
   })
   if (!foundLike) {
-    const error = OtherErrorEvent(
+    const error = new OtherErrorEvent(
       req.user,
       `unlike-post-${postId}`,
       409,
