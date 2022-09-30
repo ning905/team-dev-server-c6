@@ -7,7 +7,10 @@ import { NoPermissionEvent, NoValidationEvent } from '../eventEmitter/utils.js'
 
 export async function validateRole(req, res, next) {
   if (!req.user) {
-    const error = new NoValidationEvent(null, 'perform-authorized-action')
+    const error = new NoValidationEvent(
+      'Unable to verify user',
+      'perform-authorized-action'
+    )
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, error.message)
   }
@@ -28,7 +31,10 @@ export async function validateRole(req, res, next) {
 
 export async function validateAdminRole(req, res, next) {
   if (!req.user) {
-    const error = new NoValidationEvent(null, 'perform-admin-action')
+    const error = new NoValidationEvent(
+      'Unable to verify user',
+      'perform-admin-action'
+    )
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, error.message)
   }
@@ -47,11 +53,7 @@ export async function validateAuthentication(req, res, next) {
   const header = req.header('authorization')
 
   if (!header) {
-    const error = new NoValidationEvent(
-      null,
-      'validate-authentication',
-      'Missing Authorization header'
-    )
+    const error = new NoValidationEvent('Missing Authorization header')
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, {
       authorization: error.message
@@ -63,8 +65,6 @@ export async function validateAuthentication(req, res, next) {
   const isTypeValid = validateTokenType(type)
   if (!isTypeValid) {
     const error = new NoValidationEvent(
-      null,
-      'validate-authentication',
       `Invalid token type, expected Bearer but got ${type}`
     )
     myEmitter.emit('error', error)
@@ -75,33 +75,21 @@ export async function validateAuthentication(req, res, next) {
 
   const isTokenValid = validateToken(token)
   if (!isTokenValid) {
-    const error = new NoValidationEvent(
-      null,
-      'validate-authentication',
-      'Missing access token'
-    )
+    const error = new NoValidationEvent('Missing access token')
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, {
       authorization: error.message
     })
   }
   if (isTokenValid.name === 'TokenExpiredError') {
-    const error = new NoValidationEvent(
-      null,
-      'validate-authentication',
-      'Token has expired'
-    )
+    const error = new NoValidationEvent('Token has expired')
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, {
       authorization: error.message
     })
   }
   if (isTokenValid.name) {
-    const error = new NoValidationEvent(
-      null,
-      'validate-authentication',
-      'Invalid access token'
-    )
+    const error = new NoValidationEvent('Invalid access token')
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, {
       authorization: error.message

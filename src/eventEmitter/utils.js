@@ -212,12 +212,16 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
 }
 
 export const createErrorEvent = async (errorEvent) => {
+  let userId
+  if (errorEvent.user) {
+    userId = errorEvent.user.id
+  }
   await dbClient.event.create({
     data: {
       type: 'ERROR',
       topic: errorEvent.topic,
       content: `${errorEvent.code} ${errorEvent.message}`,
-      receivedById: errorEvent.user.id
+      receivedById: userId
     }
   })
 }
@@ -229,9 +233,13 @@ class ErrorEventBase {
   }
 }
 
-export class NoValidationEvent extends ErrorEventBase {
-  constructor(user, topic, message = 'Unable to verify user') {
-    super(user, topic)
+export class NoValidationEvent {
+  constructor(
+    message = 'Unable to verify user',
+    topic = 'validate-authentication'
+  ) {
+    this.user = null
+    this.topic = topic
     this.code = 401
     this.message = message
   }
