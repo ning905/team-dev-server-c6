@@ -3,29 +3,23 @@ import { JWT_SECRET } from '../utils/config.js'
 import jwt from 'jsonwebtoken'
 import User from '../domain/user.js'
 import { myEmitter } from '../eventEmitter/index.js'
+import { NoPermissionEvent, NoValidationEvent } from '../eventEmitter/utils.js'
 
 export async function validateRole(req, res, next) {
   if (!req.user) {
-    myEmitter.emit(
-      'error',
-      null,
-      'perform-authorized-action',
-      401,
-      'Unable to verify user'
-    )
-    return sendMessageResponse(res, 401, 'Unable to verify user')
+    const error = new NoValidationEvent(null, 'perform-authorized-action')
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
   }
 
   if (req.user.role !== 'TEACHER' && req.user.role !== 'ADMIN') {
-    myEmitter.emit(
-      'error',
+    const noPermission = new NoPermissionEvent(
       req.user,
-      'perform-authorized-action',
-      403,
-      'You are not authorized to perform this action'
+      'perform-authorized-action'
     )
-    return sendDataResponse(res, 403, {
-      authorization: 'You are not authorized to perform this action'
+    myEmitter.emit('error', noPermission)
+    return sendDataResponse(res, noPermission.code, {
+      authorization: noPermission.message
     })
   }
 
@@ -34,26 +28,16 @@ export async function validateRole(req, res, next) {
 
 export async function validateAdminRole(req, res, next) {
   if (!req.user) {
-    myEmitter.emit(
-      'error',
-      null,
-      'perform-admin-action',
-      401,
-      'Unable to verify user'
-    )
-    return sendMessageResponse(res, 401, 'Unable to verify user')
+    const error = new NoValidationEvent(null, 'perform-admin-action')
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
   }
 
   if (req.user.role !== 'ADMIN') {
-    myEmitter.emit(
-      'error',
-      req.user,
-      'perform-admin-action',
-      403,
-      'You are not authorized to perform this action'
-    )
-    return sendDataResponse(res, 403, {
-      authorization: 'You are not authorized to perform this action'
+    const noPermission = new NoPermissionEvent(req.user, 'perform-admin-action')
+    myEmitter.emit('error', noPermission)
+    return sendDataResponse(res, noPermission.code, {
+      authorization: noPermission.message
     })
   }
   next()
@@ -63,15 +47,14 @@ export async function validateAuthentication(req, res, next) {
   const header = req.header('authorization')
 
   if (!header) {
-    myEmitter.emit(
-      'error',
+    const error = new NoValidationEvent(
       null,
       'validate-authentication',
-      401,
       'Missing Authorization header'
     )
-    return sendDataResponse(res, 401, {
-      authorization: 'Missing Authorization header'
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, {
+      authorization: error.message
     })
   }
 
@@ -79,53 +62,49 @@ export async function validateAuthentication(req, res, next) {
 
   const isTypeValid = validateTokenType(type)
   if (!isTypeValid) {
-    myEmitter.emit(
-      'error',
+    const error = new NoValidationEvent(
       null,
       'validate-authentication',
-      401,
       `Invalid token type, expected Bearer but got ${type}`
     )
-    return sendDataResponse(res, 401, {
-      authentication: `Invalid token type, expected Bearer but got ${type}`
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, {
+      authorization: error.message
     })
   }
 
   const isTokenValid = validateToken(token)
   if (!isTokenValid) {
-    myEmitter.emit(
-      'error',
+    const error = new NoValidationEvent(
       null,
       'validate-authentication',
-      401,
       'Missing access token'
     )
-    return sendDataResponse(res, 401, {
-      authentication: 'Missing access token'
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, {
+      authorization: error.message
     })
   }
   if (isTokenValid.name === 'TokenExpiredError') {
-    myEmitter.emit(
-      'error',
+    const error = new NoValidationEvent(
       null,
       'validate-authentication',
-      401,
       'Token has expired'
     )
-    return sendDataResponse(res, 401, {
-      authentication: 'Token has expired'
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, {
+      authorization: error.message
     })
   }
   if (isTokenValid.name) {
-    myEmitter.emit(
-      'error',
+    const error = new NoValidationEvent(
       null,
       'validate-authentication',
-      401,
       'Invalid access token'
     )
-    return sendDataResponse(res, 401, {
-      authentication: 'Invalid access token'
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, {
+      authorization: error.message
     })
   }
 

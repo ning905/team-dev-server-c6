@@ -46,6 +46,4 @@ myEmitter.on('remove-from-cohort', (admin, student, cohort) =>
   createRemoveFromCohortEvent(admin, student, cohort)
 )
 
-myEmitter.on('error', (user, topic, errorCode, errorMsg) =>
-  createErrorEvent(user, topic, errorCode, errorMsg)
-)
+myEmitter.on('error', (error) => createErrorEvent(error))

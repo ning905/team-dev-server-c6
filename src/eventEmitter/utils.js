@@ -27,13 +27,13 @@ export const createUpdateEmailEvent = async (user, oldEmail) => {
       topic: 'update-email-address',
       content: `from ${oldEmail} to ${user.email}`,
       receivedById: user.id,
-      createdAt: user.profile.updatedAt
+      createdAt: user.updatedAt
     }
   })
 }
 
 export const createUpdatePrivacyEvent = async (user, oldPref) => {
-  const topic = 'set-post-privacy-preference-to-' + user.profile.postPrivacyPref
+  const topic = 'set-post-privacy-preference-to-' + user.postPrivacyPref
   let type = 'USER'
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
@@ -45,7 +45,7 @@ export const createUpdatePrivacyEvent = async (user, oldPref) => {
       topic: topic,
       content: oldPref,
       receivedById: user.id,
-      createdAt: user.profile.updatedAt
+      createdAt: user.updatedAt
     }
   })
 }
@@ -67,7 +67,7 @@ export const createUpdateActivateEvent = async (user) => {
       type: type,
       topic: topic,
       receivedById: user.id,
-      createdAt: user.profile.updatedAt
+      createdAt: user.updatedAt
     }
   })
 }
@@ -148,13 +148,64 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
   })
 }
 
-export const createErrorEvent = async (user, topic, errorCode, errorMsg) => {
+export const createErrorEvent = async (errorEvent) => {
   await dbClient.event.create({
     data: {
       type: 'ERROR',
-      topic: topic,
-      content: `${errorCode} ${errorMsg}`,
-      receivedById: user.id
+      topic: errorEvent.topic,
+      content: `${errorEvent.code} ${errorEvent.message}`,
+      receivedById: errorEvent.user.id
     }
   })
+}
+
+class ErrorEventBase {
+  constructor(user, topic) {
+    this.user = user
+    this.topic = topic
+  }
+}
+
+export class NoValidationEvent extends ErrorEventBase {
+  constructor(user, topic, message = 'Unable to verify user') {
+    super(user, topic)
+    this.code = 401
+    this.message = message
+  }
+}
+
+export class NoPermissionEvent extends ErrorEventBase {
+  constructor(
+    user,
+    topic,
+    message = 'You are not authorized to perform this action'
+  ) {
+    super(user, topic)
+    this.code = 403
+    this.message = message
+  }
+}
+
+export class NotFoundEvent extends ErrorEventBase {
+  constructor(user, topic, target) {
+    super(user, topic)
+    this.code = 404
+    this.message = `The ${target} with the provided id does not exist`
+  }
+}
+
+export class ServerErrorEvent extends ErrorEventBase {
+  constructor(user, topic, message = 'Internal Server Error') {
+    super(user, topic)
+    this.code = 500
+    this.message = message
+  }
+}
+
+export class OtherErrorEvent extends ErrorEventBase {
+  constructor(user, topic, code, message) {
+    super(user, topic)
+    this.code = code
+    this.message = message
+  }
 }

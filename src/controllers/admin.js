@@ -1,6 +1,11 @@
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 import { myEmitter } from '../eventEmitter/index.js'
+import {
+  NoPermissionEvent,
+  OtherErrorEvent,
+  NotFoundEvent
+} from '../eventEmitter/utils.js'
 
 export const updateUserRoleById = async (req, res) => {
   const id = Number(req.params.id)
@@ -12,14 +17,13 @@ export const updateUserRoleById = async (req, res) => {
   const foundUserOldRole = foundUser.role
 
   if (!foundUser) {
-    myEmitter.emit(
-      'error',
+    const notFound = new NotFoundEvent(
       req.user,
       `update-role-for-user-${id}`,
-      404,
-      'User not found'
+      'user'
     )
-    return sendMessageResponse(res, 404, 'User not found')
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
   if (foundUserRole === 'ADMIN') {
@@ -35,27 +39,22 @@ export const updateUserRoleById = async (req, res) => {
       myEmitter.emit('update-role', foundUser, foundUserOldRole, req.user)
       return sendDataResponse(res, 200, updateUserRole)
     } catch (err) {
-      myEmitter.emit(
-        'error',
+      const error = new OtherErrorEvent(
         req.user,
         `update-role-for-user-${id}`,
         401,
         'no update done'
       )
-      return sendMessageResponse(res, 401, 'no update done')
+      myEmitter.emit('error', error)
+      return sendMessageResponse(res, error.code, error.message)
     }
   } else {
-    myEmitter.emit(
-      'error',
+    const noPermission = new NoPermissionEvent(
       req.user,
       `update-role-for-user-${id}`,
-      403,
       'You do not have permission to change this'
     )
-    return sendMessageResponse(
-      res,
-      403,
-      'You do not have permission to change this'
-    )
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, noPermission.message)
   }
 }
