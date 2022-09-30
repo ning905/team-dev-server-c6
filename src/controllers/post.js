@@ -38,7 +38,8 @@ export const create = async (req, res) => {
 }
 
 export const getAll = async (req, res) => {
-  const posts = await dbClient.post.findMany({
+  const id = parseInt(req.user.id)
+  const query = {
     skip: 0,
     take: 100,
     orderBy: {
@@ -96,7 +97,13 @@ export const getAll = async (req, res) => {
         }
       }
     }
-  })
+  }
+  if (req.user.role === 'STUDENT') {
+    query.where = {
+      OR: [{ isPrivate: false }, { userId: id }]
+    }
+  }
+  const posts = await dbClient.post.findMany(query)
 
   return sendDataResponse(res, 200, posts)
 }
