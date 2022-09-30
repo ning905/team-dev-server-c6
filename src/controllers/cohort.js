@@ -49,6 +49,11 @@ export const getAll = async (req, res) => {
 export const getById = async (req, res) => {
   const Id = parseInt(req.params.id)
   const foundCohort = await getCohortById(Id)
+
+  if (foundCohort === null) {
+    return sendMessageResponse(res, 404, 'cohort not found')
+  }
+
   return sendDataResponse(res, 200, { cohort: foundCohort })
 }
 
