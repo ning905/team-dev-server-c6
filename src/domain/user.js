@@ -159,7 +159,8 @@ export default class User {
         }
       },
       include: {
-        profile: true
+        profile: true,
+        cohort: true
       }
     })
 

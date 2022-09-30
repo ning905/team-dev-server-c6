@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { JWT_EXPIRY, JWT_SECRET } from '../utils/config.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
+import { myEmitter } from '../eventEmitter/index.js'
 
 export const login = async (req, res) => {
   const { email, password } = req.body
@@ -27,6 +28,7 @@ export const login = async (req, res) => {
 
     return sendDataResponse(res, 200, { token, ...foundUser.toJSON() })
   } catch (e) {
+    myEmitter.emit('error', null, 'login', 500, 'Unable to process request')
     sendMessageResponse(res, 500, 'Unable to process request')
     throw e
   }
