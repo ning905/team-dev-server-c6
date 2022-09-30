@@ -26,7 +26,7 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   const id = parseInt(req.user.id)
-  let condition = undefined
+  let condition
   if (req.user.role === 'STUDENT') {
     condition = {
       OR: [{ isPrivate: false }, { userId: id }]
