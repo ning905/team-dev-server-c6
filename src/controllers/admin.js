@@ -5,6 +5,7 @@ import { myEmitter } from '../eventEmitter/index.js'
 export const updateUserRoleById = async (req, res) => {
   const id = Number(req.params.id)
   const foundUserRole = req.user.role
+  const loggedInUserRole = req.user.id
 
   const foundUser = await dbClient.user.findUnique({
     where: { id }
@@ -20,6 +21,14 @@ export const updateUserRoleById = async (req, res) => {
       'User not found'
     )
     return sendMessageResponse(res, 404, 'User not found')
+  }
+
+  if (foundUser.id === loggedInUserRole) {
+    return sendMessageResponse(
+      res,
+      500,
+      'Unable to perform perform this action'
+    )
   }
 
   if (foundUserRole === 'ADMIN') {
