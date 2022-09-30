@@ -4,7 +4,9 @@ import {
   dbDeleteLineById,
   dbDeleteLogById
 } from '../domain/deliveryLog.js'
-import { sendDataResponse } from '../utils/responses.js'
+import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
+
+import dbClient from '../utils/dbClient.js'
 
 export const createLog = async (req, res) => {
   const userId = parseInt(req.user.id)
@@ -50,4 +52,25 @@ export const deleteLineById = async (req, res) => {
   await dbDeleteLineById(id)
 
   return sendDataResponse(res, 200)
+}
+
+export const updateLogById = async (req, res) => {
+  const id = +req.params.id
+  const reqEx = req.body.exerciseId
+  const selectedLog = await dbClient.deliveryLog.findUnique({ where: { id } })
+  const notFound = selectedLog === null
+
+  if (reqEx === '') {
+    return sendMessageResponse(res, 400, 'Missing fields in request body')
+  }
+
+  if (notFound) {
+    return sendMessageResponse(res, 404, 'Log with that id does not exist')
+  }
+
+  const updatedLog = await dbClient.deliveryLog.update({
+    where: { id },
+    data: { exerciseId: +reqEx }
+  })
+  sendDataResponse(res, 201, { log: updatedLog })
 }
