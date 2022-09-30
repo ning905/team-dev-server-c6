@@ -1,19 +1,27 @@
 import dbClient from '../utils/dbClient.js'
+import { myEmitter } from './index.js'
 
 export const createRegisterEvent = async (user) => {
   let type = 'USER'
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: 'register',
-      content: user.role,
-      receivedById: user.id,
-      createdAt: user.createdAt
-    }
-  })
+
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: 'register',
+        content: user.role,
+        receivedById: user.id,
+        createdAt: user.createdAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'register')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdateEmailEvent = async (user, oldEmail) => {
@@ -21,15 +29,22 @@ export const createUpdateEmailEvent = async (user, oldEmail) => {
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: 'update-email-address',
-      content: `from ${oldEmail} to ${user.email}`,
-      receivedById: user.id,
-      createdAt: user.updatedAt
-    }
-  })
+
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: 'update-email-address',
+        content: `from ${oldEmail} to ${user.email}`,
+        receivedById: user.id,
+        createdAt: user.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'update-email')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdatePrivacyEvent = async (user, oldPref) => {
@@ -39,15 +54,21 @@ export const createUpdatePrivacyEvent = async (user, oldPref) => {
     type = 'ADMIN'
   }
 
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: topic,
-      content: oldPref,
-      receivedById: user.id,
-      createdAt: user.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: topic,
+        content: oldPref,
+        receivedById: user.id,
+        createdAt: user.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'update-privacy')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdateActivateEvent = async (user) => {
@@ -62,90 +83,132 @@ export const createUpdateActivateEvent = async (user) => {
     topic = 'deactivate-account'
   }
 
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: topic,
-      receivedById: user.id,
-      createdAt: user.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: topic,
+        receivedById: user.id,
+        createdAt: user.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'update-account-activate')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdateRoleEvent = async (assignee, oldRole, assigner) => {
-  dbClient.event.create({
-    data: {
-      type: 'ADMIN',
-      topic: 'update-role',
-      content: `from ${oldRole} to ${assignee.role}`,
-      createdById: assigner.id,
-      receivedById: assignee.id,
-      createdAt: assignee.updatedAt
-    }
-  })
+  try {
+    dbClient.event.create({
+      data: {
+        type: 'ADMIN',
+        topic: 'update-role',
+        content: `from ${oldRole} to ${assignee.role}`,
+        createdById: assigner.id,
+        receivedById: assignee.id,
+        createdAt: assignee.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(assigner, 'update-role')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createCohortCreatedEvent = async (cohort, admin) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'create',
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.createdAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'create',
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.createdAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'create-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createRenameCohortEvent = async (cohort, oldName, admin) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'rename',
-      content: `from ${oldName} to ${cohort.name}`,
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'rename',
+        content: `from ${oldName} to ${cohort.name}`,
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'rename-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createDeleteCohortEvent = async (cohort, admin) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'delete',
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'delete',
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'delete-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createAddToCohortEvent = async (admin, student, cohort) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'add-to-cohort',
-      receivedById: student.id,
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'add-to-cohort',
+        receivedById: student.id,
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'add-to-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'remove-from-cohort',
-      receivedById: student.id,
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'remove-from-cohort',
+        receivedById: student.id,
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'remove-from-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createErrorEvent = async (errorEvent) => {
@@ -199,6 +262,12 @@ export class ServerErrorEvent extends ErrorEventBase {
     super(user, topic)
     this.code = 500
     this.message = message
+  }
+}
+
+class CreateEventError extends ServerErrorEvent {
+  constructor(user, topic, message = 'Failed to create an event') {
+    super(user, topic, message)
   }
 }
 
