@@ -221,14 +221,24 @@ async function seed() {
   await prisma.exercise.createMany({
     data: [
       {
-        name: 'Exercise 1',
-        gitHubUrl: 'https://www.google.com',
-        objectives: ['Objective 1', 'Objective 2', 'Objective 3']
+        name: 'HTML Scientific Paper',
+        gitHubUrl: 'https://github.com/boolean-uk/html-scientific-paper',
+        objectives: [
+          'Start with the template in index.html',
+          'Add a <title> in the <head> of the HTML page',
+          'Use HTML elements like <header> and <section> to structure your code',
+          'Use HTML elements like <h1> and <em> to format the text',
+          'Use HTML elements like <img> and <a> with the correct attributes'
+        ]
       },
       {
-        name: 'Exercise 2',
-        gitHubUrl: 'https://www.youtube.com',
-        objectives: ['Objective A', 'Objective B', 'Objective C']
+        name: 'Authentication Challenge',
+        gitHubUrl: 'https://github.com/boolean-uk/auth-challenge',
+        objectives: [
+          'Use a token-based approach to authorise access to API resources',
+          'Use a hashing library to encrypt sensitive information',
+          'Build a front-end application that interacts with a bearer-auth protected API'
+        ]
       }
     ]
   })
