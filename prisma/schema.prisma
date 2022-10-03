@@ -78,9 +78,9 @@ model DeliveryLog {
   userId     Int
   user       User              @relation(fields: [userId], references: [id])
   cohortId   Int
-  cohort     Cohort            @relation(fields: [cohortId], references: [id])
+  cohort     Cohort            @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   lines      DeliveryLogLine[]
-  Exercise   Exercise?         @relation(fields: [exerciseId], references: [id])
+  Exercise   Exercise?         @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   exerciseId Int?
 }
 
@@ -141,7 +141,7 @@ model ExerciseUser {
   userId     Int
   users      User     @relation(fields: [userId], references: [id])
   exerciseId Int
-  exercises  Exercise @relation(fields: [exerciseId], references: [id])
+  exercises  Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, exerciseId])
 }
