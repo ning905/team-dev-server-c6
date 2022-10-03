@@ -64,7 +64,7 @@ export const updateCohortName = async (req, res) => {
   return sendMessageResponse(res, 201, { cohort: updatedCohort })
 }
 
-export const deleteCohort = async (req, res) => {
+export const deleteCohortById = async (req, res) => {
   const id = +req.params.id
 
   try {
