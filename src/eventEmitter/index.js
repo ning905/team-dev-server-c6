@@ -39,8 +39,8 @@ myEmitter.on('rename-cohort', (cohort, oldName, admin) =>
 myEmitter.on('delete-cohort', (cohort, admin) =>
   createDeleteCohortEvent(cohort, admin)
 )
-myEmitter.on('add-to-cohort', (admin, student, cohort) =>
-  createAddToCohortEvent(admin, student, cohort)
+myEmitter.on('add-to-cohort', (admin, student) =>
+  createAddToCohortEvent(admin, student)
 )
 myEmitter.on('remove-from-cohort', (admin, student, cohort) =>
   createRemoveFromCohortEvent(admin, student, cohort)
