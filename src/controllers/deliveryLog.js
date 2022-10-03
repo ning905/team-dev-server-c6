@@ -74,3 +74,14 @@ export const updateLogById = async (req, res) => {
   })
   sendDataResponse(res, 201, { log: updatedLog })
 }
+
+export const getAllLogs = async (req, res) => {
+  const exerciseId = +req.query.exerciseId
+  let logs = await dbClient.deliveryLog.findMany()
+  if (!isNaN(exerciseId)) {
+    logs = await dbClient.deliveryLog.findMany({
+      where: { exerciseId }
+    })
+  }
+  sendDataResponse(res, 200, { logs })
+}
