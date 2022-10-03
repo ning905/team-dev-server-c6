@@ -63,6 +63,4 @@ myEmitter.on('get-exercise-by-Id', (exercise, user) =>
   createGetExerciseByIdEvent(exercise, user)
 )
 
-myEmitter.on('error', (user, topic, errorCode, errorMsg) =>
-  createErrorEvent(user, topic, errorCode, errorMsg)
-)
+myEmitter.on('error', (error) => createErrorEvent(error))

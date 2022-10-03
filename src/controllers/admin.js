@@ -1,6 +1,12 @@
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 import { myEmitter } from '../eventEmitter/index.js'
+import {
+  NoPermissionEvent,
+  OtherErrorEvent,
+  NotFoundEvent,
+  ServerErrorEvent
+} from '../eventEmitter/utils.js'
 
 export const updateUserRoleById = async (req, res) => {
   const id = Number(req.params.id)
@@ -10,34 +16,27 @@ export const updateUserRoleById = async (req, res) => {
   const foundUser = await dbClient.user.findUnique({
     where: { id }
   })
+  const foundUserOldRole = foundUser.role
 
   if (!foundUser) {
-    myEmitter.emit(
-      'error',
+    const notFound = new NotFoundEvent(
       req.user,
       `update-role-for-user-${id}`,
-      404,
-      'User not found'
+      'user'
     )
-    return sendMessageResponse(res, 404, 'User not found')
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
   if (foundUser.id === loggedInUserId) {
-    myEmitter.emit(
-      'error',
+    const error = new ServerErrorEvent(
       req.user,
       `update-role-for-user-${id}`,
-      500,
       'Logged in Admin cannot change his own role'
     )
-    return sendMessageResponse(
-      res,
-      500,
-      'Logged in Admin cannot change his own role'
-    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
   }
-
-  const foundUserOldRole = foundUser.role
 
   if (loggedInUserRole === 'ADMIN') {
     try {
@@ -52,27 +51,22 @@ export const updateUserRoleById = async (req, res) => {
       myEmitter.emit('update-role', foundUser, foundUserOldRole, req.user)
       return sendDataResponse(res, 200, updateUserRole)
     } catch (err) {
-      myEmitter.emit(
-        'error',
+      const error = new OtherErrorEvent(
         req.user,
         `update-role-for-user-${id}`,
-        500,
-        'unable to perform role update'
+        401,
+        'no update done'
       )
-      return sendMessageResponse(res, 500, 'unable to perform role update')
+      myEmitter.emit('error', error)
+      return sendMessageResponse(res, error.code, error.message)
     }
   } else {
-    myEmitter.emit(
-      'error',
+    const noPermission = new NoPermissionEvent(
       req.user,
       `update-role-for-user-${id}`,
-      401,
       'You do not have permission to change this'
     )
-    return sendMessageResponse(
-      res,
-      401,
-      'You do not have permission to change this'
-    )
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, noPermission.message)
   }
 }

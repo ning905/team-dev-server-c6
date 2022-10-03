@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
+import { myEmitter } from '../src/eventEmitter/index.js'
 
 const prisma = new PrismaClient()
 
@@ -28,6 +29,7 @@ async function seed() {
       role: 'TEACHER'
     }
   })
+  myEmitter.emit('register', teacherUser)
 
   const teacherProfile = await prisma.profile.create({
     data: {
@@ -42,18 +44,8 @@ async function seed() {
 
   for (let i = 0; i <= 9; i++) {
     if (i <= 3) {
-      const cohort = await prisma.cohort.create({
-        data: {
-          event: {
-            create: {
-              type: 'COHORT',
-              topic: 'create',
-              createdById: teacherUser.id
-            }
-          }
-        }
-      })
-
+      const cohort = await prisma.cohort.create({ data: {} })
+      myEmitter.emit('create-cohort', cohort, teacherUser)
       cohorts.push(cohort)
     }
 
@@ -69,18 +61,10 @@ async function seed() {
             bio: `Here i am, coding like a hurricane`,
             profileImageUrl: profileImages[i]
           }
-        },
-        receivedEvents: {
-          create: {
-            type: 'USER',
-            topic: 'registration'
-          }
         }
-      },
-      include: {
-        receivedEvents: true
       }
     })
+    myEmitter.emit('register', user)
     users.push(user)
   }
 
@@ -91,6 +75,7 @@ async function seed() {
       cohortId: cohorts[2].id
     }
   })
+  myEmitter.emit('register', createdUser)
 
   const userProfile = await prisma.profile.create({
     data: {
@@ -109,6 +94,7 @@ async function seed() {
       role: 'ADMIN'
     }
   })
+  myEmitter.emit('register', adminUser)
 
   const adminProfile = await prisma.profile.create({
     data: {
