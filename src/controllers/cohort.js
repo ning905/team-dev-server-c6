@@ -74,7 +74,7 @@ export const deleteCohortById = async (req, res) => {
   } catch (err) {
     const notFound = new NotFoundEvent(
       req.user,
-      `delete-exercise-${id}`,
+      `delete-cohort-${id}`,
       'cohort'
     )
     myEmitter.emit('error', notFound)
