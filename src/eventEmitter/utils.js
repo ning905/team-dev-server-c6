@@ -210,12 +210,13 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
     throw err
   }
 }
-
-export const createGetAllExercisesEvent = async (exercise, user) => {
+// exercises
+// keep
+export const createExerciseCreatedEvent = async (exercise, user) => {
   await dbClient.event.create({
     data: {
       type: 'EXERCISE',
-      topic: 'get-all-exercises',
+      topic: 'create-exercise',
       createdById: user.id
       // content: `${exercise.gitHubUrl}`
     }
@@ -227,17 +228,6 @@ export const createDeleteExerciseEvent = async (exercise, user) => {
     data: {
       type: 'EXERCISE',
       topic: 'delete-exercise',
-      createdById: user.id
-      // content: `${exercise.gitHubUrl}`
-    }
-  })
-}
-
-export const createGetExerciseByIdEvent = async (exercise, user) => {
-  await dbClient.event.create({
-    data: {
-      type: 'EXERCISE',
-      topic: 'get-exercise-by-Id',
       createdById: user.id
       // content: `${exercise.gitHubUrl}`
     }
@@ -264,6 +254,14 @@ class ErrorEventBase {
   constructor(user, topic) {
     this.user = user
     this.topic = topic
+  }
+}
+
+export class BadRequestEvent extends ErrorEventBase {
+  constructor(user, topic, message = 'Incorrect request syntax') {
+    super(user, topic)
+    this.code = 400
+    this.message = message
   }
 }
 
@@ -296,6 +294,14 @@ export class NotFoundEvent extends ErrorEventBase {
     super(user, topic)
     this.code = 404
     this.message = `The ${target} with the provided id does not exist`
+  }
+}
+
+export class ConfictEvent extends ErrorEventBase {
+  constructor(user, topic, message = 'Request conflicts with data on server') {
+    super(user, topic)
+    this.code = 409
+    this.message = message
   }
 }
 

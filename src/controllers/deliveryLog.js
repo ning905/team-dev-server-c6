@@ -63,7 +63,7 @@ export const updateLogById = async (req, res) => {
   if (reqEx === '') {
     return sendMessageResponse(res, 400, 'Missing fields in request body')
   }
-
+  // use class to replace this
   if (notFound) {
     return sendMessageResponse(res, 404, 'Log with that id does not exist')
   }
