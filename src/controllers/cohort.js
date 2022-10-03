@@ -5,6 +5,7 @@ import {
   updateCohortNameByID
 } from '../domain/cohort.js'
 import { myEmitter } from '../eventEmitter/index.js'
+import { ServerErrorEvent } from '../eventEmitter/utils.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const create = async (req, res) => {
@@ -17,14 +18,13 @@ export const create = async (req, res) => {
 
     return sendDataResponse(res, 201, createdCohort)
   } catch (e) {
-    myEmitter.emit(
-      'error',
+    const error = new ServerErrorEvent(
       req.user,
       'create-cohort',
-      500,
       'Unable to create cohort'
     )
-    sendMessageResponse(res, 500, 'Unable to create cohort')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
     throw e
   }
 }
@@ -35,14 +35,13 @@ export const getAll = async (req, res) => {
 
     return sendDataResponse(res, 201, { cohorts: foundCohorts })
   } catch (e) {
-    myEmitter.emit(
-      'error',
+    const error = new ServerErrorEvent(
       req.user,
       'fetch-cohorts',
-      500,
-      'Unable to fetch Cohorts'
+      'Unable to fetch cohort'
     )
-    sendMessageResponse(res, 500, 'Unable to fetch Cohorts')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
   }
 }
 

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { JWT_EXPIRY, JWT_SECRET } from '../utils/config.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import { myEmitter } from '../eventEmitter/index.js'
+import { NotFoundEvent, ServerErrorEvent } from '../eventEmitter/utils.js'
 
 export const create = async (req, res) => {
   const userToCreate = await User.fromJson(req.body)
@@ -23,7 +24,13 @@ export const create = async (req, res) => {
     return sendDataResponse(res, 201, { token, createdUser })
   } catch (err) {
     // Send an error response back to the client then let the error handling middleware log to the terminal
-    sendMessageResponse(res, 500, 'Unable to create new user')
+    const error = new ServerErrorEvent(
+      null,
+      'register',
+      'Unable to create new user'
+    )
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
     throw err
   }
 }
@@ -39,26 +46,20 @@ export const getById = async (req, res) => {
     const foundUser = await User.findById(id)
 
     if (!foundUser) {
-      myEmitter.emit(
-        'error',
-        req.user,
-        `fetch-user-${id}`,
-        404,
-        'User not found'
-      )
-      return sendDataResponse(res, 404, { id: 'User not found' })
+      const notFound = new NotFoundEvent(req.user, `fetch-user-${id}`, 'user')
+      myEmitter.emit('error', notFound)
+      return sendMessageResponse(res, notFound.code, { id: notFound.message })
     }
 
     return sendDataResponse(res, 200, foundUser)
   } catch (e) {
-    myEmitter.emit(
-      'error',
+    const error = new ServerErrorEvent(
       req.user,
       `fetch-user-${id}`,
-      500,
       'Unable to get user'
     )
-    sendMessageResponse(res, 500, 'Unable to get user')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
     throw e
   }
 }
@@ -126,14 +127,13 @@ export const updateById = async (req, res) => {
   const foundUser = await User.findById(id)
 
   if (!foundUser) {
-    myEmitter.emit(
-      'error',
+    const notFound = new NotFoundEvent(
       req.user,
       `add-${id}to-cohort${cohortId}`,
-      404,
-      'User not found'
+      'user'
     )
-    return sendDataResponse(res, 404, { id: 'User not found' })
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, { id: notFound.message })
   }
 
   const updatedUser = await foundUser.update({ cohortId })
@@ -155,14 +155,9 @@ export const updateUserById = async (req, res) => {
   const foundUser = await User.findById(id)
 
   if (!foundUser) {
-    myEmitter.emit(
-      'error',
-      req.user,
-      `update-user-${id}`,
-      404,
-      'User not found'
-    )
-    return sendDataResponse(res, 404, { id: 'User not found' })
+    const notFound = new NotFoundEvent(req.user, `update-user-${id}`, 'user')
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, { id: notFound.message })
   }
 
   const oldEmail = foundUser.email

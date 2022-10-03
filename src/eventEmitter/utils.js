@@ -1,19 +1,27 @@
 import dbClient from '../utils/dbClient.js'
+import { myEmitter } from './index.js'
 
 export const createRegisterEvent = async (user) => {
   let type = 'USER'
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: 'register',
-      content: user.role,
-      receivedById: user.id,
-      createdAt: user.createdAt
-    }
-  })
+
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: 'register',
+        content: user.role,
+        receivedById: user.id,
+        createdAt: user.createdAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'register')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdateEmailEvent = async (user, oldEmail) => {
@@ -21,33 +29,46 @@ export const createUpdateEmailEvent = async (user, oldEmail) => {
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: 'update-email-address',
-      content: `from ${oldEmail} to ${user.email}`,
-      receivedById: user.id,
-      createdAt: user.profile.updatedAt
-    }
-  })
+
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: 'update-email-address',
+        content: `from ${oldEmail} to ${user.email}`,
+        receivedById: user.id,
+        createdAt: user.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'update-email')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdatePrivacyEvent = async (user, oldPref) => {
-  const topic = 'set-post-privacy-preference-to-' + user.profile.postPrivacyPref
+  const topic = 'set-post-privacy-preference-to-' + user.postPrivacyPref
   let type = 'USER'
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
 
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: topic,
-      content: oldPref,
-      receivedById: user.id,
-      createdAt: user.profile.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: topic,
+        content: oldPref,
+        receivedById: user.id,
+        createdAt: user.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'update-privacy')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdateActivateEvent = async (user) => {
@@ -62,99 +83,206 @@ export const createUpdateActivateEvent = async (user) => {
     topic = 'deactivate-account'
   }
 
-  await dbClient.event.create({
-    data: {
-      type: type,
-      topic: topic,
-      receivedById: user.id,
-      createdAt: user.profile.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: type,
+        topic: topic,
+        receivedById: user.id,
+        createdAt: user.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'update-account-activate')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createUpdateRoleEvent = async (assignee, oldRole, assigner) => {
-  dbClient.event.create({
-    data: {
-      type: 'ADMIN',
-      topic: 'update-role',
-      content: `from ${oldRole} to ${assignee.role}`,
-      createdById: assigner.id,
-      receivedById: assignee.id,
-      createdAt: assignee.updatedAt
-    }
-  })
+  try {
+    dbClient.event.create({
+      data: {
+        type: 'ADMIN',
+        topic: 'update-role',
+        content: `from ${oldRole} to ${assignee.role}`,
+        createdById: assigner.id,
+        receivedById: assignee.id,
+        createdAt: assignee.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(assigner, 'update-role')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createCohortCreatedEvent = async (cohort, admin) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'create',
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.createdAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'create',
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.createdAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'create-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createRenameCohortEvent = async (cohort, oldName, admin) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'rename',
-      content: `from ${oldName} to ${cohort.name}`,
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'rename',
+        content: `from ${oldName} to ${cohort.name}`,
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'rename-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createDeleteCohortEvent = async (cohort, admin) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'delete',
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'delete',
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'delete-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createAddToCohortEvent = async (admin, student, cohort) => {
-  await dbClient.event.create({
-    data: {
-      type: 'COHORT',
-      topic: 'add-to-cohort',
-      receivedById: student.id,
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
-    }
-  })
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'add-to-cohort',
+        receivedById: student.id,
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'add-to-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
 }
 
 export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'COHORT',
+        topic: 'remove-from-cohort',
+        receivedById: student.id,
+        createdById: admin.id,
+        cohortId: cohort.id,
+        createdAt: cohort.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(admin, 'remove-from-cohort')
+    myEmitter.emit('error', error)
+    throw err
+  }
+}
+
+export const createErrorEvent = async (errorEvent) => {
+  let userId
+  if (errorEvent.user) {
+    userId = errorEvent.user.id
+  }
   await dbClient.event.create({
     data: {
-      type: 'COHORT',
-      topic: 'remove-from-cohort',
-      receivedById: student.id,
-      createdById: admin.id,
-      cohortId: cohort.id,
-      createdAt: cohort.updatedAt
+      type: 'ERROR',
+      topic: errorEvent.topic,
+      content: `${errorEvent.code} ${errorEvent.message}`,
+      receivedById: userId
     }
   })
 }
 
-export const createErrorEvent = async (user, topic, errorCode, errorMsg) => {
-  await dbClient.event.create({
-    data: {
-      type: 'ERROR',
-      topic: topic,
-      content: `${errorCode} ${errorMsg}`,
-      receivedById: user.id
-    }
-  })
+class ErrorEventBase {
+  constructor(user, topic) {
+    this.user = user
+    this.topic = topic
+  }
+}
+
+export class NoValidationEvent {
+  constructor(
+    message = 'Unable to verify user',
+    topic = 'validate-authentication'
+  ) {
+    this.user = null
+    this.topic = topic
+    this.code = 401
+    this.message = message
+  }
+}
+
+export class NoPermissionEvent extends ErrorEventBase {
+  constructor(
+    user,
+    topic,
+    message = 'You are not authorized to perform this action'
+  ) {
+    super(user, topic)
+    this.code = 403
+    this.message = message
+  }
+}
+
+export class NotFoundEvent extends ErrorEventBase {
+  constructor(user, topic, target) {
+    super(user, topic)
+    this.code = 404
+    this.message = `The ${target} with the provided id does not exist`
+  }
+}
+
+export class ServerErrorEvent extends ErrorEventBase {
+  constructor(user, topic, message = 'Internal Server Error') {
+    super(user, topic)
+    this.code = 500
+    this.message = message
+  }
+}
+
+class CreateEventError extends ServerErrorEvent {
+  constructor(user, topic, message = 'Failed to create an event') {
+    super(user, topic, message)
+  }
+}
+
+export class OtherErrorEvent extends ErrorEventBase {
+  constructor(user, topic, code, message) {
+    super(user, topic)
+    this.code = code
+    this.message = message
+  }
 }

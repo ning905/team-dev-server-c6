@@ -1,21 +1,17 @@
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 import { myEmitter } from '../eventEmitter/index.js'
+import { NoPermissionEvent, ServerErrorEvent } from '../eventEmitter/utils.js'
 
 export const getEvents = async (req, res) => {
   if (req.user.role !== 'DEVELOPER') {
-    myEmitter.emit(
-      'error',
+    const noPermission = new NoPermissionEvent(
       req.user,
       'fetch-events',
-      403,
       'Only developers can view event records'
     )
-    return sendMessageResponse(
-      res,
-      403,
-      'Only developers can view event records'
-    )
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, noPermission.message)
   }
 
   let sorting = 'desc'
@@ -35,13 +31,13 @@ export const getEvents = async (req, res) => {
     })
     sendDataResponse(res, 200, events)
   } catch (err) {
-    myEmitter.emit(
-      'error',
+    const error = new ServerErrorEvent(
       req.user,
-      'fetch-cohorts',
-      500,
-      'Unable to fetch events'
+      'fetch-events',
+      'Unable to fetch cohort'
     )
-    sendMessageResponse(res, 500, 'Unable to fetch events')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
   }
 }
