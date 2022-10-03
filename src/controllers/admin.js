@@ -10,7 +10,6 @@ export const updateUserRoleById = async (req, res) => {
   const foundUser = await dbClient.user.findUnique({
     where: { id }
   })
-  const foundUserOldRole = foundUser.role
 
   if (!foundUser) {
     myEmitter.emit(
@@ -38,6 +37,8 @@ export const updateUserRoleById = async (req, res) => {
     )
   }
 
+  const foundUserOldRole = foundUser.role
+
   if (loggedInUserRole === 'ADMIN') {
     try {
       const updateUserRole = await dbClient.user.update({
@@ -55,10 +56,10 @@ export const updateUserRoleById = async (req, res) => {
         'error',
         req.user,
         `update-role-for-user-${id}`,
-        404,
+        500,
         'unable to perform role update'
       )
-      return sendMessageResponse(res, 404, 'unable to perform role update')
+      return sendMessageResponse(res, 500, 'unable to perform role update')
     }
   } else {
     myEmitter.emit(

@@ -148,6 +148,50 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
   })
 }
 
+export const createExerciseCreatedEvent = async (exercise, user) => {
+  await dbClient.event.create({
+    data: {
+      type: 'EXERCISE',
+      topic: 'create-exercise',
+      createdById: user.id
+      // content: `${exercise.gitHubUrl}`
+    }
+  })
+}
+
+export const createGetAllExercisesEvent = async (exercise, user) => {
+  await dbClient.event.create({
+    data: {
+      type: 'EXERCISE',
+      topic: 'get-all-exercises',
+      createdById: user.id
+      // content: `${exercise.gitHubUrl}`
+    }
+  })
+}
+
+export const createDeleteExerciseEvent = async (exercise, user) => {
+  await dbClient.event.create({
+    data: {
+      type: 'EXERCISE',
+      topic: 'delete-exercise',
+      createdById: user.id
+      // content: `${exercise.gitHubUrl}`
+    }
+  })
+}
+
+export const createGetExerciseByIdEvent = async (exercise, user) => {
+  await dbClient.event.create({
+    data: {
+      type: 'EXERCISE',
+      topic: 'get-exercise-by-Id',
+      createdById: user.id
+      // content: `${exercise.gitHubUrl}`
+    }
+  })
+}
+
 export const createErrorEvent = async (user, topic, errorCode, errorMsg) => {
   await dbClient.event.create({
     data: {

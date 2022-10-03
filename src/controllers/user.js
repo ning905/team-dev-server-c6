@@ -82,8 +82,6 @@ export const getAllByFirstName = async (req, res) => {
   } else {
     foundUsers = await User.findAll()
   }
-  console.log('First Name', firstName)
-  console.log('FOUND USERS', foundUsers)
 
   const formattedUsers = foundUsers.map((user) => {
     return {

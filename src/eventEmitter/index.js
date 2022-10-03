@@ -10,6 +10,10 @@ import {
   createDeleteCohortEvent,
   createAddToCohortEvent,
   createRemoveFromCohortEvent,
+  createExerciseCreatedEvent,
+  createGetAllExercisesEvent,
+  createDeleteExerciseEvent,
+  createGetExerciseByIdEvent,
   createErrorEvent
 } from './utils.js'
 
@@ -44,6 +48,19 @@ myEmitter.on('add-to-cohort', (admin, student, cohort) =>
 )
 myEmitter.on('remove-from-cohort', (admin, student, cohort) =>
   createRemoveFromCohortEvent(admin, student, cohort)
+)
+
+myEmitter.on('create-exercise', (exercise, user) =>
+  createExerciseCreatedEvent(exercise, user)
+)
+myEmitter.on('fetch-exercises', (exercise, user) =>
+  createGetAllExercisesEvent(exercise, user)
+)
+myEmitter.on('delete-exercise', (exercise, user) =>
+  createDeleteExerciseEvent(exercise, user)
+)
+myEmitter.on('get-exercise-by-Id', (exercise, user) =>
+  createGetExerciseByIdEvent(exercise, user)
 )
 
 myEmitter.on('error', (user, topic, errorCode, errorMsg) =>

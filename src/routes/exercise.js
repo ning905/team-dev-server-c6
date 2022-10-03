@@ -5,12 +5,12 @@ import {
   deleteExercise,
   getExerciseById
 } from '../controllers/exercise.js'
-
+import { validateAuthentication } from '../middleware/auth.js'
 const router = Router()
 
-router.post('/', createExercise)
-router.get('/', getAllExercises)
-router.delete('/:id', deleteExercise)
-router.get('/:id', getExerciseById)
+router.post('/', validateAuthentication, createExercise)
+router.get('/', validateAuthentication, getAllExercises)
+router.delete('/:id', validateAuthentication, deleteExercise)
+router.get('/:id', validateAuthentication, getExerciseById)
 
 export default router
