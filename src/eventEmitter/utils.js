@@ -8,6 +8,7 @@ export const createRegisterEvent = async (user) => {
   }
 
   try {
+    console.log('------------------User', user)
     await dbClient.event.create({
       data: {
         type: type,
@@ -18,6 +19,7 @@ export const createRegisterEvent = async (user) => {
       }
     })
   } catch (err) {
+    console.log('------------------UserError', err)
     const error = new CreateEventError(user, 'register')
     myEmitter.emit('error', error)
     throw err
@@ -29,6 +31,7 @@ export const createUpdateEmailEvent = async (user, oldEmail) => {
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
+  console.log('------------------UserRole', user.role, type)
 
   try {
     await dbClient.event.create({
@@ -120,6 +123,7 @@ export const createUpdateRoleEvent = async (assignee, oldRole, assigner) => {
 
 export const createCohortCreatedEvent = async (cohort, admin) => {
   try {
+    console.log('------------------Cohort', cohort)
     await dbClient.event.create({
       data: {
         type: 'COHORT',
@@ -130,6 +134,7 @@ export const createCohortCreatedEvent = async (cohort, admin) => {
       }
     })
   } catch (err) {
+    console.log('------------------CohortError', err)
     const error = new CreateEventError(admin, 'create-cohort')
     myEmitter.emit('error', error)
     throw err
