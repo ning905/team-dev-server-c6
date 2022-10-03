@@ -173,7 +173,7 @@ export const createDeleteCohortEvent = async (cohort, admin) => {
   }
 }
 
-export const createAddToCohortEvent = async (admin, student, cohort) => {
+export const createAddToCohortEvent = async (admin, student) => {
   try {
     await dbClient.event.create({
       data: {
@@ -181,8 +181,7 @@ export const createAddToCohortEvent = async (admin, student, cohort) => {
         topic: 'add-to-cohort',
         receivedById: student.id,
         createdById: admin.id,
-        cohortId: cohort.id,
-        createdAt: cohort.updatedAt
+        cohortId: student.cohortId
       }
     })
   } catch (err) {
