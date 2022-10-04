@@ -4,7 +4,8 @@ import {
   deleteLogById,
   createLine,
   deleteLineById,
-  updateLogById
+  updateLogById,
+  getAllLogs
 } from '../controllers/deliveryLog.js'
 import { validateAuthentication, validateRole } from '../middleware/auth.js'
 
@@ -15,5 +16,6 @@ router.delete('/:id', validateAuthentication, validateRole, deleteLogById)
 router.post('/line', validateAuthentication, validateRole, createLine)
 router.delete('/line/:id', validateAuthentication, validateRole, deleteLineById)
 router.patch('/:id', updateLogById)
+router.get('/', getAllLogs)
 
 export default router

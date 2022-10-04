@@ -4,12 +4,14 @@ import { myEmitter } from '../eventEmitter/index.js'
 import {
   NoPermissionEvent,
   OtherErrorEvent,
-  NotFoundEvent
+  NotFoundEvent,
+  ServerErrorEvent
 } from '../eventEmitter/utils.js'
 
 export const updateUserRoleById = async (req, res) => {
   const id = Number(req.params.id)
-  const foundUserRole = req.user.role
+  const loggedInUserRole = req.user.role
+  const loggedInUserId = req.user.id
 
   const foundUser = await dbClient.user.findUnique({
     where: { id }
@@ -26,7 +28,17 @@ export const updateUserRoleById = async (req, res) => {
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
-  if (foundUserRole === 'ADMIN') {
+  if (foundUser.id === loggedInUserId) {
+    const error = new ServerErrorEvent(
+      req.user,
+      `update-role-for-user-${id}`,
+      'Logged in Admin cannot change his own role'
+    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
+  }
+
+  if (loggedInUserRole === 'ADMIN') {
     try {
       const updatedUser = await dbClient.user.update({
         where: {

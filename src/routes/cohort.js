@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   create,
+  deleteCohortById,
   getAll,
   getById,
   updateCohortName
@@ -13,5 +14,6 @@ router.post('/', validateAuthentication, validateRole, create)
 router.get('/', validateAuthentication, validateRole, getAll)
 router.get('/:id', validateAuthentication, validateRole, getById)
 router.patch('/:id', validateAuthentication, validateRole, updateCohortName)
+router.delete('/:id', validateAuthentication, deleteCohortById)
 
 export default router
