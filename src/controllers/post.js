@@ -103,6 +103,12 @@ export const getAll = async (req, res) => {
       OR: [{ isPrivate: false }, { userId: id }]
     }
   }
+  if (req.query.user) {
+    query.where = {
+      ...query.where,
+      userId: Number(req.query.user)
+    }
+  }
   const posts = await dbClient.post.findMany(query)
 
   return sendDataResponse(res, 200, posts)
@@ -409,6 +415,79 @@ export const setIsPrivate = async (req, res) => {
       req.user,
       `update-post-${postId}-privacy`
     )
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+  }
+}
+
+export const setIsPinned = async (req, res) => {
+  const postId = Number(req.params.id)
+
+  const foundPost = await dbClient.post.findUnique({
+    where: { id: postId }
+  })
+
+  if (!foundPost) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `update-post-${postId}-pinned`,
+      'post'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  if (foundPost.userId !== req.user.id) {
+    const noPermission = new NoPermissionEvent(
+      req.user,
+      `update-post-${postId}-pinned`,
+      'Only the author can edit the post'
+    )
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, noPermission.message)
+  }
+
+  if (foundPost.isPrivate) {
+    const existingPin = new OtherErrorEvent(
+      req.user,
+      `update-post-${postId}-pinned`,
+      409,
+      "Private posts can't be pinned"
+    )
+    myEmitter.emit('error', existingPin)
+    return sendMessageResponse(res, existingPin.code, existingPin.message)
+  }
+
+  const alreadyPinned = await dbClient.post.findFirst({
+    where: {
+      userId: foundPost.userId,
+      isPinned: true
+    }
+  })
+
+  if (alreadyPinned) {
+    const existingPin = new OtherErrorEvent(
+      req.user,
+      `update-post-${postId}-pinned`,
+      409,
+      'This user already has a pinned post'
+    )
+    myEmitter.emit('error', existingPin)
+    return sendMessageResponse(res, existingPin.code, existingPin.message)
+  }
+
+  try {
+    const updatedPost = await dbClient.update({
+      where: {
+        id: postId
+      },
+      data: {
+        isPinned: !foundPost.isPinned
+      }
+    })
+    return sendMessageResponse(res, 201, updatedPost)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, `update-post-${postId}-pinned`)
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
   }

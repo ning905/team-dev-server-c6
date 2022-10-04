@@ -70,6 +70,7 @@ model Post {
   likes     Like[]
   comments  Comment[]
   isPrivate Boolean   @default(false)
+  isPinned  Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 }
