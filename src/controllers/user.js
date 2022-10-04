@@ -168,8 +168,15 @@ export const updateUserById = async (req, res) => {
 
   const oldEmail = foundUser.email
 
-  const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
-    req.body
+  const {
+    email,
+    firstName,
+    lastName,
+    bio,
+    githubUrl,
+    profileImageUrl,
+    isActive
+  } = req.body
 
   const unhashedPassword = req.body.password
   let password = ''
@@ -199,11 +206,15 @@ export const updateUserById = async (req, res) => {
       lastName,
       bio,
       githubUrl,
-      profileImageUrl
+      profileImageUrl,
+      isActive
     })
 
     if (email) {
       myEmitter.emit('update-email', updateUser, oldEmail)
+    }
+    if (isActive) {
+      myEmitter.emit('update-account-activate', updateUser)
     }
 
     return sendDataResponse(res, 201, updateUser)
