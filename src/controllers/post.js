@@ -96,7 +96,8 @@ export const getAll = async (req, res) => {
           id: true,
           cohortId: true,
           role: true,
-          profile: true
+          profile: true,
+          isActive: true
         }
       },
       likes: {
@@ -121,7 +122,15 @@ export const getAll = async (req, res) => {
       },
       comments: {
         include: {
-          likes: true,
+          likes: {
+            where: {
+              user: {
+                isActive: {
+                  not: false
+                }
+              }
+            }
+          },
           replies: {
             include: {
               likes: {
@@ -139,7 +148,8 @@ export const getAll = async (req, res) => {
                   id: true,
                   cohortId: true,
                   role: true,
-                  profile: true
+                  profile: true,
+                  isActive: true
                 }
               }
             }
@@ -150,7 +160,8 @@ export const getAll = async (req, res) => {
               id: true,
               cohortId: true,
               role: true,
-              profile: true
+              profile: true,
+              isActive: true
             }
           }
         }
