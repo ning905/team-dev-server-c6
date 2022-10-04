@@ -218,3 +218,5 @@ export const updateUserById = async (req, res) => {
     return sendDataResponse(res, 201, updateUser)
   }
 }
+
+export const checkUserLoginDetails = async (req, res) => {}
