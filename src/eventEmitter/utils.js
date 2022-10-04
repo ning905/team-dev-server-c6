@@ -264,6 +264,14 @@ export class NotFoundEvent extends ErrorEventBase {
   }
 }
 
+export class DeactivatedUserEvent extends ErrorEventBase {
+  constructor(user, topic) {
+    super(user, topic)
+    this.code = 400
+    this.message = 'The target user account has been deactivated'
+  }
+}
+
 export class ServerErrorEvent extends ErrorEventBase {
   constructor(user, topic, message = 'Internal Server Error') {
     super(user, topic)

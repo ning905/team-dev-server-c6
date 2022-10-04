@@ -4,7 +4,8 @@ import { myEmitter } from '../eventEmitter/index.js'
 import {
   NoPermissionEvent,
   OtherErrorEvent,
-  NotFoundEvent
+  NotFoundEvent,
+  DeactivatedUserEvent
 } from '../eventEmitter/utils.js'
 
 export const updateUserRoleById = async (req, res) => {
@@ -24,6 +25,16 @@ export const updateUserRoleById = async (req, res) => {
     )
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  if (!foundUser.isActive) {
+    const deactivated = new DeactivatedUserEvent(
+      req.user,
+      `update-role-for-user-${id}`
+    )
+
+    myEmitter.emit('error', deactivated)
+    return sendMessageResponse(res, deactivated.code, deactivated.message)
   }
 
   if (foundUserRole === 'ADMIN') {
