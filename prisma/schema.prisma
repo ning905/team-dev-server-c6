@@ -38,6 +38,7 @@ model User {
   exercises      ExerciseUser[]
   createdEvents  Event[]        @relation("createdEvents")
   receivedEvents Event[]        @relation("receivedEvents")
+  isActive       Boolean        @default(true)
 }
 
 model Profile {
