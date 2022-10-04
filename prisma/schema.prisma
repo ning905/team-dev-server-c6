@@ -132,6 +132,7 @@ model Exercise {
   id         Int            @id @default(autoincrement())
   name       String         @db.VarChar(255)
   gitHubUrl  String         @db.VarChar(255)
+  readMeUrl  String         @db.VarChar(255)
   objectives String[]
   users      ExerciseUser[]
   logs       DeliveryLog[]

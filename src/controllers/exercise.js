@@ -2,7 +2,7 @@ import dbClient from '../utils/dbClient.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 
 export const createExercise = async (req, res) => {
-  const { name, gitHubUrl, objectives } = req.body
+  const { name, gitHubUrl, readMeUrl, objectives } = req.body
   const missingFields = Object.values(req.body).some((v) => v === '')
   const alreadyExists =
     (await dbClient.exercise.findFirst({ where: { name } })) !== null
@@ -19,7 +19,7 @@ export const createExercise = async (req, res) => {
   }
 
   const createdExercise = await dbClient.exercise.create({
-    data: { name, gitHubUrl, objectives }
+    data: { name, gitHubUrl, readMeUrl, objectives }
   })
   return sendDataResponse(res, 201, { exercise: createdExercise })
 }
