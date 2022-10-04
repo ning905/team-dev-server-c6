@@ -5,8 +5,9 @@ import {
   dbDeleteLogById
 } from '../domain/deliveryLog.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
-
+import { myEmitter } from '../eventEmitter/index.js'
 import dbClient from '../utils/dbClient.js'
+import { NotFoundEvent } from '../eventEmitter/utils.js'
 
 export const createLog = async (req, res) => {
   const userId = parseInt(req.user.id)
@@ -58,14 +59,20 @@ export const updateLogById = async (req, res) => {
   const id = +req.params.id
   const reqEx = req.body.exerciseId
   const selectedLog = await dbClient.deliveryLog.findUnique({ where: { id } })
-  const notFound = selectedLog === null
+  const logNotFound = selectedLog === null
 
   if (reqEx === '') {
     return sendMessageResponse(res, 400, 'Missing fields in request body')
   }
-  // use class to replace this
-  if (notFound) {
-    return sendMessageResponse(res, 404, 'Log with that id does not exist')
+
+  if (logNotFound) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `update-log-for-user-${id}`,
+      'log'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
   const updatedLog = await dbClient.deliveryLog.update({
