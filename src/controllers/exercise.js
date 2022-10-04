@@ -9,7 +9,7 @@ import {
 } from '../eventEmitter/utils.js'
 
 export const createExercise = async (req, res) => {
-  const { name, gitHubUrl, objectives } = req.body
+  const { name, gitHubUrl, readMeUrl, objectives } = req.body
   const missingFields = Object.values(req.body).some((v) => v === '')
 
   if (missingFields) {
@@ -37,7 +37,7 @@ export const createExercise = async (req, res) => {
 
   try {
     const createdExercise = await dbClient.exercise.create({
-      data: { name, gitHubUrl, objectives }
+      data: { name, gitHubUrl, readMeUrl, objectives }
     })
     myEmitter.emit('create-exercise', { exercise: createdExercise }, req.user)
     return sendDataResponse(res, 201, { exercise: createdExercise })

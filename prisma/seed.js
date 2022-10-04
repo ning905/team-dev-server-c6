@@ -211,6 +211,7 @@ async function seed() {
       {
         name: 'HTML Scientific Paper',
         gitHubUrl: 'https://github.com/boolean-uk/html-scientific-paper',
+        readMeUrl: 'https://raw.githubusercontent.com/boolean-uk/html-scientific-paper/main/README.md',
         objectives: [
           'Start with the template in index.html',
           'Add a <title> in the <head> of the HTML page',
@@ -222,6 +223,7 @@ async function seed() {
       {
         name: 'Authentication Challenge',
         gitHubUrl: 'https://github.com/boolean-uk/auth-challenge',
+        readMeUrl: 'https://raw.githubusercontent.com/boolean-uk/auth-challenge/main/README.md',
         objectives: [
           'Use a token-based approach to authorise access to API resources',
           'Use a hashing library to encrypt sensitive information',
