@@ -113,7 +113,8 @@ async function seed() {
   const createdPost = await prisma.post.create({
     data: {
       content: "I'm losing my patience creating a DB",
-      userId: createdUser.id
+      userId: createdUser.id,
+      isPinned: true
     }
   })
 
