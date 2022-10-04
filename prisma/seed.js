@@ -68,7 +68,7 @@ async function seed() {
       })
       console.log('-------------------------UserCreation', user)
       users.push(user)
-      // myEmitter.emit('register', users[0])
+      myEmitter.emit('register', users[0])
     } catch (err) {
       console.log('-------------------------UserCreationError', err)
     }

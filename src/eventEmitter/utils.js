@@ -214,15 +214,13 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
     throw err
   }
 }
-// exercises
-// keep
+
 export const createExerciseCreatedEvent = async (exercise, user) => {
   await dbClient.event.create({
     data: {
       type: 'EXERCISE',
       topic: 'create-exercise',
       createdById: user.id
-      // content: `${exercise.gitHubUrl}`
     }
   })
 }
@@ -233,7 +231,6 @@ export const createDeleteExerciseEvent = async (exercise, user) => {
       type: 'EXERCISE',
       topic: 'delete-exercise',
       createdById: user.id
-      // content: `${exercise.gitHubUrl}`
     }
   })
 }
