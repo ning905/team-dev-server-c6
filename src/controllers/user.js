@@ -248,7 +248,40 @@ export const updateUserPrivacy = async (req, res) => {
 }
 
 export const checkUserLoginDetails = async (req, res) => {
+  const id = Number(req.params.id)
+  const foundUser = await User.findById(id)
+
+  if (!foundUser) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `check-user-${id}-login-details`,
+      'user'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, { id: notFound.message })
+  }
+
+  if (foundUser.id !== req.user.id) {
+    const noPermission = new NoPermissionEvent(
+      req.user,
+      `check-user-${id}-login-details`
+    )
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, {
+      id: noPermission.message
+    })
+  }
+
   const email = req.body.email
   const password = await bcrypt.hash(req.body.password, 8)
-  const id = Number(req.params.id)
+
+  if (foundUser.email !== email || foundUser.password !== password) {
+    return sendMessageResponse(
+      res,
+      400,
+      'Invalid email and/or password provided'
+    )
+  }
+
+  return sendMessageResponse(res, 200, 'success')
 }
