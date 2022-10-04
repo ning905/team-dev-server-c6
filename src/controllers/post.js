@@ -14,7 +14,7 @@ const formatPostsData = (posts) => {
   const REMOVED = '[removed]'
 
   posts.forEach((post) => {
-    if (post.user.isActive === false) {
+    if (!post.user.isActive) {
       post.content = REMOVED
       post.user.email = REMOVED
       post.user.profile.firstName = REMOVED
@@ -25,7 +25,7 @@ const formatPostsData = (posts) => {
     }
 
     post.comments.forEach((comment) => {
-      if (comment.user.isActive === false) {
+      if (!comment.user.isActive) {
         comment.content = REMOVED
         comment.user.email = REMOVED
         comment.user.profile.firstName = REMOVED
@@ -36,7 +36,7 @@ const formatPostsData = (posts) => {
       }
 
       comment.replies.forEach((reply) => {
-        if (reply.user.isActive === false) {
+        if (!reply.user.isActive) {
           reply.content = REMOVED
           reply.user.email = REMOVED
           reply.user.profile.firstName = REMOVED
@@ -48,8 +48,6 @@ const formatPostsData = (posts) => {
       })
     })
   })
-
-  return posts
 }
 
 export const create = async (req, res) => {
@@ -104,7 +102,7 @@ export const getAll = async (req, res) => {
         where: {
           user: {
             isActive: {
-              not: false
+              equals: true
             }
           }
         },
@@ -126,7 +124,7 @@ export const getAll = async (req, res) => {
             where: {
               user: {
                 isActive: {
-                  not: false
+                  equals: true
                 }
               }
             }
@@ -137,7 +135,7 @@ export const getAll = async (req, res) => {
                 where: {
                   user: {
                     isActive: {
-                      not: false
+                      equals: true
                     }
                   }
                 }
@@ -178,8 +176,7 @@ export const getAll = async (req, res) => {
   const posts = await dbClient.post.findMany(query)
 
   if (req.user.role === 'STUDENT') {
-    const formattedPosts = formatPostsData(posts)
-    return sendDataResponse(res, 200, formattedPosts)
+    formatPostsData(posts)
   }
 
   return sendDataResponse(res, 200, posts)
