@@ -58,6 +58,8 @@ model Cohort {
   deliveryLogs DeliveryLog[]
   name         String?       @unique
   event        Event[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime?     @updatedAt
 }
 
 model Post {
@@ -79,9 +81,9 @@ model DeliveryLog {
   userId     Int
   user       User              @relation(fields: [userId], references: [id])
   cohortId   Int
-  cohort     Cohort            @relation(fields: [cohortId], references: [id])
+  cohort     Cohort            @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   lines      DeliveryLogLine[]
-  Exercise   Exercise?         @relation(fields: [exerciseId], references: [id])
+  Exercise   Exercise?         @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   exerciseId Int?
 }
 
@@ -93,20 +95,18 @@ model DeliveryLogLine {
 }
 
 model Comment {
-  id      Int           @id @default(autoincrement())
-  content String        @db.VarChar(150)
-  userId  Int
-  user    User          @relation(fields: [userId], references: [id])
-  postId  Int
-  post    Post          @relation(fields: [postId], references: [id])
-  likes   CommentLike[]
-
-  parentId Int?
-  parent   Comment?  @relation("replies", fields: [parentId], references: [id])
-  replies  Comment[] @relation("replies")
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  id        Int           @id @default(autoincrement())
+  content   String        @db.VarChar(150)
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
+  postId    Int
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  likes     CommentLike[]
+  parentId  Int?
+  parent    Comment?      @relation("replies", fields: [parentId], references: [id])
+  replies   Comment[]     @relation("replies")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime?     @updatedAt
 }
 
 model Like {
@@ -133,16 +133,19 @@ model Exercise {
   id         Int            @id @default(autoincrement())
   name       String         @db.VarChar(255)
   gitHubUrl  String         @db.VarChar(255)
+  readMeUrl  String?        @db.VarChar(255)
   objectives String[]
   users      ExerciseUser[]
   logs       DeliveryLog[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime?      @updatedAt
 }
 
 model ExerciseUser {
   userId     Int
   users      User     @relation(fields: [userId], references: [id])
   exerciseId Int
-  exercises  Exercise @relation(fields: [exerciseId], references: [id])
+  exercises  Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, exerciseId])
 }
@@ -152,6 +155,7 @@ enum EventType {
   USER
   ADMIN
   COHORT
+  EXERCISE
 }
 
 model Event {
