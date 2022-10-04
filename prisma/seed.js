@@ -49,23 +49,25 @@ async function seed() {
       cohorts.push(cohort)
     }
 
-    const user = await prisma.user.create({
-      data: {
-        email: `test${i}@test.com`,
-        password,
-        cohortId: cohorts[0].id,
-        profile: {
-          create: {
-            firstName: `name${i}`,
-            lastName: `surname${i}`,
-            bio: `Here i am, coding like a hurricane`,
-            profileImageUrl: profileImages[i]
+    try {
+      const user = await prisma.user.create({
+        data: {
+          email: `test${i}@test.com`,
+          password,
+          cohortId: cohorts[0].id,
+          profile: {
+            create: {
+              firstName: `name${i}`,
+              lastName: `surname${i}`,
+              bio: `Here i am, coding like a hurricane`,
+              profileImageUrl: profileImages[i]
+            }
           }
         }
-      }
-    })
-    myEmitter.emit('register', user)
-    users.push(user)
+      })
+      users.push(user)
+      myEmitter.emit('register', users[0])
+    } catch (err) {}
   }
 
   const createdUser = await prisma.user.create({
