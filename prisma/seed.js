@@ -45,7 +45,6 @@ async function seed() {
   for (let i = 0; i <= 9; i++) {
     if (i <= 3) {
       const cohort = await prisma.cohort.create({ data: {} })
-      console.log('-------------------------CohortCreation', cohort)
       myEmitter.emit('create-cohort', cohort, teacherUser)
       cohorts.push(cohort)
     }
@@ -66,12 +65,9 @@ async function seed() {
           }
         }
       })
-      console.log('-------------------------UserCreation', user)
       users.push(user)
       myEmitter.emit('register', users[0])
-    } catch (err) {
-      console.log('-------------------------UserCreationError', err)
-    }
+    } catch (err) {}
   }
 
   const createdUser = await prisma.user.create({
