@@ -8,6 +8,50 @@ import {
   ServerErrorEvent
 } from '../eventEmitter/utils.js'
 
+const formatPostsData = (posts) => {
+  const DEFAULT_PFP =
+    'https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png'
+  const REMOVED = '[removed]'
+
+  posts.forEach((post) => {
+    if (post.user.isActive === false) {
+      post.content = REMOVED
+      post.user.email = REMOVED
+      post.user.profile.firstName = REMOVED
+      post.user.profile.lastName = REMOVED
+      post.user.profile.bio = REMOVED
+      post.user.profile.githubUrl = REMOVED
+      post.user.profile.profileImageUrl = DEFAULT_PFP
+    }
+
+    post.comments.forEach((comment) => {
+      if (comment.user.isActive === false) {
+        comment.content = REMOVED
+        comment.user.email = REMOVED
+        comment.user.profile.firstName = REMOVED
+        comment.user.profile.lastName = REMOVED
+        comment.user.profile.bio = REMOVED
+        comment.user.profile.githubUrl = REMOVED
+        comment.user.profile.profileImageUrl = DEFAULT_PFP
+      }
+
+      comment.replies.forEach((reply) => {
+        if (reply.user.isActive === false) {
+          reply.content = REMOVED
+          reply.user.email = REMOVED
+          reply.user.profile.firstName = REMOVED
+          reply.user.profile.lastName = REMOVED
+          reply.user.profile.bio = REMOVED
+          reply.user.profile.githubUrl = REMOVED
+          reply.user.profile.profileImageUrl = DEFAULT_PFP
+        }
+      })
+    })
+  })
+
+  return posts
+}
+
 export const create = async (req, res) => {
   const { content, isPrivate } = req.body
   const { id } = req.user
@@ -56,6 +100,13 @@ export const getAll = async (req, res) => {
         }
       },
       likes: {
+        where: {
+          user: {
+            isActive: {
+              not: false
+            }
+          }
+        },
         include: {
           user: {
             select: {
@@ -73,7 +124,15 @@ export const getAll = async (req, res) => {
           likes: true,
           replies: {
             include: {
-              likes: true,
+              likes: {
+                where: {
+                  user: {
+                    isActive: {
+                      not: false
+                    }
+                  }
+                }
+              },
               user: {
                 select: {
                   email: true,
@@ -98,12 +157,19 @@ export const getAll = async (req, res) => {
       }
     }
   }
+
   if (req.user.role === 'STUDENT') {
     query.where = {
       OR: [{ isPrivate: false }, { userId: id }]
     }
   }
+
   const posts = await dbClient.post.findMany(query)
+
+  if (req.user.role === 'STUDENT') {
+    const formattedPosts = formatPostsData(posts)
+    return sendDataResponse(res, 200, formattedPosts)
+  }
 
   return sendDataResponse(res, 200, posts)
 }
