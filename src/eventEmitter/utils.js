@@ -101,7 +101,7 @@ export const createUpdateActivateEvent = async (user) => {
 
 export const createUpdateRoleEvent = async (assignee, oldRole, assigner) => {
   try {
-    dbClient.event.create({
+    await dbClient.event.create({
       data: {
         type: 'ADMIN',
         topic: 'update-role',
@@ -181,8 +181,7 @@ export const createAddToCohortEvent = async (admin, student, cohort) => {
         topic: 'add-to-cohort',
         receivedById: student.id,
         createdById: admin.id,
-        cohortId: cohort.id,
-        createdAt: cohort.updatedAt
+        cohortId: cohort
       }
     })
   } catch (err) {

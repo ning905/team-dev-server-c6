@@ -137,7 +137,7 @@ export const updateById = async (req, res) => {
   }
 
   const updatedUser = await foundUser.update({ cohortId })
-  myEmitter.emit('add-to-cohort', req.user, updatedUser, updatedUser.cohort)
+  myEmitter.emit('add-to-cohort', req.user, updatedUser, updatedUser.cohortId)
 
   return sendDataResponse(res, 201, {
     user: { cohort_id: updatedUser.cohortId }
