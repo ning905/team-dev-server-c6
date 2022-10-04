@@ -54,6 +54,7 @@ async function seed() {
         email: `test${i}@test.com`,
         password,
         cohortId: cohorts[0].id,
+        ...(i === 3 && { isActive: false }),
         profile: {
           create: {
             firstName: `name${i}`,
@@ -186,10 +187,10 @@ async function seed() {
         parentId: 1
       },
       {
-        content: 'Reply to reply',
-        userId: createdUser.id,
+        content: 'Reply',
+        userId: users[3].id,
         postId: createdPost.id,
-        parentId: 3
+        parentId: 1
       }
     ]
   })
