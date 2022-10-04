@@ -111,6 +111,7 @@ export const getAllByCohortId = async (req, res) => {
     foundUsers = await User.findAll()
   }
 
+  foundUsers = foundUsers.filter((user) => user.isActive)
   const formattedUsers = foundUsers.map((user) => {
     return {
       ...user.toJSON().user
