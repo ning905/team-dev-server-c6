@@ -10,6 +10,7 @@ import {
   NotFoundEvent,
   ServerErrorEvent
 } from '../eventEmitter/utils.js'
+import { validateCredentials } from './auth.js'
 
 export const create = async (req, res) => {
   const userToCreate = await User.fromJson(req.body)
@@ -292,6 +293,7 @@ export const updateUserPrivacy = async (req, res) => {
 export const checkUserLoginDetails = async (req, res) => {
   const id = Number(req.params.id)
   const foundUser = await User.findById(id)
+  console.log('req body: ', req.body)
 
   if (!foundUser) {
     const notFound = new NotFoundEvent(
@@ -314,10 +316,13 @@ export const checkUserLoginDetails = async (req, res) => {
     })
   }
 
-  const email = req.body.email
-  const password = await bcrypt.hash(req.body.password, 8)
+  const passwordIsValid = await validateCredentials(
+    req.body.password,
+    foundUser
+  )
 
-  if (foundUser.email !== email || foundUser.password !== password) {
+  if (foundUser.email !== req.body.email || !passwordIsValid) {
+    console.log('failed login info')
     return sendMessageResponse(
       res,
       400,

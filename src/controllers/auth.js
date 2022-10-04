@@ -50,7 +50,7 @@ function generateJwt(userId) {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY })
 }
 
-async function validateCredentials(password, user) {
+export async function validateCredentials(password, user) {
   if (!user) {
     return false
   }
