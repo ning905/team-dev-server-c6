@@ -5,27 +5,11 @@ import { JWT_EXPIRY, JWT_SECRET } from '../utils/config.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import { myEmitter } from '../eventEmitter/index.js'
 import {
+  DeactivatedUserEvent,
   NoPermissionEvent,
   NotFoundEvent,
   ServerErrorEvent
 } from '../eventEmitter/utils.js'
-
-const formatDeactivatedUsers = (users) => {
-  const DEFAULT_PFP =
-    'https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png'
-  const REMOVED = '[removed]'
-
-  users.forEach((user) => {
-    if (!user.isActive) {
-      user.first_name = REMOVED
-      user.last_name = REMOVED
-      user.email = REMOVED
-      user.biography = REMOVED
-      user.github_url = REMOVED
-      user.profile_image_url = DEFAULT_PFP
-    }
-  })
-}
 
 export const create = async (req, res) => {
   const userToCreate = await User.fromJson(req.body)
@@ -128,16 +112,14 @@ export const getAllByCohortId = async (req, res) => {
     foundUsers = await User.findAll()
   }
 
-  foundUsers = foundUsers.filter((user) => user.isActive)
+  if (req.user.role === 'STUDENT') {
+    foundUsers = foundUsers.filter((user) => user.isActive)
+  }
   const formattedUsers = foundUsers.map((user) => {
     return {
       ...user.toJSON().user
     }
   })
-
-  if (req.user.role === 'STUDENT') {
-    formatDeactivatedUsers(formattedUsers)
-  }
 
   return sendDataResponse(res, 200, { users: formattedUsers })
 }
@@ -155,11 +137,21 @@ export const updateUserCohortById = async (req, res) => {
   if (!foundUser) {
     const notFound = new NotFoundEvent(
       req.user,
-      `add-${id}to-cohort${cohortId}`,
+      `add-user-${id}to-cohort${cohortId}`,
       'user'
     )
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, { id: notFound.message })
+  }
+
+  if (!foundUser.isActive) {
+    const deactivated = new DeactivatedUserEvent(
+      req.user,
+      `add-user-${id}to-cohort${cohortId}`
+    )
+
+    myEmitter.emit('error', deactivated)
+    return sendMessageResponse(res, deactivated.code, deactivated.message)
   }
 
   const updatedUser = await foundUser.update({ cohortId })
@@ -199,6 +191,13 @@ export const updateUserById = async (req, res) => {
     profileImageUrl,
     isActive
   } = req.body
+
+  if (!foundUser.isActive && !isActive) {
+    const deactivated = new DeactivatedUserEvent(req.user, `update-user-${id}`)
+
+    myEmitter.emit('error', deactivated)
+    return sendMessageResponse(res, deactivated.code, deactivated.message)
+  }
 
   const unhashedPassword = req.body.password
   let password = ''
@@ -270,6 +269,16 @@ export const updateUserPrivacy = async (req, res) => {
     return sendMessageResponse(res, noPermission.code, {
       id: noPermission.message
     })
+  }
+
+  if (!foundUser.isActive) {
+    const deactivated = new DeactivatedUserEvent(
+      req.user,
+      `update-user-${id}-privacy`
+    )
+
+    myEmitter.emit('error', deactivated)
+    return sendMessageResponse(res, deactivated.code, deactivated.message)
   }
 
   const oldPostPrivacyPref = foundUser.postPrivacyPref
