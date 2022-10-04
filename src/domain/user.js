@@ -8,7 +8,7 @@ export default class User {
    * take as inputs, what types they return, and other useful information that JS doesn't have built in
    * @tutorial https://www.valentinog.com/blog/jsdoc
    *
-   * @param { { id: int, cohortId: int, email: string, profile: { firstName: string, lastName: string, bio: string, githubUrl: string, profileImageUrl: string, postPrivacyPref: string  } } } user
+   * @param { { id: int, cohortId: int, email: string, isActive: boolean, profile: { firstName: string, lastName: string, bio: string, githubUrl: string, profileImageUrl: string, postPrivacyPref: string  } } } user
    * @returns {User}
    */
   static fromDb(user) {
@@ -23,7 +23,8 @@ export default class User {
       user.profile.profileImageUrl,
       user.password,
       user.role,
-      user.profile.postPrivacyPref
+      user.profile.postPrivacyPref,
+      user.isActive
     )
   }
 
@@ -37,7 +38,8 @@ export default class User {
       profile_image_url,
       password,
       role,
-      postPrivacyPref
+      postPrivacyPref,
+      isActive
     } = json
 
     const passwordHash = await bcrypt.hash(password, 8)
@@ -53,7 +55,8 @@ export default class User {
       profile_image_url,
       passwordHash,
       role,
-      postPrivacyPref
+      postPrivacyPref,
+      isActive
     )
   }
 
@@ -68,7 +71,8 @@ export default class User {
     profileImageUrl,
     passwordHash = null,
     role = 'STUDENT',
-    postPrivacyPref = 'PUBLIC'
+    postPrivacyPref = 'PUBLIC',
+    isActive = true
   ) {
     this.id = id
     this.cohortId = cohortId
@@ -81,6 +85,7 @@ export default class User {
     this.passwordHash = passwordHash
     this.role = role
     this.postPrivacyPref = postPrivacyPref
+    this.isActive = isActive
   }
 
   toJSON() {
@@ -95,7 +100,8 @@ export default class User {
         biography: this.bio,
         github_url: this.githubUrl,
         profile_image_url: this.profileImageUrl,
-        postPrivacyPref: this.postPrivacyPref
+        postPrivacyPref: this.postPrivacyPref,
+        isActive: this.isActive
       }
     }
   }
@@ -111,6 +117,7 @@ export default class User {
         password: this.passwordHash,
         cohortId: this.cohortId,
         role: this.role,
+        isActive: this.isActive,
         profile: {
           create: {
             firstName: this.firstName,
@@ -138,7 +145,8 @@ export default class User {
     githubUrl,
     profileImageUrl,
     cohortId,
-    postPrivacyPref
+    postPrivacyPref,
+    isActive
   }) {
     const updatedUser = await dbClient.user.update({
       where: {
@@ -147,6 +155,7 @@ export default class User {
       data: {
         email,
         cohortId,
+        isActive,
         profile: {
           update: {
             firstName,
