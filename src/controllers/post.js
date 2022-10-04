@@ -432,7 +432,6 @@ export const setIsPinned = async (req, res) => {
   const foundPost = await dbClient.post.findUnique({
     where: { id: postId }
   })
-  console.log('Found post', foundPost)
 
   if (!foundPost) {
     const notFound = new NotFoundEvent(
@@ -471,7 +470,6 @@ export const setIsPinned = async (req, res) => {
       isPinned: true
     }
   })
-  console.log('Already Pinned', alreadyPinned)
 
   if (alreadyPinned) {
     const existingPin = new OtherErrorEvent(
