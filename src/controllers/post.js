@@ -189,19 +189,13 @@ export const deletePost = async (req, res) => {
     return sendMessageResponse(res, noPermission.code, noPermission.message)
   }
 
-  const deletedComments = await dbClient.comment.deleteMany({
-    where: {
-      postId: id
-    }
-  })
-
   const deletedPost = await dbClient.post.delete({
     where: {
       id
     }
   })
 
-  return sendDataResponse(res, 201, { deletedPost, deletedComments })
+  return sendDataResponse(res, 201, { deletedPost })
 }
 
 export const createComment = async (req, res) => {
