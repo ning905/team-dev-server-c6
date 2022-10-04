@@ -74,7 +74,8 @@ async function seed() {
     data: {
       email: 'notmyrealemail@email.com',
       password,
-      cohortId: cohorts[2].id
+      cohortId: cohorts[2].id,
+      role: 'DEVELOPER'
     }
   })
   myEmitter.emit('register', createdUser)

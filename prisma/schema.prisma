@@ -15,6 +15,7 @@ enum Role {
   STUDENT
   TEACHER
   ADMIN
+  DEVELOPER
 }
 
 enum Visibility {
