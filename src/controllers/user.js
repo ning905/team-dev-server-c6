@@ -246,3 +246,9 @@ export const updateUserPrivacy = async (req, res) => {
   myEmitter.emit('update-privacy', updateUser, oldPostPrivacyPref)
   return sendDataResponse(res, 201, updateUser)
 }
+
+export const checkUserLoginDetails = async (req, res) => {
+  const email = req.body.email
+  const password = await bcrypt.hash(req.body.password, 8)
+  const id = Number(req.params.id)
+}
