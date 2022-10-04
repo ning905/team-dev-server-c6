@@ -433,24 +433,6 @@ export const setIsPinned = async (req, res) => {
     where: { id: postId }
   })
   console.log('Found post', foundPost)
-  const alreadyPinned = await dbClient.post.findFirst({
-    where: {
-      userId: foundPost.userId,
-      isPinned: true
-    }
-  })
-
-  console.log('Already Pinned', alreadyPinned)
-  if (alreadyPinned) {
-    const existingPin = new OtherErrorEvent(
-      req.user,
-      `update-post-${postId}-pinned`,
-      409,
-      'This user already has a pinned post'
-    )
-    myEmitter.emit('error', existingPin)
-    return sendMessageResponse(res, existingPin.code, existingPin.message)
-  }
 
   if (!foundPost) {
     const notFound = new NotFoundEvent(
@@ -470,6 +452,36 @@ export const setIsPinned = async (req, res) => {
     )
     myEmitter.emit('error', noPermission)
     return sendMessageResponse(res, noPermission.code, noPermission.message)
+  }
+
+  if (foundPost.isPrivate) {
+    const existingPin = new OtherErrorEvent(
+      req.user,
+      `update-post-${postId}-pinned`,
+      409,
+      "Private posts can't be pinned"
+    )
+    myEmitter.emit('error', existingPin)
+    return sendMessageResponse(res, existingPin.code, existingPin.message)
+  }
+
+  const alreadyPinned = await dbClient.post.findFirst({
+    where: {
+      userId: foundPost.userId,
+      isPinned: true
+    }
+  })
+  console.log('Already Pinned', alreadyPinned)
+
+  if (alreadyPinned) {
+    const existingPin = new OtherErrorEvent(
+      req.user,
+      `update-post-${postId}-pinned`,
+      409,
+      'This user already has a pinned post'
+    )
+    myEmitter.emit('error', existingPin)
+    return sendMessageResponse(res, existingPin.code, existingPin.message)
   }
 
   try {
