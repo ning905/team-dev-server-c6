@@ -101,7 +101,7 @@ export const createUpdateActivateEvent = async (user) => {
 
 export const createUpdateRoleEvent = async (assignee, oldRole, assigner) => {
   try {
-    dbClient.event.create({
+    await dbClient.event.create({
       data: {
         type: 'ADMIN',
         topic: 'update-role',
