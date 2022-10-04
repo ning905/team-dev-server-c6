@@ -1,6 +1,3 @@
--- AlterEnum
-ALTER TYPE "EventType" ADD VALUE 'EXERCISE';
-
 -- AlterTable
 ALTER TABLE "Cohort" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "updatedAt" TIMESTAMP(3);
