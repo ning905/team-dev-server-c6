@@ -4,7 +4,11 @@ import jwt from 'jsonwebtoken'
 import { JWT_EXPIRY, JWT_SECRET } from '../utils/config.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import { myEmitter } from '../eventEmitter/index.js'
-import { NotFoundEvent, ServerErrorEvent } from '../eventEmitter/utils.js'
+import {
+  NoPermissionEvent,
+  NotFoundEvent,
+  ServerErrorEvent
+} from '../eventEmitter/utils.js'
 
 export const create = async (req, res) => {
   const userToCreate = await User.fromJson(req.body)
@@ -116,7 +120,7 @@ export const getAllByCohortId = async (req, res) => {
   return sendDataResponse(res, 200, { users: formattedUsers })
 }
 
-export const updateById = async (req, res) => {
+export const updateUserCohortById = async (req, res) => {
   const cohortId = parseInt(req.body.cohort_id)
   const id = parseInt(req.params.id)
 
@@ -144,12 +148,6 @@ export const updateById = async (req, res) => {
   })
 }
 
-export const updateLoggedInUser = async (req, res) => {
-  req.params.id = req.user.id
-
-  return updateUserById(req, res)
-}
-
 export const updateUserById = async (req, res) => {
   const id = parseInt(req.params.id)
   const foundUser = await User.findById(id)
@@ -160,23 +158,21 @@ export const updateUserById = async (req, res) => {
     return sendMessageResponse(res, notFound.code, { id: notFound.message })
   }
 
-  const oldEmail = foundUser.email
-  const oldPostPrivacyPref = foundUser.postPrivacyPref
+  if (foundUser.id !== req.user.id) {
+    const noPermission = new NoPermissionEvent(req.user, `update-user-${id}`)
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, {
+      id: noPermission.message
+    })
+  }
 
-  const {
-    email,
-    firstName,
-    lastName,
-    bio,
-    githubUrl,
-    profileImageUrl,
-    postPrivacyPref
-  } = req.body
+  const oldEmail = foundUser.email
+
+  const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
+    req.body
 
   const unhashedPassword = req.body.password
-
   let password = ''
-
   if (unhashedPassword) {
     password = await bcrypt.hash(unhashedPassword, 8)
   }
@@ -203,20 +199,50 @@ export const updateUserById = async (req, res) => {
       lastName,
       bio,
       githubUrl,
-      profileImageUrl,
-      postPrivacyPref
+      profileImageUrl
     })
 
     if (email) {
       myEmitter.emit('update-email', updateUser, oldEmail)
     }
 
-    if (postPrivacyPref) {
-      myEmitter.emit('update-privacy', updateUser, oldPostPrivacyPref)
-    }
-
     return sendDataResponse(res, 201, updateUser)
   }
 }
 
-export const checkUserLoginDetails = async (req, res) => {}
+export const updateUserPrivacy = async (req, res) => {
+  const id = parseInt(req.params.id)
+  const foundUser = await User.findById(id)
+
+  if (!foundUser) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `update-user-${id}-privacy`,
+      'user'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, { id: notFound.message })
+  }
+
+  if (
+    req.user.id !== foundUser.id &&
+    req.user.role !== 'TEACHER' &&
+    req.user.role !== 'ADMIN'
+  ) {
+    const noPermission = new NoPermissionEvent(
+      req.user,
+      `update-user-${id}-privacy`
+    )
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, {
+      id: noPermission.message
+    })
+  }
+
+  const oldPostPrivacyPref = foundUser.postPrivacyPref
+  const { postPrivacyPref } = req.body
+  const updateUser = await foundUser.update({ postPrivacyPref })
+
+  myEmitter.emit('update-privacy', updateUser, oldPostPrivacyPref)
+  return sendDataResponse(res, 201, updateUser)
+}
