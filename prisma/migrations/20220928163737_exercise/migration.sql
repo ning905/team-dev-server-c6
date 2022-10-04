@@ -3,7 +3,6 @@ CREATE TABLE "Exercise" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "gitHubUrl" VARCHAR(255) NOT NULL,
-    "readMeUrl" VARCHAR(255) NOT NULL,
     "objectives" TEXT[],
 
     CONSTRAINT "Exercise_pkey" PRIMARY KEY ("id")
