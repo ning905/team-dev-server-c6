@@ -179,3 +179,50 @@ export const getModuleById = async (req, res) => {
     throw err
   }
 }
+
+export const updateModuleById = async (req, res) => {
+  const currId = Number(req.params.id)
+  const moduleId = Number(req.params.moduleId)
+  const { name, description, objectives } = req.body
+
+  const foundModule = await dbClient.module.findFirst({
+    where: {
+      id: moduleId,
+      curriculum: {
+        some: {
+          id: currId
+        }
+      }
+    }
+  })
+
+  if (!foundModule) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `update-module-${moduleId}`,
+      'module'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  try {
+    const updated = await dbClient.module.update({
+      where: {
+        id: moduleId
+      },
+      data: {
+        name,
+        description,
+        objectives
+      }
+    })
+
+    return sendDataResponse(res, 201, updated)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, `update-module-${moduleId}`)
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
