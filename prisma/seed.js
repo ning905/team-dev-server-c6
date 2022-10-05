@@ -211,7 +211,8 @@ async function seed() {
       {
         name: 'HTML Scientific Paper',
         gitHubUrl: 'https://github.com/boolean-uk/html-scientific-paper',
-        readMeUrl: 'https://raw.githubusercontent.com/boolean-uk/html-scientific-paper/main/README.md',
+        readMeUrl:
+          'https://raw.githubusercontent.com/boolean-uk/html-scientific-paper/main/README.md',
         objectives: [
           'Start with the template in index.html',
           'Add a <title> in the <head> of the HTML page',
@@ -223,7 +224,8 @@ async function seed() {
       {
         name: 'Authentication Challenge',
         gitHubUrl: 'https://github.com/boolean-uk/auth-challenge',
-        readMeUrl: 'https://raw.githubusercontent.com/boolean-uk/auth-challenge/main/README.md',
+        readMeUrl:
+          'https://raw.githubusercontent.com/boolean-uk/auth-challenge/main/README.md',
         objectives: [
           'Use a token-based approach to authorise access to API resources',
           'Use a hashing library to encrypt sensitive information',
@@ -232,6 +234,81 @@ async function seed() {
       }
     ]
   })
+
+  const iterator = 3
+  for (let curr = 1; curr < iterator; curr++) {
+    const curriculum = await prisma.curriculum.create({
+      data: {
+        name: 'Javascript',
+        description:
+          'Learn the JavaScript fundamentals you will need for front-end or back-end development'
+      }
+    })
+    for (let mod = 1; mod < iterator; mod++) {
+    const module = await prisma.module.create({
+      data: {
+        name: `Module ${mod}`,
+        description: `Description for Module-${mod}`,
+        objectives: [
+          `Objective 1 for module-${mod} Curriculum-${curr}`,
+          `Objective 2 for module-${mod} Curriculum-${curr}`,
+          `Objective 2 for module-${mod} Curriculum-${curr}`,
+          `Objective 2 for module-${mod} Curriculum-${curr}`,
+          `Objective 2 for module-${mod} Curriculum-${curr}`
+        ],
+        curriculumId: curriculum.id
+      }
+    })
+    for (let un = 1; un < iterator; un++) {
+      const unit = await prisma.unit.create({
+        name: `Unit ${un}`,
+        description: `Description for Unit-${un}`,
+        objectives: [
+          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`
+        ],
+        moduleId: module.id
+      })
+      for (let les = 1; les < iterator; les++) {
+        const lesson = await prisma.lesson.create({
+          name: `Lesson ${les}`,
+          description: `Lesson description for ${les}`,
+          objectives: [
+            `Objective 1 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 2 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 3 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 4 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 5 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+          ],
+          unitId: unit.id
+        })
+        for (let lesPl = 1; lesPl < iterator; lesPl++) {
+          const lessonPlan = await prisma.lessonPlan.create({
+            name: `Lesson Plan ${lesPl}`,
+            description: `Lesson plan description for ${lesPl}`,
+            objectives: [
+              `Objective 1 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 2 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 3 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 4 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 5 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+            ],
+            lessonPlanId: lesson.id
+          })
+          console.log(
+            'module, unit, lesson, lessonPlan',
+            module,
+            unit,
+            lesson,
+            lessonPlan
+          )
+        }
+      }
+    }
+  }
 }
 
 seed().catch(async (error) => {

@@ -23,21 +23,23 @@ enum Visibility {
 }
 
 model User {
-  id             Int            @id @default(autoincrement())
-  email          String         @unique
-  password       String         @db.VarChar(250)
-  role           Role           @default(STUDENT)
-  profile        Profile?
-  cohortId       Int?
-  cohort         Cohort?        @relation(fields: [cohortId], references: [id])
-  posts          Post[]
-  deliveryLogs   DeliveryLog[]
-  comments       Comment[]
-  likes          Like[]
-  commentLikes   CommentLike[]
-  exercises      ExerciseUser[]
-  createdEvents  Event[]        @relation("createdEvents")
-  receivedEvents Event[]        @relation("receivedEvents")
+  id              Int            @id @default(autoincrement())
+  email           String         @unique
+  password        String         @db.VarChar(250)
+  role            Role           @default(STUDENT)
+  profile         Profile?
+  cohortId        Int?
+  cohort          Cohort?        @relation(fields: [cohortId], references: [id])
+  posts           Post[]
+  deliveryLogs    DeliveryLog[]
+  comments        Comment[]
+  likes           Like[]
+  commentLikes    CommentLike[]
+  exercises       ExerciseUser[]
+  createdLessons  LessonPlan[]   @relation("created-by")
+  receivedLessons LessonPlan[]   @relation("created-for")
+  createdEvents   Event[]        @relation("createdEvents")
+  receivedEvents  Event[]        @relation("receivedEvents")
 }
 
 model Profile {
@@ -136,6 +138,7 @@ model Exercise {
   objectives String[]
   users      ExerciseUser[]
   logs       DeliveryLog[]
+  lesson     Lesson[]
   createdAt  DateTime       @default(now())
   updatedAt  DateTime?      @updatedAt
 }
@@ -168,6 +171,65 @@ model Event {
   receivedById Int?
   cohort       Cohort?   @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   cohortId     Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+}
+
+model Curriculum {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  description String?
+  modules     Module[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+}
+
+model Module {
+  id          Int          @id @default(autoincrement())
+  name        String?
+  description String?
+  objectives  String[]
+  curriculum  Curriculum[]
+  units       Unit[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime?    @updatedAt
+}
+
+model Unit {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  description String?
+  objectives  String[]
+  moduleId    Int
+  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+}
+
+model Lesson {
+  id          Int          @id @default(autoincrement())
+  date        DateTime?    @default(now())
+  description String?
+  objectives  String[]
+  unitId      Int
+  unit        Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  lessonPlans LessonPlan[]
+  exercises   Exercise[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime?    @updatedAt
+}
+
+model LessonPlan {
+  id           Int       @id @default(autoincrement())
+  description  String?
+  objectives   String[]
+  lessonId     Int       @unique
+  lesson       Lesson    @relation(fields: [lessonId], references: [id])
+  createdById  Int
+  createdBy    User      @relation("created-by", fields: [createdById], references: [id], onDelete: Cascade)
+  createdForId Int
+  createdFor   User      @relation("created-for", fields: [createdForId], references: [id], onDelete: Cascade)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime? @updatedAt
 }
