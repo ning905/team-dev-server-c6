@@ -99,3 +99,58 @@ export const deleteCurriculumById = async (req, res) => {
     return sendMessageResponse(res, error.code, error.message)
   }
 }
+
+export const createModule = async (req, res) => {
+  const { name, description, objectives } = req.body
+  const currId = Number(req.params.id)
+
+  if (!name) {
+    return sendMessageResponse(res, 400, 'missing module name')
+  }
+  if (!description) {
+    return sendMessageResponse(res, 400, 'missing module description')
+  }
+
+  try {
+    const created = await dbClient.module.create({
+      data: {
+        name,
+        description,
+        objectives,
+        curriculum: { connect: { id: currId } }
+      }
+    })
+
+    return sendDataResponse(res, 201, created)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'create-model')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const getAllModulesByCurr = async (req, res) => {
+  const currId = Number(req.params.id)
+
+  try {
+    const modules = await dbClient.module.findMany({
+      where: {
+        curriculum: {
+          some: {
+            id: currId
+          }
+        }
+      }
+    })
+
+    return sendDataResponse(res, 200, modules)
+  } catch (err) {
+    const error = new ServerErrorEvent(
+      req.user,
+      `fetch-modules-for-curriculum-${currId}`
+    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
+  }
+}
