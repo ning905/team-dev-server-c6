@@ -1,5 +1,6 @@
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
+
 import { myEmitter } from '../eventEmitter/index.js'
 import { ServerErrorEvent } from '../eventEmitter/utils.js'
 
@@ -20,10 +21,22 @@ export const createCurriculum = async (req, res) => {
     const error = new ServerErrorEvent(
       req.user,
       'create-curriculum',
-      'Unable to create cohort'
+      'Unable to create curriculum'
     )
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err
+  }
+}
+
+export const getAllCurriculums = async (req, res) => {
+  try {
+    const currs = await dbClient.curriculum.findMany()
+
+    return sendDataResponse(res, 200, currs)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'fetch-all-curriculums')
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
   }
 }
