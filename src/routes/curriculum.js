@@ -6,7 +6,11 @@ import {
   deleteCurriculumById,
   createCurriculum,
   createModule,
-  getAllModulesByCurr
+  getAllModulesByCurr,
+  getAllModules,
+  getModuleById,
+  updateModuleById,
+  deleteModuleById
 } from '../controllers/curriculum.js'
 
 const router = Router()
@@ -23,9 +27,20 @@ router.delete(
 
 router.post('/:id/module', validateAuthentication, createModule)
 router.get('/:id/module', validateAuthentication, getAllModulesByCurr)
+router.get('/moduels', validateAuthentication, getAllModules)
 router.get('/:id/module/:moduleId', validateAuthentication, getModuleById)
-router.put('/:id/module/:moduleId', validateAuthentication, updateModuleById)
-router.delete('/:id/module/:moduleId', validateAuthentication, deleteModuleById)
+router.put(
+  '/:id/module/:moduleId',
+  validateAuthentication,
+  validateRole,
+  updateModuleById
+)
+router.delete(
+  '/:id/module/:moduleId',
+  validateAuthentication,
+  validateRole,
+  deleteModuleById
+)
 
 // router.post('/:id/module/:moduleId/unit', validateAuthentication, createUnit)
 // router.get('/:id/module/:moduleId/unit', validateAuthentication, getAllUnits)
@@ -36,12 +51,12 @@ router.delete('/:id/module/:moduleId', validateAuthentication, deleteModuleById)
 // )
 // router.put(
 //   '/:id/module/:moduleId/unit/:unitId',
-//   validateAuthentication,
+//   validateAuthentication, validateRole
 //   updateUnitById
 // )
 // router.delete(
 //   '/:id/module/:moduleId/unit/:unitId',
-//   validateAuthentication,
+//   validateAuthentication, validateRole
 //   deleteUnitById
 // )
 
@@ -62,12 +77,12 @@ router.delete('/:id/module/:moduleId', validateAuthentication, deleteModuleById)
 // )
 // router.put(
 //   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
-//   validateAuthentication,
+//   validateAuthentication, validateRole
 //   updateLessonById
 // )
 // router.delete(
 //   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
-//   validateAuthentication,
+//   validateAuthentication, validateRole
 //   deleteLessonById
 // )
 
@@ -83,12 +98,12 @@ router.delete('/:id/module/:moduleId', validateAuthentication, deleteModuleById)
 // )
 // router.put(
 //   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId/lessonPlan',
-//   validateAuthentication,
+//   validateAuthentication, validateRole
 //   updateLessonPlan
 // )
 // router.delete(
 //   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId/lessonPlan',
-//   validateAuthentication,
+//   validateAuthentication, validateRole
 //   deleteLessonPlan
 // )
 
