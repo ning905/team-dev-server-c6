@@ -154,3 +154,28 @@ export const getAllModulesByCurr = async (req, res) => {
     return sendMessageResponse(res, error.code, error.message)
   }
 }
+
+export const getModuleById = async (req, res) => {
+  const currId = Number(req.params.id)
+  const moduleId = Number(req.params.moduleId)
+
+  try {
+    const foundModule = await dbClient.module.findFirst({
+      where: {
+        id: moduleId,
+        curriculum: {
+          some: {
+            id: currId
+          }
+        }
+      }
+    })
+
+    return sendDataResponse(res, 201, foundModule)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'create-model')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}

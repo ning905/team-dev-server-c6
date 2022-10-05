@@ -6,7 +6,8 @@ import {
   deleteCurriculumById,
   createCurriculum,
   createModule,
-  getAllModulesByCurr
+  getAllModulesByCurr,
+  getModuleById
 } from '../controllers/curriculum.js'
 
 const router = Router()
@@ -24,8 +25,8 @@ router.delete(
 router.post('/:id/module', validateAuthentication, createModule)
 router.get('/:id/module', validateAuthentication, getAllModulesByCurr)
 router.get('/:id/module/:moduleId', validateAuthentication, getModuleById)
-router.put('/:id/module/:moduleId', validateAuthentication, updateModuleById)
-router.delete('/:id/module/:moduleId', validateAuthentication, deleteModuleById)
+// router.put('/:id/module/:moduleId', validateAuthentication, updateModuleById)
+// router.delete('/:id/module/:moduleId', validateAuthentication, deleteModuleById)
 
 // router.post('/:id/module/:moduleId/unit', validateAuthentication, createUnit)
 // router.get('/:id/module/:moduleId/unit', validateAuthentication, getAllUnits)
