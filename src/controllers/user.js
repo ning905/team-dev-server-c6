@@ -193,7 +193,11 @@ export const updateUserById = async (req, res) => {
     isActive
   } = req.body
 
-  if (!foundUser.isActive && !isActive) {
+  if (!isActive) {
+    console.log('is deactivating account: ', { isActive })
+  }
+
+  if (!foundUser.isActive && isActive) {
     const deactivated = new DeactivatedUserEvent(req.user, `update-user-${id}`)
 
     myEmitter.emit('error', deactivated)
@@ -235,7 +239,7 @@ export const updateUserById = async (req, res) => {
     if (email) {
       myEmitter.emit('update-email', updateUser, oldEmail)
     }
-    if (isActive) {
+    if (isActive === true || isActive === false) {
       myEmitter.emit('update-account-activate', updateUser)
     }
 

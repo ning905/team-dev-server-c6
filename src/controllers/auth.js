@@ -26,7 +26,7 @@ export const login = async (req, res) => {
     }
 
     let userToLogin = foundUser
-    if (foundUser.isActive === false) {
+    if (!foundUser.isActive) {
       userToLogin = await foundUser.update({ isActive: true })
       myEmitter.emit('update-account-activate', userToLogin)
     }

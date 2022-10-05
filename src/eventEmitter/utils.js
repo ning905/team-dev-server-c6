@@ -77,7 +77,7 @@ export const createUpdateActivateEvent = async (user) => {
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
-  if (user.isActivate) {
+  if (user.isActive) {
     topic = 'activate-account'
   } else {
     topic = 'deactivate-account'
