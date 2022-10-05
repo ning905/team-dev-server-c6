@@ -1,8 +1,8 @@
 -- CreateTable
 CREATE TABLE "Curriculum" (
     "id" SERIAL NOT NULL,
-    "name" TEXT,
-    "description" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
 
@@ -12,8 +12,8 @@ CREATE TABLE "Curriculum" (
 -- CreateTable
 CREATE TABLE "Module" (
     "id" SERIAL NOT NULL,
-    "name" TEXT,
-    "description" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "objectives" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
@@ -24,8 +24,8 @@ CREATE TABLE "Module" (
 -- CreateTable
 CREATE TABLE "Unit" (
     "id" SERIAL NOT NULL,
-    "name" TEXT,
-    "description" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "objectives" TEXT[],
     "moduleId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -38,8 +38,8 @@ CREATE TABLE "Unit" (
 CREATE TABLE "Lesson" (
     "id" SERIAL NOT NULL,
     "dayNumber" INTEGER NOT NULL,
-    "name" TEXT,
-    "description" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "objectives" TEXT[],
     "unitId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -51,8 +51,8 @@ CREATE TABLE "Lesson" (
 -- CreateTable
 CREATE TABLE "LessonPlan" (
     "id" SERIAL NOT NULL,
-    "name" TEXT,
-    "description" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "objectives" TEXT[],
     "lessonId" INTEGER NOT NULL,
     "createdById" INTEGER NOT NULL,

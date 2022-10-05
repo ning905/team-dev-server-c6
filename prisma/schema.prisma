@@ -177,8 +177,8 @@ model Event {
 
 model Curriculum {
   id          Int       @id @default(autoincrement())
-  name        String?
-  description String?
+  name        String
+  description String
   modules     Module[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
@@ -186,10 +186,10 @@ model Curriculum {
 
 model Module {
   id          Int          @id @default(autoincrement())
-  name        String?
-  description String?
+  name        String
+  description String
   objectives  String[]
-  curriculum  Curriculum[]
+  curriculums Curriculum[]
   units       Unit[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime?    @updatedAt
@@ -197,8 +197,8 @@ model Module {
 
 model Unit {
   id          Int       @id @default(autoincrement())
-  name        String?
-  description String?
+  name        String
+  description String
   objectives  String[]
   moduleId    Int
   module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
@@ -210,8 +210,8 @@ model Unit {
 model Lesson {
   id          Int          @id @default(autoincrement())
   dayNumber   Int
-  name        String?
-  description String?
+  name        String
+  description String
   objectives  String[]
   unitId      Int
   unit        Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
@@ -223,8 +223,8 @@ model Lesson {
 
 model LessonPlan {
   id           Int       @id @default(autoincrement())
-  name         String?
-  description  String?
+  name         String
+  description  String
   objectives   String[]
   lessonId     Int
   lesson       Lesson    @relation(fields: [lessonId], references: [id])
