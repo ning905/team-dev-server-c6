@@ -1,12 +1,23 @@
 import { Router } from 'express'
-// import { validateAuthentication, validateRole } from '../middleware/auth.js'
+import { validateAuthentication, validateRole } from '../middleware/auth.js'
+import {
+  getAllCurriculums,
+  updateCurriculumById,
+  deleteCurriculumById,
+  createCurriculum
+} from '../controllers/curriculum.js'
 
 const router = Router()
 
-// router.post('/', validateAuthentication, createCurriculum)
-// router.get('/', validateAuthentication, getAllCurriculums)
-// router.put('/:id', validateAuthentication, updateCurriculumById)
-// router.delete('/:id', validateAuthentication, deleteCurriculumById)
+router.post('/', validateAuthentication, validateRole, createCurriculum)
+router.get('/', validateAuthentication, getAllCurriculums)
+router.put('/:id', validateAuthentication, validateRole, updateCurriculumById)
+router.delete(
+  '/:id',
+  validateAuthentication,
+  validateRole,
+  deleteCurriculumById
+)
 
 // router.post('/:id/module', validateAuthentication, createModule)
 // router.get('/:id/module', validateAuthentication, getAllModules)
