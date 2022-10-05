@@ -209,7 +209,8 @@ model Unit {
 
 model Lesson {
   id          Int          @id @default(autoincrement())
-  date        DateTime?    @default(now())
+  dayNumber   Int
+  name        String?
   description String?
   objectives  String[]
   unitId      Int
@@ -222,9 +223,10 @@ model Lesson {
 
 model LessonPlan {
   id           Int       @id @default(autoincrement())
+  name         String?
   description  String?
   objectives   String[]
-  lessonId     Int       @unique
+  lessonId     Int
   lesson       Lesson    @relation(fields: [lessonId], references: [id])
   createdById  Int
   createdBy    User      @relation("created-by", fields: [createdById], references: [id], onDelete: Cascade)

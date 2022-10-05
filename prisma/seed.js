@@ -235,8 +235,8 @@ async function seed() {
     ]
   })
 
-  const iterator = 3
-  for (let curr = 1; curr < iterator; curr++) {
+  const iterator = 2
+  for (let curr = 1; curr <= iterator; curr++) {
     const curriculum = await prisma.curriculum.create({
       data: {
         name: 'Javascript',
@@ -244,7 +244,7 @@ async function seed() {
           'Learn the JavaScript fundamentals you will need for front-end or back-end development'
       }
     })
-    for (let mod = 1; mod < iterator; mod++) {
+    for (let mod = 1; mod <= iterator; mod++) {
       const module = await prisma.module.create({
         data: {
           name: `Module ${mod}`,
@@ -256,64 +256,113 @@ async function seed() {
             `Objective 2 for module-${mod} Curriculum-${curr}`,
             `Objective 2 for module-${mod} Curriculum-${curr}`
           ],
-          curriculumId: curriculum.id
+          curriculum: {
+            connect: {
+              id: curriculum.id
+            }
+          }
         }
       })
-      for (let un = 1; un < iterator; un++) {
+      for (let un = 1; un <= iterator; un++) {
         const unit = await prisma.unit.create({
-          name: `Unit ${un}`,
-          description: `Description for Unit-${un}`,
-          objectives: [
-            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`
-          ],
-          moduleId: module.id
-        })
-        for (let les = 1; les < iterator; les++) {
-          const lesson = await prisma.lesson.create({
-            name: `Lesson ${les}`,
-            description: `Lesson description for ${les}`,
+          data: {
+            name: `Unit ${un}`,
+            description: `Description for Unit-${un}`,
             objectives: [
-              `Objective 1 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 2 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 3 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 4 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 5 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+              `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`
             ],
-            unitId: unit.id
-          })
-          for (let lesPl = 1; lesPl < iterator; lesPl++) {
-            const lessonPlan = await prisma.lessonPlan.create({
-              name: `Lesson Plan ${lesPl}`,
-              description: `Lesson plan description for ${lesPl}`,
+            moduleId: module.id
+          }
+        })
+        for (let les = 1; les <= iterator; les++) {
+          const lesson = await prisma.lesson.create({
+            data: {
+              dayNumber: 1,
+              name: `Lesson ${les}`,
+              description: `Lesson description for ${les}`,
               objectives: [
-                `Objective 1 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-                `Objective 2 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-                `Objective 3 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-                `Objective 4 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-                `Objective 5 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+                `Objective 1 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 2 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 3 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 4 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 5 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
               ],
-              lessonPlanId: lesson.id
+              unitId: unit.id
+            }
+          })
+          for (let ex = 1; ex <= iterator; ex++) {
+            const exercise = await prisma.exercise.create({
+              data: {
+                name: `Exercise ${ex}`,
+                gitHubUrl:
+                  'https://github.com/boolean-uk/html-scientific-paper',
+                readMeUrl:
+                  'https://raw.githubusercontent.com/boolean-uk/html-scientific-paper/main/README.md',
+                objectives: [
+                  `Objective 1 for exercise ${ex} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                  `Objective 2 for exercise ${ex} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                  `Objective 3 for exercise ${ex} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                  `Objective 4 for exercise ${ex} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                  `Objective 5 for exercise ${ex} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+                ],
+                lesson: {
+                  connect: {
+                    id: lesson.id
+                  }
+                }
+              }
             })
-            console.log(
-              'module, unit, lesson, lessonPlan',
-              module,
-              unit,
-              lesson,
-              lessonPlan
-            )
+            for (let lesPl = 1; lesPl <= iterator; lesPl++) {
+              const lessonPlan = await prisma.lessonPlan.create({
+                data: {
+                  name: `Lesson Plan ${lesPl}`,
+                  description: `Lesson plan description for ${lesPl}`,
+                  objectives: [
+                    `Objective 1 for  lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                    `Objective 2 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                    `Objective 3 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                    `Objective 4 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                    `Objective 5 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+                  ],
+                  createdBy: {
+                    connect: {
+                      id: teacherUser.id
+                    }
+                  },
+                  createdFor: {
+                    connect: {
+                      id: users[2].id
+                    }
+                  },
+                  lesson: {
+                    connect: {
+                      id: lesson.id
+                    }
+                  }
+                }
+              })
+              console.log(
+                'curriculum, module, unit, lesson, exercise, lessonPlan',
+                curriculum,
+                module,
+                unit,
+                lesson,
+                exercise,
+                lessonPlan
+              )
+            }
           }
         }
       }
     }
   }
-
-  seed().catch(async (error) => {
-    console.error(error)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
 }
+seed().catch(async (error) => {
+  console.error(error)
+  await prisma.$disconnect()
+  process.exit(1)
+})

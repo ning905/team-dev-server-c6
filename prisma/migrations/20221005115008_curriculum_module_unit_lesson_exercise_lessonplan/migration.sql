@@ -37,7 +37,8 @@ CREATE TABLE "Unit" (
 -- CreateTable
 CREATE TABLE "Lesson" (
     "id" SERIAL NOT NULL,
-    "date" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "dayNumber" INTEGER NOT NULL,
+    "name" TEXT,
     "description" TEXT,
     "objectives" TEXT[],
     "unitId" INTEGER NOT NULL,
@@ -50,6 +51,7 @@ CREATE TABLE "Lesson" (
 -- CreateTable
 CREATE TABLE "LessonPlan" (
     "id" SERIAL NOT NULL,
+    "name" TEXT,
     "description" TEXT,
     "objectives" TEXT[],
     "lessonId" INTEGER NOT NULL,
@@ -72,9 +74,6 @@ CREATE TABLE "_CurriculumToModule" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "LessonPlan_lessonId_key" ON "LessonPlan"("lessonId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ExerciseToLesson_AB_unique" ON "_ExerciseToLesson"("A", "B");
