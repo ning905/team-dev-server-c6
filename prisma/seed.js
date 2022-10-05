@@ -245,74 +245,75 @@ async function seed() {
       }
     })
     for (let mod = 1; mod < iterator; mod++) {
-    const module = await prisma.module.create({
-      data: {
-        name: `Module ${mod}`,
-        description: `Description for Module-${mod}`,
-        objectives: [
-          `Objective 1 for module-${mod} Curriculum-${curr}`,
-          `Objective 2 for module-${mod} Curriculum-${curr}`,
-          `Objective 2 for module-${mod} Curriculum-${curr}`,
-          `Objective 2 for module-${mod} Curriculum-${curr}`,
-          `Objective 2 for module-${mod} Curriculum-${curr}`
-        ],
-        curriculumId: curriculum.id
-      }
-    })
-    for (let un = 1; un < iterator; un++) {
-      const unit = await prisma.unit.create({
-        name: `Unit ${un}`,
-        description: `Description for Unit-${un}`,
-        objectives: [
-          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
-          `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`
-        ],
-        moduleId: module.id
-      })
-      for (let les = 1; les < iterator; les++) {
-        const lesson = await prisma.lesson.create({
-          name: `Lesson ${les}`,
-          description: `Lesson description for ${les}`,
+      const module = await prisma.module.create({
+        data: {
+          name: `Module ${mod}`,
+          description: `Description for Module-${mod}`,
           objectives: [
-            `Objective 1 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 2 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 3 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 4 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-            `Objective 5 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+            `Objective 1 for module-${mod} Curriculum-${curr}`,
+            `Objective 2 for module-${mod} Curriculum-${curr}`,
+            `Objective 2 for module-${mod} Curriculum-${curr}`,
+            `Objective 2 for module-${mod} Curriculum-${curr}`,
+            `Objective 2 for module-${mod} Curriculum-${curr}`
           ],
-          unitId: unit.id
+          curriculumId: curriculum.id
+        }
+      })
+      for (let un = 1; un < iterator; un++) {
+        const unit = await prisma.unit.create({
+          name: `Unit ${un}`,
+          description: `Description for Unit-${un}`,
+          objectives: [
+            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`,
+            `Objective 1 for Unit-${un} Module-${mod} Curriculum-${curr}`
+          ],
+          moduleId: module.id
         })
-        for (let lesPl = 1; lesPl < iterator; lesPl++) {
-          const lessonPlan = await prisma.lessonPlan.create({
-            name: `Lesson Plan ${lesPl}`,
-            description: `Lesson plan description for ${lesPl}`,
+        for (let les = 1; les < iterator; les++) {
+          const lesson = await prisma.lesson.create({
+            name: `Lesson ${les}`,
+            description: `Lesson description for ${les}`,
             objectives: [
-              `Objective 1 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 2 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 3 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 4 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
-              `Objective 5 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+              `Objective 1 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 2 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 3 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 4 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+              `Objective 5 for lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
             ],
-            lessonPlanId: lesson.id
+            unitId: unit.id
           })
-          console.log(
-            'module, unit, lesson, lessonPlan',
-            module,
-            unit,
-            lesson,
-            lessonPlan
-          )
+          for (let lesPl = 1; lesPl < iterator; lesPl++) {
+            const lessonPlan = await prisma.lessonPlan.create({
+              name: `Lesson Plan ${lesPl}`,
+              description: `Lesson plan description for ${lesPl}`,
+              objectives: [
+                `Objective 1 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 2 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 3 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 4 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`,
+                `Objective 5 for lesson plan-${lesPl} lesson-${les} Unit-${un} Module-${mod} Curriculum-${curr}`
+              ],
+              lessonPlanId: lesson.id
+            })
+            console.log(
+              'module, unit, lesson, lessonPlan',
+              module,
+              unit,
+              lesson,
+              lessonPlan
+            )
+          }
         }
       }
     }
   }
-}
 
-seed().catch(async (error) => {
-  console.error(error)
-  await prisma.$disconnect()
-  process.exit(1)
-})
+  seed().catch(async (error) => {
+    console.error(error)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
+}
