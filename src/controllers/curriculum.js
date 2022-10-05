@@ -2,7 +2,7 @@ import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 
 import { myEmitter } from '../eventEmitter/index.js'
-import { ServerErrorEvent } from '../eventEmitter/utils.js'
+import { NotFoundEvent, ServerErrorEvent } from '../eventEmitter/utils.js'
 
 export const createCurriculum = async (req, res) => {
   try {
@@ -36,6 +36,31 @@ export const getAllCurriculums = async (req, res) => {
     return sendDataResponse(res, 200, currs)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'fetch-all-curriculums')
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
+  }
+}
+
+export const deleteCurriculumById = async (req, res) => {
+  const id = Number(req.params.id)
+
+  const foundCurr = await dbClient.curriculum.findUnique({ where: { id } })
+  if (!foundCurr) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `delete-curriculum-${id}`,
+      'curriculum'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  try {
+    const deleted = await dbClient.curriculum.delete({ where: { id } })
+
+    return sendDataResponse(res, 201, deleted)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, `delete-curriculum-${id}`)
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, error.message)
   }
