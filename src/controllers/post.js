@@ -461,8 +461,7 @@ export const setIsPrivate = async (req, res) => {
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
-
-  if (foundPost.user.id !== req.user.id) {
+  if (foundPost.userId !== req.user.id) {
     const noPermission = new NoPermissionEvent(
       req.user,
       `update-post-${postId}-privacy`,
@@ -470,6 +469,17 @@ export const setIsPrivate = async (req, res) => {
     )
     myEmitter.emit('error', noPermission)
     return sendMessageResponse(res, noPermission.code, noPermission.message)
+  }
+
+  if (foundPost.isPinned) {
+    const error = new OtherErrorEvent(
+      req.user,
+      `update-post-${postId}-privacy`,
+      409,
+      "Pinned posts can't be private"
+    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
   }
 
   try {
@@ -481,7 +491,6 @@ export const setIsPrivate = async (req, res) => {
         isPrivate: !foundPost.isPrivate
       }
     })
-
     return sendDataResponse(res, 201, updatedPost)
   } catch (err) {
     const error = new ServerErrorEvent(
