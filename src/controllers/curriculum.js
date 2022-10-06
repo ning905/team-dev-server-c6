@@ -195,7 +195,7 @@ export const getModuleById = async (req, res) => {
     const foundModule = await dbClient.module.findFirst({
       where: {
         id: moduleId,
-        curriculum: {
+        curriculums: {
           some: {
             id: currId
           }
