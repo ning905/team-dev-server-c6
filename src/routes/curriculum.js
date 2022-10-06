@@ -11,7 +11,11 @@ import {
   getModuleById,
   updateModuleById,
   deleteModuleById,
-  createUnit
+  createUnit,
+  getAllUnitsByModule,
+  getAllUnits,
+  getUnitById,
+  updateUnitById
 } from '../controllers/curriculum.js'
 
 const router = Router()
@@ -44,17 +48,23 @@ router.delete(
 )
 
 router.post('/:id/module/:moduleId/unit', validateAuthentication, createUnit)
-// router.get('/:id/module/:moduleId/unit', validateAuthentication, getAllUnits)
-// router.get(
-//   '/:id/module/:moduleId/unit/:unitId',
-//   validateAuthentication,
-//   getUnitById
-// )
-// router.put(
-//   '/:id/module/:moduleId/unit/:unitId',
-//   validateAuthentication, validateRole
-//   updateUnitById
-// )
+router.get(
+  '/:id/module/:moduleId/units',
+  validateAuthentication,
+  getAllUnitsByModule
+)
+router.get('/modules/units', validateAuthentication, getAllUnits)
+router.get(
+  '/:id/module/:moduleId/unit/:unitId',
+  validateAuthentication,
+  getUnitById
+)
+router.put(
+  '/:id/module/:moduleId/unit/:unitId',
+  validateAuthentication,
+  validateRole,
+  updateUnitById
+)
 // router.delete(
 //   '/:id/module/:moduleId/unit/:unitId',
 //   validateAuthentication, validateRole

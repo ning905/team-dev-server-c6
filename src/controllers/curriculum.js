@@ -182,7 +182,7 @@ export const getModuleById = async (req, res) => {
 
     return sendDataResponse(res, 201, foundModule)
   } catch (err) {
-    const error = new ServerErrorEvent(req.user, 'create-model')
+    const error = new ServerErrorEvent(req.user, 'fetch-module')
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err
@@ -275,7 +275,7 @@ export const deleteModuleById = async (req, res) => {
 
 export const createUnit = async (req, res) => {
   const { name, description, objectives } = req.body
-  const moduleId = Number(req.params.id)
+  const moduleId = Number(req.params.moduleId)
 
   if (!name) {
     return sendMessageResponse(res, 400, 'missing unit name')
@@ -300,6 +300,110 @@ export const createUnit = async (req, res) => {
     return sendDataResponse(res, 201, created)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-unit')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const getAllUnitsByModule = async (req, res) => {
+  const moduleId = Number(req.params.moduleId)
+
+  try {
+    const units = await dbClient.unit.findMany({
+      where: { moduleId }
+    })
+
+    return sendDataResponse(res, 200, units)
+  } catch (err) {
+    const error = new ServerErrorEvent(
+      req.user,
+      `fetch-units-for-module-${moduleId}`
+    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
+  }
+}
+
+export const getAllUnits = async (req, res) => {
+  try {
+    const allUnits = await dbClient.unit.findMany()
+    return sendDataResponse(res, 201, { units: allUnits })
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Unable to fetch units')
+    throw err
+  }
+}
+
+export const getUnitById = async (req, res) => {
+  const moduleId = Number(req.params.moduleId)
+  const unitId = Number(req.params.unitId)
+
+  try {
+    const foundUnit = await dbClient.unit.findFirst({
+      where: {
+        id: unitId,
+        moduleId
+      }
+    })
+
+    return sendDataResponse(res, 201, foundUnit)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'fetch-unit')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const updateUnitById = async (req, res) => {
+  const { name, description, objectives } = req.body
+  const moduleId = Number(req.params.id)
+  const unitId = Number(req.params.unitId)
+
+  if (!name) {
+    return sendMessageResponse(res, 400, 'missing unit name')
+  }
+  if (!description) {
+    return sendMessageResponse(res, 400, 'missing unit description')
+  }
+  if (!objectives) {
+    return sendMessageResponse(res, 400, 'missing unit objectives')
+  }
+
+  const foundUnit = await dbClient.unit.findFirst({
+    where: {
+      id: unitId,
+      module: {
+        some: {
+          id: moduleId
+        }
+      }
+    }
+  })
+
+  if (!foundUnit) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `edit-module-${unitId}`,
+      'module'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  try {
+    const updateUnit = await dbClient.unit.update({
+      where: { id: unitId },
+      data: { name, description, objectives },
+      include: {
+        lessons: true,
+        modules: true
+      }
+    })
+    return sendDataResponse(res, 201, updateUnit)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, `edit-module-${unitId}`)
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err
