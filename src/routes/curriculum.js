@@ -8,7 +8,7 @@ import {
   createModule,
   getAllModulesByCurr,
   getAllModules,
-  getModuleById,
+  // getModuleById,
   updateModuleById,
   deleteModuleById
 } from '../controllers/curriculum.js'
@@ -28,7 +28,7 @@ router.delete(
 router.post('/:id/module', validateAuthentication, createModule)
 router.get('/:id/module', validateAuthentication, getAllModulesByCurr)
 router.get('/moduels', validateAuthentication, getAllModules)
-router.get('/:id/module/:moduleId', validateAuthentication, getModuleById)
+// router.get('/:id/module/:moduleId', validateAuthentication, getModuleById)
 router.put(
   '/:id/module/:moduleId',
   validateAuthentication,

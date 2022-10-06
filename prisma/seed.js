@@ -262,7 +262,7 @@ async function seed() {
           `Objective 4 for module-${iterator} Curriculum-${curriculum.id}`,
           `Objective 5 for module-${iterator} Curriculum-${curriculum.id}`
         ],
-        curriculum: {
+        curriculums: {
           connect: {
             id: curriculum.id
           }
@@ -280,10 +280,10 @@ async function seed() {
         description: `Description for Unit-${iterator}`,
         objectives: [
           `Objective 1 for Unit-${iterator} Module-${module.id} `,
-          `Objective 1 for Unit-${iterator} Module-${module.id} `,
-          `Objective 1 for Unit-${iterator} Module-${module.id} `,
-          `Objective 1 for Unit-${iterator} Module-${module.id} `,
-          `Objective 1 for Unit-${iterator} Module-${module.id}`
+          `Objective 2 for Unit-${iterator} Module-${module.id} `,
+          `Objective 3 for Unit-${iterator} Module-${module.id} `,
+          `Objective 4 for Unit-${iterator} Module-${module.id} `,
+          `Objective 5 for Unit-${iterator} Module-${module.id}`
         ],
         moduleId: module.id
       }
@@ -326,7 +326,7 @@ async function seed() {
           `Objective 4 for exercise ${iterator} lesson-${lesson.id}`,
           `Objective 5 for exercise ${iterator} lesson-${lesson.id}`
         ],
-        lesson: {
+        lessons: {
           connect: {
             id: lesson.id
           }
@@ -359,7 +359,7 @@ async function seed() {
             id: users[2].id
           }
         },
-        lesson: {
+        lessons: {
           connect: {
             id: lesson.id
           }
@@ -373,23 +373,23 @@ async function seed() {
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createModule(curriculums[i - 1], iterator)
+    await createModule(curriculums[i - 1], i)
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createUnit(modules[i - 1], iterator)
+    await createUnit(modules[i - 1], i)
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createLesson(units[i - 1], iterator)
+    await createLesson(units[i - 1], i)
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createLessonPLan(lessons[i - 1], iterator)
+    await createLessonPLan(lessons[i - 1], i)
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createExercise(lessons[i - 1], iterator)
+    await createExercise(lessons[i - 1], i)
   }
   console.log(
     'Curriculums, Modules, Units, Lessons, Exercises, Lesson Plans',

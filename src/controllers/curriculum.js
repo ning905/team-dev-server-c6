@@ -2,11 +2,7 @@ import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import dbClient from '../utils/dbClient.js'
 
 import { myEmitter } from '../eventEmitter/index.js'
-import {
-  ServerErrorEvent,
-  NotFoundEvent
-  // NoPermissionEvent
-} from '../eventEmitter/utils.js'
+import { ServerErrorEvent, NotFoundEvent } from '../eventEmitter/utils.js'
 
 export const createCurriculum = async (req, res) => {
   try {
@@ -153,4 +149,75 @@ export const getAllModulesByCurr = async (req, res) => {
     myEmitter.emit('error', error)
     return sendMessageResponse(res, error.code, error.message)
   }
+}
+
+export const getAllModules = async (req, res) => {
+  try {
+    const allModules = await dbClient.module.findMany()
+    return sendDataResponse(res, 201, { modules: allModules })
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Unable to fetch modules')
+    throw err
+  }
+}
+
+export const updateModuleById = async (req, res) => {
+  const id = Number(req.params.id)
+  const { name, description, objectives } = req.body
+  console.log('CONTENT', name, description, objectives)
+
+  if (!name && !description && !objectives) {
+    return sendMessageResponse(res, 400, 'Must provide content')
+  }
+
+  const foundModule = await dbClient.module.findUnique({
+    where: { id }
+  })
+
+  if (!foundModule) {
+    const notFound = new NotFoundEvent(req.user, `edit-module-${id}`, 'module')
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  const updateModule = await dbClient.module.update({
+    where: { id },
+    data: { name, description, objectives },
+    include: {
+      units: true,
+      curriculums: true
+    }
+  })
+
+  return sendDataResponse(res, 201, updateModule)
+}
+
+export const deleteModuleById = async (req, res) => {
+  const id = Number(req.params.id)
+
+  const foundModule = await dbClient.module.findUnique({
+    where: {
+      id
+    },
+    include: {
+      units: true
+    }
+  })
+
+  if (!foundModule) {
+    const notFound = new NotFoundEvent(req.user, `delete-module-${id}`, 'post')
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  const deleteModule = await dbClient.module.delete({
+    where: {
+      id
+    },
+    include: {
+      units: true
+    }
+  })
+
+  return sendDataResponse(res, 201, { deleteModule })
 }

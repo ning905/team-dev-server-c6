@@ -138,7 +138,7 @@ model Exercise {
   objectives String[]
   users      ExerciseUser[]
   logs       DeliveryLog[]
-  lesson     Lesson[]
+  lessons    Lesson[]
   createdAt  DateTime       @default(now())
   updatedAt  DateTime?      @updatedAt
 }
@@ -226,8 +226,8 @@ model LessonPlan {
   name         String
   description  String
   objectives   String[]
-  lessonId     Int
-  lesson       Lesson    @relation(fields: [lessonId], references: [id])
+  lessonId     Int?
+  lessons      Lesson[]
   createdById  Int
   createdBy    User      @relation("created-by", fields: [createdById], references: [id], onDelete: Cascade)
   createdForId Int

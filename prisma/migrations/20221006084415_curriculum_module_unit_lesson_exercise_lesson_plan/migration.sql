@@ -54,7 +54,7 @@ CREATE TABLE "LessonPlan" (
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "objectives" TEXT[],
-    "lessonId" INTEGER NOT NULL,
+    "lessonId" INTEGER,
     "createdById" INTEGER NOT NULL,
     "createdForId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -75,6 +75,12 @@ CREATE TABLE "_CurriculumToModule" (
     "B" INTEGER NOT NULL
 );
 
+-- CreateTable
+CREATE TABLE "_LessonToLessonPlan" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "_ExerciseToLesson_AB_unique" ON "_ExerciseToLesson"("A", "B");
 
@@ -86,6 +92,12 @@ CREATE UNIQUE INDEX "_CurriculumToModule_AB_unique" ON "_CurriculumToModule"("A"
 
 -- CreateIndex
 CREATE INDEX "_CurriculumToModule_B_index" ON "_CurriculumToModule"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_LessonToLessonPlan_AB_unique" ON "_LessonToLessonPlan"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_LessonToLessonPlan_B_index" ON "_LessonToLessonPlan"("B");
 
 -- AddForeignKey
 ALTER TABLE "Unit" ADD CONSTRAINT "Unit_moduleId_fkey" FOREIGN KEY ("moduleId") REFERENCES "Module"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -100,9 +112,6 @@ ALTER TABLE "LessonPlan" ADD CONSTRAINT "LessonPlan_createdById_fkey" FOREIGN KE
 ALTER TABLE "LessonPlan" ADD CONSTRAINT "LessonPlan_createdForId_fkey" FOREIGN KEY ("createdForId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "LessonPlan" ADD CONSTRAINT "LessonPlan_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "_ExerciseToLesson" ADD CONSTRAINT "_ExerciseToLesson_A_fkey" FOREIGN KEY ("A") REFERENCES "Exercise"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -113,3 +122,9 @@ ALTER TABLE "_CurriculumToModule" ADD CONSTRAINT "_CurriculumToModule_A_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "_CurriculumToModule" ADD CONSTRAINT "_CurriculumToModule_B_fkey" FOREIGN KEY ("B") REFERENCES "Module"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_LessonToLessonPlan" ADD CONSTRAINT "_LessonToLessonPlan_A_fkey" FOREIGN KEY ("A") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_LessonToLessonPlan" ADD CONSTRAINT "_LessonToLessonPlan_B_fkey" FOREIGN KEY ("B") REFERENCES "LessonPlan"("id") ON DELETE CASCADE ON UPDATE CASCADE;
