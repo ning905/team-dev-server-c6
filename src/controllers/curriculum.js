@@ -5,15 +5,20 @@ import { myEmitter } from '../eventEmitter/index.js'
 import { ServerErrorEvent, NotFoundEvent } from '../eventEmitter/utils.js'
 
 export const createCurriculum = async (req, res) => {
-  try {
-    if (!req.body.name) {
-      return sendMessageResponse(res, 400, 'missing curriculum name')
-    }
+  if (!req.body.name) {
+    return sendMessageResponse(res, 400, 'missing curriculum name')
+  }
 
-    if (!req.body.description) {
-      return sendMessageResponse(res, 400, 'missing curriculum description')
-    }
-    const newCurriculum = await dbClient.curriculum(req.body.name)
+  if (!req.body.description) {
+    return sendMessageResponse(res, 400, 'missing curriculum description')
+  }
+  try {
+    const newCurriculum = await dbClient.curriculum.create({
+      data: {
+        name: req.body.name,
+        description: req.body.description
+      }
+    })
     myEmitter.emit('create-curriculum', createCurriculum, req.user)
 
     return sendDataResponse(res, 201, newCurriculum)
@@ -43,10 +48,13 @@ export const getAllCurriculums = async (req, res) => {
 
 export const updateCurriculumById = async (req, res) => {
   const id = Number(req.params.id)
-  const { content } = req.body
 
-  if (!content) {
-    return sendMessageResponse(res, 400, 'Must provide curriculum content')
+  if (!req.body.name) {
+    return sendMessageResponse(res, 400, 'missing curriculum name')
+  }
+
+  if (!req.body.description) {
+    return sendMessageResponse(res, 400, 'missing curriculum description')
   }
 
   const foundCurriculum = await dbClient.curriculum.findUnique({
@@ -62,13 +70,21 @@ export const updateCurriculumById = async (req, res) => {
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
-
-  const updatedCurriculum = await dbClient.curriculum.update({
-    where: { id },
-    data: { content }
-  })
-
-  return sendDataResponse(res, 201, updatedCurriculum)
+  try {
+    const updatedCurriculum = await dbClient.curriculum.update({
+      where: { id },
+      data: {
+        name: req.body.name,
+        description: req.body.description
+      }
+    })
+    return sendDataResponse(res, 201, updatedCurriculum)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, `edit-curriculum-${id}`)
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
 }
 
 export const deleteCurriculumById = async (req, res) => {
