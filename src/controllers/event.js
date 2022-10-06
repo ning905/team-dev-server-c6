@@ -100,16 +100,12 @@ export const getEvents = async (req, res) => {
     const searchByRole = [
       {
         createdBy: {
-          role: {
-            contains: req.query.role
-          }
+          role: req.query.role
         }
       },
       {
         receivedBy: {
-          role: {
-            contains: req.query.role
-          }
+          role: req.query.role
         }
       }
     ]
