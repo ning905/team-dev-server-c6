@@ -40,7 +40,7 @@ export const updateUserRoleById = async (req, res) => {
 
   if (loggedInUserRole === 'ADMIN') {
     try {
-      const updateUserRole = await dbClient.user.update({
+      const updatedUser = await dbClient.user.update({
         where: {
           id: foundUser.id
         },
@@ -48,8 +48,8 @@ export const updateUserRoleById = async (req, res) => {
           role: req.body.role
         }
       })
-      myEmitter.emit('update-role', foundUser, foundUserOldRole, req.user)
-      return sendDataResponse(res, 200, updateUserRole)
+      myEmitter.emit('update-role', updatedUser, foundUserOldRole, req.user)
+      return sendDataResponse(res, 200, updatedUser)
     } catch (err) {
       const error = new OtherErrorEvent(
         req.user,
