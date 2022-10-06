@@ -122,7 +122,7 @@ export const createModule = async (req, res) => {
 
     return sendDataResponse(res, 201, created)
   } catch (err) {
-    const error = new ServerErrorEvent(req.user, 'create-model')
+    const error = new ServerErrorEvent(req.user, 'create-module')
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err
@@ -394,7 +394,7 @@ export const updateUnitById = async (req, res) => {
     })
     return sendDataResponse(res, 201, updateUnit)
   } catch (err) {
-    const error = new ServerErrorEvent(req.user, `edit-module-${unitId}`)
+    const error = new ServerErrorEvent(req.user, `edit-unit-${unitId}`)
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err
@@ -416,8 +416,8 @@ export const deleteUnitById = async (req, res) => {
   if (!foundUnit) {
     const notFound = new NotFoundEvent(
       req.user,
-      `delete-module-${unitId}`,
-      'post'
+      `delete-unit-${unitId}`,
+      'unit'
     )
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
@@ -492,7 +492,7 @@ export const getAllLessons = async (req, res) => {
     const allLessons = await dbClient.lesson.findMany()
     return sendDataResponse(res, 201, { lessons: allLessons })
   } catch (err) {
-    sendMessageResponse(res, 500, 'Unable to fetch lesson')
+    sendMessageResponse(res, 500, 'Unable to fetch lessons')
     throw err
   }
 }
@@ -523,13 +523,13 @@ export const updateLessonById = async (req, res) => {
   const lessonId = Number(req.params.lessonId)
 
   if (!name) {
-    return sendMessageResponse(res, 400, 'missing unit name')
+    return sendMessageResponse(res, 400, 'missing lesson name')
   }
   if (!description) {
-    return sendMessageResponse(res, 400, 'missing unit description')
+    return sendMessageResponse(res, 400, 'missing lesson description')
   }
   if (!objectives) {
-    return sendMessageResponse(res, 400, 'missing unit objectives')
+    return sendMessageResponse(res, 400, 'missing lesson objectives')
   }
 
   const foundLesson = await dbClient.lesson.findFirst({
@@ -556,7 +556,7 @@ export const updateLessonById = async (req, res) => {
     })
     return sendDataResponse(res, 201, updateLesson)
   } catch (err) {
-    const error = new ServerErrorEvent(req.user, `edit-module-${lessonId}`)
+    const error = new ServerErrorEvent(req.user, `edit-lesson-${lessonId}`)
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err
@@ -580,7 +580,7 @@ export const deleteLessonById = async (req, res) => {
     const notFound = new NotFoundEvent(
       req.user,
       `delete-lesson-${lessonId}`,
-      'post'
+      'lesson'
     )
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
@@ -593,4 +593,161 @@ export const deleteLessonById = async (req, res) => {
   })
 
   return sendDataResponse(res, 201, { deleteLesson })
+}
+
+export const createLessonPlan = async (req, res) => {
+  const { name, description, objectives } = req.body
+  const lessonId = Number(req.params.lessonId)
+  const createdById = Number(req.user.id)
+  const createdForId = Number(req.body.user.id)
+
+  if (!name) {
+    return sendMessageResponse(res, 400, 'missing lesson plan name')
+  }
+  if (!description) {
+    return sendMessageResponse(res, 400, 'missing lesson plan description')
+  }
+  if (!objectives) {
+    return sendMessageResponse(res, 400, 'missing lesson plan objectives')
+  }
+
+  try {
+    const created = await dbClient.lessonPlan.create({
+      data: {
+        name,
+        description,
+        objectives,
+        lessonId,
+        createdById,
+        createdForId
+      }
+    })
+
+    return sendDataResponse(res, 201, created)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'create-lesson-plan')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const getAllLessonPlansByLesson = async (req, res) => {
+  const lessonId = Number(req.params.lessonId)
+
+  try {
+    const lessonPlans = await dbClient.lessonPlan.findMany({
+      where: { lessonId }
+    })
+
+    return sendDataResponse(res, 200, lessonPlans)
+  } catch (err) {
+    const error = new ServerErrorEvent(
+      req.user,
+      `fetch-lesson-plans-for-lesson-${lessonId}`
+    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
+  }
+}
+
+export const getAllLessonPlans = async (req, res) => {
+  try {
+    const allLessonPlans = await dbClient.lessonPlan.findMany()
+    return sendDataResponse(res, 201, { lessonPlans: allLessonPlans })
+  } catch (err) {
+    sendMessageResponse(res, 500, 'Unable to fetch lesson plans')
+    throw err
+  }
+}
+
+export const getLessonPlanById = async (req, res) => {
+  const lessonId = Number(req.params.lessonId)
+  const lessonPlanId = Number(req.params.lessonPlanId)
+
+  try {
+    const foundLessonPlan = await dbClient.lessonPlan.findFirst({
+      where: {
+        id: lessonPlanId,
+        lessonId
+      }
+    })
+
+    return sendDataResponse(res, 201, foundLessonPlan)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'fetch-lesson-plans')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const updateLessonPlanById = async (req, res) => {
+  const { name, description, objectives } = req.body
+  const lessonPlanId = Number(req.params.lessonPlanId)
+
+  if (!name) {
+    return sendMessageResponse(res, 400, 'missing lesson plan name')
+  }
+  if (!description) {
+    return sendMessageResponse(res, 400, 'missing lesson plan description')
+  }
+  if (!objectives) {
+    return sendMessageResponse(res, 400, 'missing lesson plan objectives')
+  }
+
+  const foundLessonPlan = await dbClient.lesson.findFirst({
+    where: { id: lessonPlanId }
+  })
+
+  if (!foundLessonPlan) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `edit-lesson-${lessonPlanId}`,
+      'lesson'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  try {
+    const updateLessonPlan = await dbClient.lessonPlan.update({
+      where: { id: lessonPlanId },
+      data: { name, description, objectives }
+    })
+    return sendDataResponse(res, 201, updateLessonPlan)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, `edit-lesson-${lessonPlanId}`)
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const deleteLessonPlanById = async (req, res) => {
+  const lessonPlanId = Number(req.params.lessonPlanId)
+
+  const foundLesson = await dbClient.lessonPlan.findUnique({
+    where: {
+      id: lessonPlanId
+    }
+  })
+
+  if (!foundLesson) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `delete-lesson-plan-${lessonPlanId}`,
+      'lesson'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  const deleteLessonPlan = await dbClient.lesson.delete({
+    where: {
+      id: lessonPlanId
+    }
+  })
+
+  return sendDataResponse(res, 201, { deleteLessonPlan })
 }
