@@ -19,9 +19,9 @@ export const createCurriculum = async (req, res) => {
         description: req.body.description
       }
     })
-    myEmitter.emit('create-curriculum', createCurriculum, req.user)
+    myEmitter.emit('create-curriculum', createCurriculum)
 
-    return sendDataResponse(res, 201, newCurriculum)
+    return sendDataResponse(res, 201, { curriculum: newCurriculum })
   } catch (err) {
     const error = new ServerErrorEvent(
       req.user,
@@ -78,9 +78,16 @@ export const updateCurriculumById = async (req, res) => {
         description: req.body.description
       }
     })
+    myEmitter.emit(
+      'update-curriculum',
+      updatedCurriculum,
+      req.user,
+      foundCurriculum.name,
+      foundCurriculum.description
+    )
     return sendDataResponse(res, 201, updatedCurriculum)
   } catch (err) {
-    const error = new ServerErrorEvent(req.user, `edit-curriculum-${id}`)
+    const error = new ServerErrorEvent(req.user, `update-curriculum-${id}`)
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err

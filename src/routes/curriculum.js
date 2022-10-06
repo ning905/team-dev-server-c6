@@ -45,7 +45,7 @@ router.delete(
 
 router.post('/:id/module', validateAuthentication, createModule)
 router.get('/:id/module', validateAuthentication, getAllModulesByCurr)
-router.get('/moduels', validateAuthentication, getAllModules)
+router.get('/modules', validateAuthentication, getAllModules)
 router.get('/:id/module/:moduleId', validateAuthentication, getModuleById)
 router.put(
   '/:id/module/:moduleId',

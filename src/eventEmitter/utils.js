@@ -276,7 +276,7 @@ export const createDeleteCurriculumEvent = async (curriculum, user) => {
     await dbClient.event.create({
       data: {
         type: 'CURRICULUM',
-        topic: 'delete',
+        topic: 'delete-curriculum',
         curriculumId: curriculum.id,
         createdAt: curriculum.updatedAt
       }
