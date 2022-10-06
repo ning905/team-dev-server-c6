@@ -17,7 +17,12 @@ import {
   getUnitById,
   updateUnitById,
   deleteUnitById,
-  createLesson
+  createLesson,
+  getAllLessonsByUnit,
+  getAllLessons,
+  getLessonById,
+  updateLessonById,
+  deleteLessonById
 } from '../controllers/curriculum.js'
 
 const router = Router()
@@ -79,26 +84,33 @@ router.post(
   validateAuthentication,
   createLesson
 )
-// router.get(
-//   '/:id/module/:moduleId/unit/:unitId/lesson',
-//   validateAuthentication,
-//   getAllLessons
-// )
-// router.get(
-//   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
-//   validateAuthentication,
-//   getLessonById
-// )
-// router.put(
-//   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
-//   validateAuthentication, validateRole
-//   updateLessonById
-// )
-// router.delete(
-//   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
-//   validateAuthentication, validateRole
-//   deleteLessonById
-// )
+router.get(
+  '/:id/module/:moduleId/unit/:unitId/lessons',
+  validateAuthentication,
+  getAllLessonsByUnit
+)
+router.get(
+  '/:id/module/:moduleId/unit/:unitId/lesson',
+  validateAuthentication,
+  getAllLessons
+)
+router.get(
+  '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
+  validateAuthentication,
+  getLessonById
+)
+router.put(
+  '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
+  validateAuthentication,
+  validateRole,
+  updateLessonById
+)
+router.delete(
+  '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId',
+  validateAuthentication,
+  validateRole,
+  deleteLessonById
+)
 
 // router.post(
 //   '/:id/module/:moduleId/unit/:unitId/lesson/:lessonId/lessonPlan',
