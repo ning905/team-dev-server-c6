@@ -14,7 +14,7 @@ export const createCurriculum = async (req, res) => {
       return sendMessageResponse(res, 400, 'missing curriculum description')
     }
     const newCurriculum = await dbClient.curriculum(req.body.name)
-    // myEmitter.emit('create-cohort', createdCohort, req.user)
+    myEmitter.emit('create-curriculum', createCurriculum, req.user)
 
     return sendDataResponse(res, 201, newCurriculum)
   } catch (err) {

@@ -230,6 +230,64 @@ export const createDeleteExerciseEvent = async (exercise, user) => {
   })
 }
 
+export const createCurriculumCreatedEvent = async (user, curriculum) => {
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'CURRICULUM',
+        topic: 'create',
+        curriculumId: curriculum.id,
+        createdAt: curriculum.createdAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'create-curriculum')
+    myEmitter.emit('error', error)
+    throw err
+  }
+}
+
+export const createRenameCurriculumEvent = async (
+  curriculum,
+  user,
+  oldName,
+  oldDescription
+) => {
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'CURRICULUM',
+        topic: 'rename',
+        name: `from ${oldName} to ${curriculum.name}`,
+        description: `from ${oldDescription} to ${curriculum.description}`,
+        curriculumId: curriculum.id,
+        createdAt: curriculum.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'rename-curriculum')
+    myEmitter.emit('error', error)
+    throw err
+  }
+}
+
+export const createDeleteCurriculumEvent = async (curriculum, user) => {
+  try {
+    await dbClient.event.create({
+      data: {
+        type: 'CURRICULUM',
+        topic: 'delete',
+        curriculumId: curriculum.id,
+        createdAt: curriculum.updatedAt
+      }
+    })
+  } catch (err) {
+    const error = new CreateEventError(user, 'delete-curriculum')
+    myEmitter.emit('error', error)
+    throw err
+  }
+}
+
 export const createErrorEvent = async (errorEvent) => {
   let userId
   if (errorEvent.user) {

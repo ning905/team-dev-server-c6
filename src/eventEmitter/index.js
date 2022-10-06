@@ -12,7 +12,10 @@ import {
   createRemoveFromCohortEvent,
   createExerciseCreatedEvent,
   createDeleteExerciseEvent,
-  createErrorEvent
+  createErrorEvent,
+  createCurriculumCreatedEvent,
+  createRenameCurriculumEvent,
+  createDeleteCurriculumEvent
 } from './utils.js'
 
 class MyEventEmitter extends EventEmitter {}
@@ -53,6 +56,17 @@ myEmitter.on('create-exercise', (exercise, user) =>
 )
 myEmitter.on('delete-exercise', (exercise, user) =>
   createDeleteExerciseEvent(exercise, user)
+)
+
+// CURRICULUM
+myEmitter.on('create-curriculum', (curriculum, user) =>
+  createCurriculumCreatedEvent(curriculum, user)
+)
+myEmitter.on('rename-curriculum', (curriculum, user, oldName, oldDescription) =>
+  createRenameCurriculumEvent(curriculum, user, oldName, oldDescription)
+)
+myEmitter.on('delete-curriculum', (curriculum, user) =>
+  createDeleteCurriculumEvent(curriculum, user)
 )
 
 myEmitter.on('error', (error) => createErrorEvent(error))
