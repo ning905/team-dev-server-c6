@@ -160,6 +160,7 @@ enum EventType {
   ADMIN
   COHORT
   EXERCISE
+  CURRICULUM
 }
 
 model Event {

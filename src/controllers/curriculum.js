@@ -19,8 +19,7 @@ export const createCurriculum = async (req, res) => {
         description: req.body.description
       }
     })
-    myEmitter.emit('create-curriculum', createCurriculum)
-
+    myEmitter.emit('create-curriculum', createCurriculum, req.user)
     return sendDataResponse(res, 201, { curriculum: newCurriculum })
   } catch (err) {
     const error = new ServerErrorEvent(

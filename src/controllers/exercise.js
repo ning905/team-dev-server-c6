@@ -39,7 +39,7 @@ export const createExercise = async (req, res) => {
     const createdExercise = await dbClient.exercise.create({
       data: { name, gitHubUrl, readMeUrl, objectives }
     })
-    myEmitter.emit('create-exercise', { exercise: createdExercise }, req.user)
+    myEmitter.emit('create-curriculum', { exercise: createdExercise }, req.user)
     return sendDataResponse(res, 201, { exercise: createdExercise })
   } catch (err) {
     const serverError = new ServerErrorEvent(
