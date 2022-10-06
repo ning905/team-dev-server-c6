@@ -210,11 +210,32 @@ export const createRemoveFromCohortEvent = async (admin, student, cohort) => {
   }
 }
 
+export const createExerciseCreatedEvent = async (exercise, user) => {
+  await dbClient.event.create({
+    data: {
+      type: 'EXERCISE',
+      topic: 'create-exercise',
+      createdById: user.id
+    }
+  })
+}
+
+export const createDeleteExerciseEvent = async (exercise, user) => {
+  await dbClient.event.create({
+    data: {
+      type: 'EXERCISE',
+      topic: 'delete-exercise',
+      createdById: user.id
+    }
+  })
+}
+
 export const createErrorEvent = async (errorEvent) => {
   let userId
   if (errorEvent.user) {
     userId = errorEvent.user.id
   }
+
   await dbClient.event.create({
     data: {
       type: 'ERROR',
@@ -229,6 +250,14 @@ class ErrorEventBase {
   constructor(user, topic) {
     this.user = user
     this.topic = topic
+  }
+}
+
+export class BadRequestEvent extends ErrorEventBase {
+  constructor(user, topic, message = 'Incorrect request syntax') {
+    super(user, topic)
+    this.code = 400
+    this.message = message
   }
 }
 
@@ -261,6 +290,14 @@ export class NotFoundEvent extends ErrorEventBase {
     super(user, topic)
     this.code = 404
     this.message = `The ${target} with the provided id does not exist`
+  }
+}
+
+export class ConfictEvent extends ErrorEventBase {
+  constructor(user, topic, message = 'Request conflicts with data on server') {
+    super(user, topic)
+    this.code = 409
+    this.message = message
   }
 }
 

@@ -10,7 +10,8 @@ import {
 
 export const updateUserRoleById = async (req, res) => {
   const id = Number(req.params.id)
-  const foundUserRole = req.user.role
+  const loggedInUserRole = req.user.role
+  const loggedInUserId = req.user.id
 
   const foundUser = await dbClient.user.findUnique({
     where: { id }
@@ -37,9 +38,19 @@ export const updateUserRoleById = async (req, res) => {
     return sendMessageResponse(res, deactivated.code, deactivated.message)
   }
 
-  if (foundUserRole === 'ADMIN') {
+  if (foundUser.id === loggedInUserId) {
+    const error = new NoPermissionEvent(
+      req.user,
+      `update-role-for-user-${id}`,
+      'Logged in Admin cannot change his own role'
+    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
+  }
+
+  if (loggedInUserRole === 'ADMIN') {
     try {
-      const updateUser = await dbClient.user.update({
+      const updatedUser = await dbClient.user.update({
         where: {
           id: foundUser.id
         },
@@ -47,8 +58,8 @@ export const updateUserRoleById = async (req, res) => {
           role: req.body.role
         }
       })
-      myEmitter.emit('update-role', updateUser, foundUserOldRole, req.user)
-      return sendDataResponse(res, 200, updateUser)
+      myEmitter.emit('update-role', updatedUser, foundUserOldRole, req.user)
+      return sendDataResponse(res, 200, updatedUser)
     } catch (err) {
       const error = new OtherErrorEvent(
         req.user,

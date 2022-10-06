@@ -8,6 +8,7 @@ import {
   deleteLike,
   createComment,
   setIsPrivate,
+  setIsPinned,
   createCommentLike,
   deleteCommentLike,
   deleteComment,
@@ -19,8 +20,10 @@ const router = Router()
 
 router.post('/', validateAuthentication, create)
 router.get('/', validateAuthentication, getAll)
+
 router.patch('/:id', validateAuthentication, edit)
 router.patch('/:id/status', validateAuthentication, setIsPrivate)
+router.patch('/:id/pinned', validateAuthentication, setIsPinned)
 router.delete('/:id', validateAuthentication, deletePost)
 
 router.post('/:id/like', validateAuthentication, createLike)

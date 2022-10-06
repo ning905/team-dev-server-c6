@@ -19,16 +19,38 @@ export const getEvents = async (req, res) => {
     sorting = req.query.sorting
   }
 
-  try {
-    const events = await dbClient.event.findMany({
-      where: {
-        type: req.query.type,
-        content: req.query.content
-      },
-      orderBy: {
-        createdAt: sorting
-      }
+  const query = {
+    orderBy: {
+      createdAt: sorting
+    }
+  }
+
+  if (req.query.content) {
+    query.where = { ...query.where }
+    query.where.content = {
+      contains: req.query.content,
+      mode: 'insensitive'
+    }
+  }
+
+  if (req.query.type && Array.isArray(req.query.type)) {
+    const types = []
+
+    req.query.type.map((type) => {
+      return types.push({ type: type })
     })
+
+    query.where = {
+      ...query.where,
+      OR: types
+    }
+  } else if (req.query.type) {
+    query.where = { ...query.where }
+    query.where.type = req.query.type
+  }
+
+  try {
+    const events = await dbClient.event.findMany(query)
     sendDataResponse(res, 200, events)
   } catch (err) {
     const error = new ServerErrorEvent(
