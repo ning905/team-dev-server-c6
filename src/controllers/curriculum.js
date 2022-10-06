@@ -244,11 +244,11 @@ export const updateModuleById = async (req, res) => {
 }
 
 export const deleteModuleById = async (req, res) => {
-  const id = Number(req.params.id)
+  const moduleId = Number(req.params.moduleId)
 
   const foundModule = await dbClient.module.findUnique({
     where: {
-      id
+      moduleId
     },
     include: {
       units: true
@@ -256,14 +256,18 @@ export const deleteModuleById = async (req, res) => {
   })
 
   if (!foundModule) {
-    const notFound = new NotFoundEvent(req.user, `delete-module-${id}`, 'post')
+    const notFound = new NotFoundEvent(
+      req.user,
+      `delete-module-${moduleId}`,
+      'post'
+    )
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
   const deleteModule = await dbClient.module.delete({
     where: {
-      id
+      moduleId
     },
     include: {
       units: true
@@ -404,6 +408,73 @@ export const updateUnitById = async (req, res) => {
     return sendDataResponse(res, 201, updateUnit)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `edit-module-${unitId}`)
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const deleteUnitById = async (req, res) => {
+  const unitId = Number(req.params.unitId)
+
+  const foundUnit = await dbClient.unit.findUnique({
+    where: {
+      id: unitId
+    },
+    include: {
+      lessons: true
+    }
+  })
+
+  if (!foundUnit) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `delete-module-${unitId}`,
+      'post'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, notFound.message)
+  }
+
+  const deleteUnit = await dbClient.unit.delete({
+    where: {
+      id: unitId
+    },
+    include: {
+      lessons: true
+    }
+  })
+
+  return sendDataResponse(res, 201, { deleteUnit })
+}
+
+export const createLesson = async (req, res) => {
+  const { name, description, objectives } = req.body
+  const unitId = Number(req.params.unitId)
+
+  if (!name) {
+    return sendMessageResponse(res, 400, 'missing lesson name')
+  }
+  if (!description) {
+    return sendMessageResponse(res, 400, 'missing lesson description')
+  }
+  if (!objectives) {
+    return sendMessageResponse(res, 400, 'missing lesson objectives')
+  }
+
+  try {
+    const created = await dbClient.lesson.create({
+      data: {
+        name,
+        description,
+        objectives,
+        unit: { connect: { id: unitId } }
+      }
+    })
+
+    return sendDataResponse(res, 201, created)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'create-lesson')
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err

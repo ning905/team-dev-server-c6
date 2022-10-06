@@ -15,7 +15,9 @@ import {
   getAllUnitsByModule,
   getAllUnits,
   getUnitById,
-  updateUnitById
+  updateUnitById,
+  deleteUnitById,
+  createLesson
 } from '../controllers/curriculum.js'
 
 const router = Router()
@@ -65,17 +67,18 @@ router.put(
   validateRole,
   updateUnitById
 )
-// router.delete(
-//   '/:id/module/:moduleId/unit/:unitId',
-//   validateAuthentication, validateRole
-//   deleteUnitById
-// )
+router.delete(
+  '/:id/module/:moduleId/unit/:unitId',
+  validateAuthentication,
+  validateRole,
+  deleteUnitById
+)
 
-// router.post(
-//   '/:id/module/:moduleId/unit/:unitId/lesson',
-//   validateAuthentication,
-//   createLesson
-// )
+router.post(
+  '/:id/module/:moduleId/unit/:unitId/lesson',
+  validateAuthentication,
+  createLesson
+)
 // router.get(
 //   '/:id/module/:moduleId/unit/:unitId/lesson',
 //   validateAuthentication,
