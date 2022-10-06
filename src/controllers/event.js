@@ -55,7 +55,8 @@ const getQuery = (req) => {
           role: true,
           profile: true
         }
-      }
+      },
+      cohort: true
     }
   }
 
