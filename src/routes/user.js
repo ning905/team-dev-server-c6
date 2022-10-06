@@ -5,7 +5,8 @@ import {
   getAll,
   updateUserCohortById,
   updateUserById,
-  updateUserPrivacy
+  updateUserPrivacy,
+  checkUserLoginDetails
 } from '../controllers/user.js'
 import { validateAuthentication, validateRole } from '../middleware/auth.js'
 
@@ -22,5 +23,6 @@ router.patch(
   updateUserCohortById
 )
 router.patch('/:id/privacy', validateAuthentication, updateUserPrivacy)
+router.post('/:id', validateAuthentication, checkUserLoginDetails)
 
 export default router
