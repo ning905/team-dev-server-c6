@@ -5,10 +5,12 @@ import { JWT_EXPIRY, JWT_SECRET } from '../utils/config.js'
 import { sendDataResponse, sendMessageResponse } from '../utils/responses.js'
 import { myEmitter } from '../eventEmitter/index.js'
 import {
+  DeactivatedUserEvent,
   NoPermissionEvent,
   NotFoundEvent,
   ServerErrorEvent
 } from '../eventEmitter/utils.js'
+import { validateCredentials } from './auth.js'
 
 export const create = async (req, res) => {
   const userToCreate = await User.fromJson(req.body)
@@ -111,6 +113,9 @@ export const getAllByCohortId = async (req, res) => {
     foundUsers = await User.findAll()
   }
 
+  if (req.user.role === 'STUDENT') {
+    foundUsers = foundUsers.filter((user) => user.isActive)
+  }
   const formattedUsers = foundUsers.map((user) => {
     return {
       ...user.toJSON().user
@@ -133,11 +138,21 @@ export const updateUserCohortById = async (req, res) => {
   if (!foundUser) {
     const notFound = new NotFoundEvent(
       req.user,
-      `add-${id}to-cohort${cohortId}`,
+      `add-user-${id}to-cohort${cohortId}`,
       'user'
     )
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, { id: notFound.message })
+  }
+
+  if (!foundUser.isActive) {
+    const deactivated = new DeactivatedUserEvent(
+      req.user,
+      `add-user-${id}to-cohort${cohortId}`
+    )
+
+    myEmitter.emit('error', deactivated)
+    return sendMessageResponse(res, deactivated.code, deactivated.message)
   }
 
   const updatedUser = await foundUser.update({ cohortId })
@@ -168,8 +183,26 @@ export const updateUserById = async (req, res) => {
 
   const oldEmail = foundUser.email
 
-  const { email, firstName, lastName, bio, githubUrl, profileImageUrl } =
-    req.body
+  const {
+    email,
+    firstName,
+    lastName,
+    bio,
+    githubUrl,
+    profileImageUrl,
+    isActive
+  } = req.body
+
+  if (!isActive) {
+    console.log('is deactivating account: ', { isActive })
+  }
+
+  if (!foundUser.isActive && isActive) {
+    const deactivated = new DeactivatedUserEvent(req.user, `update-user-${id}`)
+
+    myEmitter.emit('error', deactivated)
+    return sendMessageResponse(res, deactivated.code, deactivated.message)
+  }
 
   const unhashedPassword = req.body.password
   let password = ''
@@ -199,11 +232,15 @@ export const updateUserById = async (req, res) => {
       lastName,
       bio,
       githubUrl,
-      profileImageUrl
+      profileImageUrl,
+      isActive
     })
 
     if (email) {
       myEmitter.emit('update-email', updateUser, oldEmail)
+    }
+    if (isActive === true || isActive === false) {
+      myEmitter.emit('update-account-activate', updateUser)
     }
 
     return sendDataResponse(res, 201, updateUser)
@@ -239,10 +276,62 @@ export const updateUserPrivacy = async (req, res) => {
     })
   }
 
+  if (!foundUser.isActive) {
+    const deactivated = new DeactivatedUserEvent(
+      req.user,
+      `update-user-${id}-privacy`
+    )
+
+    myEmitter.emit('error', deactivated)
+    return sendMessageResponse(res, deactivated.code, deactivated.message)
+  }
+
   const oldPostPrivacyPref = foundUser.postPrivacyPref
   const { postPrivacyPref } = req.body
   const updateUser = await foundUser.update({ postPrivacyPref })
 
   myEmitter.emit('update-privacy', updateUser, oldPostPrivacyPref)
   return sendDataResponse(res, 201, updateUser)
+}
+
+export const checkUserLoginDetails = async (req, res) => {
+  const id = Number(req.params.id)
+  const foundUser = await User.findById(id)
+  console.log('req body: ', req.body)
+
+  if (!foundUser) {
+    const notFound = new NotFoundEvent(
+      req.user,
+      `check-user-${id}-login-details`,
+      'user'
+    )
+    myEmitter.emit('error', notFound)
+    return sendMessageResponse(res, notFound.code, { id: notFound.message })
+  }
+
+  if (foundUser.id !== req.user.id) {
+    const noPermission = new NoPermissionEvent(
+      req.user,
+      `check-user-${id}-login-details`
+    )
+    myEmitter.emit('error', noPermission)
+    return sendMessageResponse(res, noPermission.code, {
+      id: noPermission.message
+    })
+  }
+
+  const passwordIsValid = await validateCredentials(
+    req.body.password,
+    foundUser
+  )
+
+  if (foundUser.email !== req.body.email || !passwordIsValid) {
+    return sendMessageResponse(
+      res,
+      400,
+      'Invalid email and/or password provided'
+    )
+  }
+
+  return sendMessageResponse(res, 200, 'success')
 }
