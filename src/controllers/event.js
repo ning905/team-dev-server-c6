@@ -4,6 +4,7 @@ import { myEmitter } from '../eventEmitter/index.js'
 import { NoPermissionEvent, ServerErrorEvent } from '../eventEmitter/utils.js'
 
 export const getEvents = async (req, res) => {
+  console.log('My Query!', req.query)
   if (req.user.role !== 'DEVELOPER') {
     const noPermission = new NoPermissionEvent(
       req.user,
@@ -22,6 +23,26 @@ export const getEvents = async (req, res) => {
   const query = {
     orderBy: {
       createdAt: sorting
+    },
+    include: {
+      createdBy: {
+        select: {
+          email: true,
+          id: true,
+          cohortId: true,
+          role: true,
+          profile: true
+        }
+      },
+      receivedBy: {
+        select: {
+          email: true,
+          id: true,
+          cohortId: true,
+          role: true,
+          profile: true
+        }
+      }
     }
   }
 
@@ -30,6 +51,78 @@ export const getEvents = async (req, res) => {
     query.where.content = {
       contains: req.query.content,
       mode: 'insensitive'
+    }
+  }
+
+  if (req.query.role || req.query.firstName) {
+    const searchByName = [
+      {
+        createdBy: {
+          profile: {
+            firstName: {
+              contains: req.query.firstName,
+              mode: 'insensitive'
+            }
+          }
+        }
+      },
+      {
+        createdBy: {
+          profile: {
+            lastName: {
+              contains: req.query.firstName,
+              mode: 'insensitive'
+            }
+          }
+        }
+      },
+      {
+        receivedBy: {
+          profile: {
+            firstName: {
+              contains: req.query.firstName,
+              mode: 'insensitive'
+            }
+          }
+        }
+      },
+      {
+        receivedBy: {
+          profile: {
+            lastName: {
+              contains: req.query.firstName,
+              mode: 'insensitive'
+            }
+          }
+        }
+      }
+    ]
+    const searchByRole = [
+      {
+        createdBy: {
+          role: {
+            contains: req.query.role
+          }
+        }
+      },
+      {
+        receivedBy: {
+          role: {
+            contains: req.query.role
+          }
+        }
+      }
+    ]
+    if (req.query.firstName) {
+      query.where = {
+        ...query.where,
+        OR: searchByName
+      }
+    } else {
+      query.where = {
+        ...query.where,
+        OR: searchByRole
+      }
     }
   }
 
@@ -56,7 +149,7 @@ export const getEvents = async (req, res) => {
     const error = new ServerErrorEvent(
       req.user,
       'fetch-events',
-      'Unable to fetch cohort'
+      'Unable to fetch events'
     )
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
