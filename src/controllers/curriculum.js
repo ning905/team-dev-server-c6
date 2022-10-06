@@ -11,11 +11,11 @@ import {
 export const createCurriculum = async (req, res) => {
   try {
     if (!req.body.name) {
-      return sendDataResponse(res, 400, 'missing curriculum name')
+      return sendMessageResponse(res, 400, 'missing curriculum name')
     }
 
     if (!req.body.description) {
-      return sendDataResponse(res, 400, 'missing curriculum description')
+      return sendMessageResponse(res, 400, 'missing curriculum description')
     }
     const newCurriculum = await dbClient.curriculum(req.body.name)
     // myEmitter.emit('create-cohort', createdCohort, req.user)
