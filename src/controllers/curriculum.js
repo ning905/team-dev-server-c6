@@ -19,7 +19,7 @@ export const createCurriculum = async (req, res) => {
         description: req.body.description
       }
     })
-    myEmitter.emit('create-curriculum', createCurriculum, req.user)
+    myEmitter.emit('create-curriculum', newCurriculum, req.user)
     return sendDataResponse(res, 201, { curriculum: newCurriculum })
   } catch (err) {
     const error = new ServerErrorEvent(
@@ -109,7 +109,7 @@ export const deleteCurriculumById = async (req, res) => {
 
   try {
     const deleted = await dbClient.curriculum.delete({ where: { id } })
-
+    myEmitter.emit('delete-curriculum', deleted, req.user)
     return sendDataResponse(res, 201, deleted)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `delete-curriculum-${id}`)
@@ -138,10 +138,10 @@ export const createModule = async (req, res) => {
         name,
         description,
         objectives,
-        curriculum: { connect: { id: currId } }
+        curriculums: { connect: { id: currId } }
       }
     })
-
+    myEmitter.emit('create-module', created, req.user)
     return sendDataResponse(res, 201, created)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-module')
@@ -256,6 +256,7 @@ export const updateModuleById = async (req, res) => {
         curriculums: true
       }
     })
+    myEmitter.emit('update-module', updateModule, req.user)
     return sendDataResponse(res, 201, updateModule)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `edit-module-${moduleId}`)
@@ -270,7 +271,7 @@ export const deleteModuleById = async (req, res) => {
 
   const foundModule = await dbClient.module.findUnique({
     where: {
-      moduleId
+      id: moduleId
     },
     include: {
       units: true
@@ -289,13 +290,13 @@ export const deleteModuleById = async (req, res) => {
 
   const deleteModule = await dbClient.module.delete({
     where: {
-      moduleId
+      id: moduleId
     },
     include: {
       units: true
     }
   })
-
+  myEmitter.emit('delete-module', deleteModule, req.user)
   return sendDataResponse(res, 201, { deleteModule })
 }
 
@@ -314,7 +315,7 @@ export const createUnit = async (req, res) => {
   }
 
   try {
-    const created = await dbClient.unit.create({
+    const newUnit = await dbClient.unit.create({
       data: {
         name,
         description,
@@ -322,8 +323,8 @@ export const createUnit = async (req, res) => {
         module: { connect: { id: moduleId } }
       }
     })
-
-    return sendDataResponse(res, 201, created)
+    myEmitter.emit('create-unit', newUnit, req.user)
+    return sendDataResponse(res, 201, { unit: newUnit })
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-unit')
     myEmitter.emit('error', error)
@@ -414,6 +415,7 @@ export const updateUnitById = async (req, res) => {
         lessons: true
       }
     })
+    myEmitter.emit('update-unit', updateUnit, req.user)
     return sendDataResponse(res, 201, updateUnit)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `edit-unit-${unitId}`)
@@ -453,7 +455,7 @@ export const deleteUnitById = async (req, res) => {
       lessons: true
     }
   })
-
+  myEmitter.emit('delete-unit', deleteUnit, req.user)
   return sendDataResponse(res, 201, { deleteUnit })
 }
 

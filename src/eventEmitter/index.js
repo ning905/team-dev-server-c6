@@ -15,7 +15,13 @@ import {
   createErrorEvent,
   createCurriculumCreatedEvent,
   createRenameCurriculumEvent,
-  createDeleteCurriculumEvent
+  createDeleteCurriculumEvent,
+  createModuleCreatedEvent,
+  createRenameModuleEvent,
+  createDeleteModuleEvent,
+  createUnitCreatedEvent,
+  createRenameUnitEvent,
+  createDeleteUnitEvent
 } from './utils.js'
 
 class MyEventEmitter extends EventEmitter {}
@@ -62,11 +68,28 @@ myEmitter.on('delete-exercise', (exercise, user) =>
 myEmitter.on('create-curriculum', (curriculum, user) =>
   createCurriculumCreatedEvent(curriculum, user)
 )
-myEmitter.on('rename-curriculum', (curriculum, user, oldName, oldDescription) =>
+myEmitter.on('update-curriculum', (curriculum, user, oldName, oldDescription) =>
   createRenameCurriculumEvent(curriculum, user, oldName, oldDescription)
 )
 myEmitter.on('delete-curriculum', (curriculum, user) =>
   createDeleteCurriculumEvent(curriculum, user)
 )
+// MODULE
+myEmitter.on('create-module', (module, user) =>
+  createModuleCreatedEvent(module, user)
+)
+myEmitter.on('update-module', (module, user, oldName, oldDescription) =>
+  createRenameModuleEvent(module, user, oldName, oldDescription)
+)
+myEmitter.on('delete-module', (module, user) =>
+  createDeleteModuleEvent(module, user)
+)
+// UNIT
+myEmitter.on('create-unit', (unit, user) => createUnitCreatedEvent(unit, user))
+
+myEmitter.on('update-unit', (unit, user, oldName, oldDescription) =>
+  createRenameUnitEvent(unit, user, oldName, oldDescription)
+)
+myEmitter.on('delete-unit', (unit, user) => createDeleteUnitEvent(unit, user))
 
 myEmitter.on('error', (error) => createErrorEvent(error))
