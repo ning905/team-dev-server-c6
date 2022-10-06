@@ -270,7 +270,7 @@ async function seed() {
           'Learn the JavaScript fundamentals you will need for front-end or back-end development'
       }
     })
-    curriculums.push(newCurriculum)
+    return newCurriculum
   }
 
   const modules = []
@@ -293,7 +293,7 @@ async function seed() {
         }
       }
     })
-    modules.push(newModule)
+    return newModule
   }
 
   const units = []
@@ -312,7 +312,7 @@ async function seed() {
         moduleId: module.id
       }
     })
-    units.push(newUnit)
+    return newUnit
   }
 
   const lessons = []
@@ -332,7 +332,7 @@ async function seed() {
         unitId: unit.id
       }
     })
-    lessons.push(newLesson)
+    return newLesson
   }
 
   const exercises = []
@@ -357,7 +357,7 @@ async function seed() {
         }
       }
     })
-    exercises.push(newExercise)
+    return newExercise
   }
 
   const lessonPlans = []
@@ -390,31 +390,32 @@ async function seed() {
         }
       }
     })
-    lessonPlans.push(newLessonPlan)
+    return newLessonPlan
   }
   for (let i = 1; i <= iterator; i++) {
-    await createCurriculum()
+    curriculums.push(await createCurriculum())
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createModule(curriculums[i - 1], i)
+    modules.push(await createModule(curriculums[i - 1], i))
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createUnit(modules[i - 1], i)
+    units.push(await createUnit(modules[i - 1], i))
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createLesson(units[i - 1], i)
+    lessons.push(await createLesson(units[i - 1], i))
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createLessonPLan(lessons[i - 1], i)
+    exercises.push(await createExercise(lessons[i - 1], i))
   }
 
   for (let i = 1; i <= iterator; i++) {
-    await createExercise(lessons[i - 1], i)
+    lessonPlans.push(await createLessonPLan(lessons[i - 1], i))
   }
+
   console.log(
     'Curriculums, Modules, Units, Lessons, Exercises, Lesson Plans',
     curriculums,
