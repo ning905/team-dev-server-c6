@@ -460,6 +460,7 @@ export const setIsPinned = async (req, res) => {
 
   const alreadyPinned = await dbClient.post.findFirst({
     where: {
+      id: { not: postId },
       userId: foundPost.userId,
       isPinned: true
     }
@@ -477,7 +478,7 @@ export const setIsPinned = async (req, res) => {
   }
 
   try {
-    const updatedPost = await dbClient.update({
+    const updatePinned = await dbClient.post.update({
       where: {
         id: postId
       },
@@ -485,7 +486,7 @@ export const setIsPinned = async (req, res) => {
         isPinned: !foundPost.isPinned
       }
     })
-    return sendMessageResponse(res, 201, updatedPost)
+    return sendMessageResponse(res, 201, updatePinned)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `update-post-${postId}-pinned`)
     myEmitter.emit('error', error)
