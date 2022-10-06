@@ -460,7 +460,7 @@ export const deleteUnitById = async (req, res) => {
 }
 
 export const createLesson = async (req, res) => {
-  const { name, description, objectives } = req.body
+  const { name, description, objectives, dayNumber } = req.body
   const unitId = Number(req.params.unitId)
 
   if (!name) {
@@ -474,16 +474,17 @@ export const createLesson = async (req, res) => {
   }
 
   try {
-    const created = await dbClient.lesson.create({
+    const newLesson = await dbClient.lesson.create({
       data: {
         name,
         description,
         objectives,
-        unit: { connect: { id: unitId } }
+        unit: { connect: { id: unitId } },
+        dayNumber
       }
     })
-
-    return sendDataResponse(res, 201, created)
+    myEmitter.emit('create-lesson', newLesson, req.user)
+    return sendDataResponse(res, 201, newLesson)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-lesson')
     myEmitter.emit('error', error)
@@ -543,7 +544,7 @@ export const getLessonById = async (req, res) => {
 }
 
 export const updateLessonById = async (req, res) => {
-  const { name, description, objectives } = req.body
+  const { name, description, objectives, dayNumber } = req.body
   const lessonId = Number(req.params.lessonId)
 
   if (!name) {
@@ -573,11 +574,12 @@ export const updateLessonById = async (req, res) => {
   try {
     const updateLesson = await dbClient.lesson.update({
       where: { id: lessonId },
-      data: { name, description, objectives },
+      data: { name, description, objectives, dayNumber },
       include: {
         lessonPlans: true
       }
     })
+    myEmitter.emit('update-lesson', updateLesson, req.user)
     return sendDataResponse(res, 201, updateLesson)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `edit-lesson-${lessonId}`)
@@ -615,7 +617,7 @@ export const deleteLessonById = async (req, res) => {
       id: lessonId
     }
   })
-
+  myEmitter.emit('delete-lesson', deleteLesson, req.user)
   return sendDataResponse(res, 201, { deleteLesson })
 }
 
