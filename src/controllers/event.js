@@ -60,10 +60,26 @@ const getQuery = (req) => {
   }
 
   if (req.query.content) {
-    query.where = { ...query.where }
-    query.where.content = {
-      contains: req.query.content,
-      mode: 'insensitive'
+    query.where = {
+      ...query.where,
+      AND: [
+        {
+          OR: [
+            {
+              content: {
+                contains: req.query.content,
+                mode: 'insensitive'
+              }
+            },
+            {
+              topic: {
+                contains: req.query.content,
+                mode: 'insensitive'
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 
