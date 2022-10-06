@@ -728,25 +728,11 @@ export const deleteComment = async (req, res) => {
   }
 }
 
-const commentDeletePermission = (comment, user) => {
-  if (
-    user.role === 'TEACHER' ||
-    user.role === 'ADMIN' ||
-    comment.user.id === user.id ||
-    comment.post.user.id === user.id
-  ) {
-    return true
-  }
-  return false
-}
+const commentDeletePermission = (comment, user) =>
+  user.role === 'TEACHER' ||
+  user.role === 'ADMIN' ||
+  comment.user.id === user.id ||
+  comment.post.user.id === user.id
 
-const postDeletePermission = (post, user) => {
-  if (
-    user.role === 'TEACHER' ||
-    user.role === 'ADMIN' ||
-    post.user.id === user.id
-  ) {
-    return true
-  }
-  return false
-}
+const postDeletePermission = (post, user) =>
+  user.role === 'TEACHER' || user.role === 'ADMIN' || post.user.id === user.id
