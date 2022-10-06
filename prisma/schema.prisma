@@ -41,6 +41,7 @@ model User {
   receivedLessons LessonPlan[]   @relation("created-for")
   createdEvents   Event[]        @relation("createdEvents")
   receivedEvents  Event[]        @relation("receivedEvents")
+  isActive        Boolean        @default(true)
 }
 
 model Profile {

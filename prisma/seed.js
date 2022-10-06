@@ -42,32 +42,55 @@ async function seed() {
     }
   })
 
+  const createUser = async (
+    email,
+    password,
+    firstName,
+    lastName,
+    profileImageUrl,
+    isActive
+  ) => {
+    const user = await prisma.user.create({
+      data: {
+        email: email,
+        password,
+        cohortId: cohorts[0].id,
+        isActive: isActive,
+        profile: {
+          create: {
+            firstName: firstName,
+            lastName: lastName,
+            bio: 'Here i am, coding like a hurricane',
+            profileImageUrl: profileImageUrl
+          }
+        }
+      }
+    })
+    return user
+  }
+
   for (let i = 0; i <= 9; i++) {
+    let isActive = true
     if (i <= 3) {
       const cohort = await prisma.cohort.create({ data: {} })
       myEmitter.emit('create-cohort', cohort, teacherUser)
       cohorts.push(cohort)
     }
+    if (i >= 6) {
+      isActive = false
+    }
 
-    try {
-      const user = await prisma.user.create({
-        data: {
-          email: `test${i}@test.com`,
-          password,
-          cohortId: cohorts[0].id,
-          profile: {
-            create: {
-              firstName: `name${i}`,
-              lastName: `surname${i}`,
-              bio: `Here i am, coding like a hurricane`,
-              profileImageUrl: profileImages[i]
-            }
-          }
-        }
-      })
-      users.push(user)
-      myEmitter.emit('register', users[0])
-    } catch (err) {}
+    const user = await createUser(
+      `test${i}@test.com`,
+      password,
+      `name${i}`,
+      `surname${i}`,
+      profileImages[i],
+      isActive
+    )
+
+    myEmitter.emit('register', user)
+    users.push(user)
   }
 
   const createdUser = await prisma.user.create({
@@ -189,10 +212,10 @@ async function seed() {
         parentId: 1
       },
       {
-        content: 'Reply to reply',
-        userId: createdUser.id,
+        content: 'Reply',
+        userId: users[3].id,
         postId: createdPost.id,
-        parentId: 3
+        parentId: 1
       }
     ]
   })
