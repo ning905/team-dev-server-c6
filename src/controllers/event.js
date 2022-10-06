@@ -161,9 +161,13 @@ const getQuery = (req) => {
     req.query.type.map((type) => {
       return types[0].OR.push({ type: type })
     })
-    query.where = {
-      ...query.where,
-      AND: query.where.AND.concat(types)
+    if (!query.where) {
+      query.where = types[0]
+    } else {
+      query.where = {
+        ...query.where,
+        AND: query.where.AND.concat(types)
+      }
     }
   } else if (req.query.type) {
     query.where = { ...query.where }
