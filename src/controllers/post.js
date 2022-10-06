@@ -8,6 +8,48 @@ import {
   ServerErrorEvent
 } from '../eventEmitter/utils.js'
 
+const formatPostsData = (posts) => {
+  const DEFAULT_PFP =
+    'https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png'
+  const REMOVED = '[removed]'
+
+  posts.forEach((post) => {
+    if (!post.user.isActive) {
+      post.content = REMOVED
+      post.user.email = REMOVED
+      post.user.profile.firstName = REMOVED
+      post.user.profile.lastName = REMOVED
+      post.user.profile.bio = REMOVED
+      post.user.profile.githubUrl = REMOVED
+      post.user.profile.profileImageUrl = DEFAULT_PFP
+    }
+
+    post.comments.forEach((comment) => {
+      if (!comment.user.isActive) {
+        comment.content = REMOVED
+        comment.user.email = REMOVED
+        comment.user.profile.firstName = REMOVED
+        comment.user.profile.lastName = REMOVED
+        comment.user.profile.bio = REMOVED
+        comment.user.profile.githubUrl = REMOVED
+        comment.user.profile.profileImageUrl = DEFAULT_PFP
+      }
+
+      comment.replies.forEach((reply) => {
+        if (!reply.user.isActive) {
+          reply.content = REMOVED
+          reply.user.email = REMOVED
+          reply.user.profile.firstName = REMOVED
+          reply.user.profile.lastName = REMOVED
+          reply.user.profile.bio = REMOVED
+          reply.user.profile.githubUrl = REMOVED
+          reply.user.profile.profileImageUrl = DEFAULT_PFP
+        }
+      })
+    })
+  })
+}
+
 export const create = async (req, res) => {
   const { content, isPrivate } = req.body
   const { id } = req.user
@@ -52,10 +94,18 @@ export const getAll = async (req, res) => {
           id: true,
           cohortId: true,
           role: true,
-          profile: true
+          profile: true,
+          isActive: true
         }
       },
       likes: {
+        where: {
+          user: {
+            isActive: {
+              equals: true
+            }
+          }
+        },
         include: {
           user: {
             select: {
@@ -70,17 +120,34 @@ export const getAll = async (req, res) => {
       },
       comments: {
         include: {
-          likes: true,
+          likes: {
+            where: {
+              user: {
+                isActive: {
+                  equals: true
+                }
+              }
+            }
+          },
           replies: {
             include: {
-              likes: true,
+              likes: {
+                where: {
+                  user: {
+                    isActive: {
+                      equals: true
+                    }
+                  }
+                }
+              },
               user: {
                 select: {
                   email: true,
                   id: true,
                   cohortId: true,
                   role: true,
-                  profile: true
+                  profile: true,
+                  isActive: true
                 }
               }
             }
@@ -91,13 +158,15 @@ export const getAll = async (req, res) => {
               id: true,
               cohortId: true,
               role: true,
-              profile: true
+              profile: true,
+              isActive: true
             }
           }
         }
       }
     }
   }
+
   if (req.user.role === 'STUDENT') {
     query.where = {
       OR: [{ isPrivate: false }, { userId: id }]
@@ -110,6 +179,10 @@ export const getAll = async (req, res) => {
     }
   }
   const posts = await dbClient.post.findMany(query)
+
+  if (req.user.role === 'STUDENT') {
+    formatPostsData(posts)
+  }
 
   return sendDataResponse(res, 200, posts)
 }
@@ -460,6 +533,7 @@ export const setIsPinned = async (req, res) => {
 
   const alreadyPinned = await dbClient.post.findFirst({
     where: {
+      id: { not: postId },
       userId: foundPost.userId,
       isPinned: true
     }
@@ -477,7 +551,7 @@ export const setIsPinned = async (req, res) => {
   }
 
   try {
-    const updatedPost = await dbClient.update({
+    const updatePinned = await dbClient.post.update({
       where: {
         id: postId
       },
@@ -485,7 +559,7 @@ export const setIsPinned = async (req, res) => {
         isPinned: !foundPost.isPinned
       }
     })
-    return sendMessageResponse(res, 201, updatedPost)
+    return sendMessageResponse(res, 201, updatePinned)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `update-post-${postId}-pinned`)
     myEmitter.emit('error', error)

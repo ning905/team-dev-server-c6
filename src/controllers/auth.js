@@ -25,9 +25,15 @@ export const login = async (req, res) => {
       })
     }
 
-    const token = generateJwt(foundUser.id)
+    let userToLogin = foundUser
+    if (!foundUser.isActive) {
+      userToLogin = await foundUser.update({ isActive: true })
+      myEmitter.emit('update-account-activate', userToLogin)
+    }
 
-    return sendDataResponse(res, 200, { token, ...foundUser.toJSON() })
+    const token = generateJwt(userToLogin.id)
+
+    return sendDataResponse(res, 200, { token, ...userToLogin.toJSON() })
   } catch (e) {
     const error = new ServerErrorEvent(
       null,
@@ -44,7 +50,7 @@ function generateJwt(userId) {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY })
 }
 
-async function validateCredentials(password, user) {
+export async function validateCredentials(password, user) {
   if (!user) {
     return false
   }
