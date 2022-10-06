@@ -106,6 +106,9 @@ export const createModule = async (req, res) => {
   if (!description) {
     return sendMessageResponse(res, 400, 'missing module description')
   }
+  if (!objectives) {
+    return sendMessageResponse(res, 400, 'missing module objectives')
+  }
 
   try {
     const created = await dbClient.module.create({
@@ -161,35 +164,83 @@ export const getAllModules = async (req, res) => {
   }
 }
 
-export const updateModuleById = async (req, res) => {
-  const id = Number(req.params.id)
-  const { name, description, objectives } = req.body
-  console.log('CONTENT', name, description, objectives)
+export const getModuleById = async (req, res) => {
+  const currId = Number(req.params.id)
+  const moduleId = Number(req.params.moduleId)
 
-  if (!name && !description && !objectives) {
-    return sendMessageResponse(res, 400, 'Must provide content')
+  try {
+    const foundModule = await dbClient.module.findFirst({
+      where: {
+        id: moduleId,
+        curriculum: {
+          some: {
+            id: currId
+          }
+        }
+      }
+    })
+
+    return sendDataResponse(res, 201, foundModule)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'create-model')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
+}
+
+export const updateModuleById = async (req, res) => {
+  const { name, description, objectives } = req.body
+  const currId = Number(req.params.id)
+  const moduleId = Number(req.params.moduleId)
+
+  if (!name) {
+    return sendMessageResponse(res, 400, 'missing module name')
+  }
+  if (!description) {
+    return sendMessageResponse(res, 400, 'missing module description')
+  }
+  if (!objectives) {
+    return sendMessageResponse(res, 400, 'missing module objectives')
   }
 
-  const foundModule = await dbClient.module.findUnique({
-    where: { id }
+  const foundModule = await dbClient.module.findFirst({
+    where: {
+      id: moduleId,
+      curriculums: {
+        some: {
+          id: currId
+        }
+      }
+    }
   })
 
   if (!foundModule) {
-    const notFound = new NotFoundEvent(req.user, `edit-module-${id}`, 'module')
+    const notFound = new NotFoundEvent(
+      req.user,
+      `edit-module-${moduleId}`,
+      'module'
+    )
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
-  const updateModule = await dbClient.module.update({
-    where: { id },
-    data: { name, description, objectives },
-    include: {
-      units: true,
-      curriculums: true
-    }
-  })
-
-  return sendDataResponse(res, 201, updateModule)
+  try {
+    const updateModule = await dbClient.module.update({
+      where: { id: moduleId },
+      data: { name, description, objectives },
+      include: {
+        units: true,
+        curriculums: true
+      }
+    })
+    return sendDataResponse(res, 201, updateModule)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, `edit-module-${moduleId}`)
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
 }
 
 export const deleteModuleById = async (req, res) => {
@@ -220,4 +271,37 @@ export const deleteModuleById = async (req, res) => {
   })
 
   return sendDataResponse(res, 201, { deleteModule })
+}
+
+export const createUnit = async (req, res) => {
+  const { name, description, objectives } = req.body
+  const moduleId = Number(req.params.id)
+
+  if (!name) {
+    return sendMessageResponse(res, 400, 'missing unit name')
+  }
+  if (!description) {
+    return sendMessageResponse(res, 400, 'missing unit description')
+  }
+  if (!objectives) {
+    return sendMessageResponse(res, 400, 'missing unit objectives')
+  }
+
+  try {
+    const created = await dbClient.unit.create({
+      data: {
+        name,
+        description,
+        objectives,
+        module: { connect: { id: moduleId } }
+      }
+    })
+
+    return sendDataResponse(res, 201, created)
+  } catch (err) {
+    const error = new ServerErrorEvent(req.user, 'create-unit')
+    myEmitter.emit('error', error)
+    sendMessageResponse(res, error.code, error.message)
+    throw err
+  }
 }

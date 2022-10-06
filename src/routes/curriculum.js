@@ -8,9 +8,10 @@ import {
   createModule,
   getAllModulesByCurr,
   getAllModules,
-  // getModuleById,
+  getModuleById,
   updateModuleById,
-  deleteModuleById
+  deleteModuleById,
+  createUnit
 } from '../controllers/curriculum.js'
 
 const router = Router()
@@ -28,7 +29,7 @@ router.delete(
 router.post('/:id/module', validateAuthentication, createModule)
 router.get('/:id/module', validateAuthentication, getAllModulesByCurr)
 router.get('/moduels', validateAuthentication, getAllModules)
-// router.get('/:id/module/:moduleId', validateAuthentication, getModuleById)
+router.get('/:id/module/:moduleId', validateAuthentication, getModuleById)
 router.put(
   '/:id/module/:moduleId',
   validateAuthentication,
@@ -42,7 +43,7 @@ router.delete(
   deleteModuleById
 )
 
-// router.post('/:id/module/:moduleId/unit', validateAuthentication, createUnit)
+router.post('/:id/module/:moduleId/unit', validateAuthentication, createUnit)
 // router.get('/:id/module/:moduleId/unit', validateAuthentication, getAllUnits)
 // router.get(
 //   '/:id/module/:moduleId/unit/:unitId',
