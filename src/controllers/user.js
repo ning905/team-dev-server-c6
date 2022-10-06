@@ -326,7 +326,6 @@ export const checkUserLoginDetails = async (req, res) => {
   )
 
   if (foundUser.email !== req.body.email || !passwordIsValid) {
-    console.log('failed login info')
     return sendMessageResponse(
       res,
       400,
