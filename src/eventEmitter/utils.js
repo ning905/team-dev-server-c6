@@ -77,7 +77,7 @@ export const createUpdateActivateEvent = async (user) => {
   if (user.role === 'ADMIN') {
     type = 'ADMIN'
   }
-  if (user.isActivate) {
+  if (user.isActive) {
     topic = 'activate-account'
   } else {
     topic = 'deactivate-account'
@@ -298,6 +298,14 @@ export class ConfictEvent extends ErrorEventBase {
     super(user, topic)
     this.code = 409
     this.message = message
+  }
+}
+
+export class DeactivatedUserEvent extends ErrorEventBase {
+  constructor(user, topic) {
+    super(user, topic)
+    this.code = 400
+    this.message = 'The target user account has been deactivated'
   }
 }
 
