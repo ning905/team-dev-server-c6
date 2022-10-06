@@ -3,6 +3,11 @@ import dbClient from '../utils/dbClient.js'
 
 import { myEmitter } from '../eventEmitter/index.js'
 import { ServerErrorEvent, NotFoundEvent } from '../eventEmitter/utils.js'
+import { myEmitterCurriculum } from '../eventEmitter/indexCurriculum.js'
+import { myEmitterModule } from '../eventEmitter/indexModule.js'
+import { myEmitterUnit } from '../eventEmitter/indexUnit.js'
+import { myEmitterLesson } from '../eventEmitter/indexLesson.js'
+import { myEmitterLessonPlan } from '../eventEmitter/indexLessonPlan.js'
 
 export const createCurriculum = async (req, res) => {
   if (!req.body.name) {
@@ -19,7 +24,7 @@ export const createCurriculum = async (req, res) => {
         description: req.body.description
       }
     })
-    myEmitter.emit('create-curriculum', newCurriculum, req.user)
+    myEmitterCurriculum.emit('create-curriculum', newCurriculum, req.user)
     return sendDataResponse(res, 201, { curriculum: newCurriculum })
   } catch (err) {
     const error = new ServerErrorEvent(
@@ -77,7 +82,7 @@ export const updateCurriculumById = async (req, res) => {
         description: req.body.description
       }
     })
-    myEmitter.emit(
+    myEmitterCurriculum.emit(
       'update-curriculum',
       updatedCurriculum,
       req.user,
@@ -109,7 +114,7 @@ export const deleteCurriculumById = async (req, res) => {
 
   try {
     const deleted = await dbClient.curriculum.delete({ where: { id } })
-    myEmitter.emit('delete-curriculum', deleted, req.user)
+    myEmitterCurriculum.emit('delete-curriculum', deleted, req.user)
     return sendDataResponse(res, 201, deleted)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `delete-curriculum-${id}`)
@@ -141,7 +146,7 @@ export const createModule = async (req, res) => {
         curriculums: { connect: { id: currId } }
       }
     })
-    myEmitter.emit('create-module', created, req.user)
+    myEmitterModule.emit('create-module', created, req.user)
     return sendDataResponse(res, 201, created)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-module')
@@ -256,7 +261,13 @@ export const updateModuleById = async (req, res) => {
         curriculums: true
       }
     })
-    myEmitter.emit('update-module', updateModule, req.user)
+    myEmitterModule.emit(
+      'update-module',
+      updateModule,
+      req.user,
+      foundModule.name,
+      foundModule.description
+    )
     return sendDataResponse(res, 201, updateModule)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `edit-module-${moduleId}`)
@@ -296,7 +307,7 @@ export const deleteModuleById = async (req, res) => {
       units: true
     }
   })
-  myEmitter.emit('delete-module', deleteModule, req.user)
+  myEmitterModule.emit('delete-module', deleteModule, req.user)
   return sendDataResponse(res, 201, { deleteModule })
 }
 
@@ -323,7 +334,7 @@ export const createUnit = async (req, res) => {
         module: { connect: { id: moduleId } }
       }
     })
-    myEmitter.emit('create-unit', newUnit, req.user)
+    myEmitterUnit.emit('create-unit', newUnit, req.user)
     return sendDataResponse(res, 201, { unit: newUnit })
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-unit')
@@ -415,7 +426,13 @@ export const updateUnitById = async (req, res) => {
         lessons: true
       }
     })
-    myEmitter.emit('update-unit', updateUnit, req.user)
+    myEmitterUnit.emit(
+      'update-unit',
+      updateUnit,
+      req.user,
+      foundUnit.name,
+      foundUnit.description
+    )
     return sendDataResponse(res, 201, updateUnit)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `edit-unit-${unitId}`)
@@ -455,7 +472,7 @@ export const deleteUnitById = async (req, res) => {
       lessons: true
     }
   })
-  myEmitter.emit('delete-unit', deleteUnit, req.user)
+  myEmitterUnit.emit('delete-unit', deleteUnit, req.user)
   return sendDataResponse(res, 201, { deleteUnit })
 }
 
@@ -483,7 +500,7 @@ export const createLesson = async (req, res) => {
         dayNumber
       }
     })
-    myEmitter.emit('create-lesson', newLesson, req.user)
+    myEmitterLesson.emit('create-lesson', newLesson, req.user)
     return sendDataResponse(res, 201, newLesson)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-lesson')
@@ -579,7 +596,13 @@ export const updateLessonById = async (req, res) => {
         lessonPlans: true
       }
     })
-    myEmitter.emit('update-lesson', updateLesson, req.user)
+    myEmitterLesson.emit(
+      'update-lesson',
+      updateLesson,
+      req.user,
+      foundLesson.name,
+      foundLesson.description
+    )
     return sendDataResponse(res, 201, updateLesson)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, `edit-lesson-${lessonId}`)
@@ -617,7 +640,7 @@ export const deleteLessonById = async (req, res) => {
       id: lessonId
     }
   })
-  myEmitter.emit('delete-lesson', deleteLesson, req.user)
+  myEmitterLesson.emit('delete-lesson', deleteLesson, req.user)
   return sendDataResponse(res, 201, { deleteLesson })
 }
 
@@ -648,7 +671,7 @@ export const createLessonPlan = async (req, res) => {
         createdForId
       }
     })
-    myEmitter.emit('create-lesson-plan', createdLessonPlan, req.user)
+    myEmitterLessonPlan.emit('create-lesson-plan', createdLessonPlan, req.user)
     return sendDataResponse(res, 201, createdLessonPlan)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-lesson-plan')
@@ -741,7 +764,13 @@ export const updateLessonPlanById = async (req, res) => {
       where: { id: lessonPlanId },
       data: { name, description, objectives }
     })
-    myEmitter.emit('update-lesson-plan', updateLessonPlan, req.user)
+    myEmitterLessonPlan.emit(
+      'update-lesson-plan',
+      updateLessonPlan,
+      req.user,
+      foundLessonPlan.name,
+      foundLessonPlan.description
+    )
     return sendDataResponse(res, 201, updateLessonPlan)
   } catch (err) {
     const error = new ServerErrorEvent(
@@ -778,6 +807,6 @@ export const deleteLessonPlanById = async (req, res) => {
       id: lessonPlanId
     }
   })
-  myEmitter.emit('delete-lesson-plan', deleteLessonPlan, req.user)
+  myEmitterLessonPlan.emit('delete-lesson-plan', deleteLessonPlan, req.user)
   return sendDataResponse(res, 201, { deleteLessonPlan })
 }
