@@ -185,11 +185,13 @@ export const deletePost = async (req, res) => {
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
-  if (foundPost.user.id !== req.user.id) {
+  const hasDeletePermission = postDeletePermission(foundPost, req.user)
+
+  if (!hasDeletePermission) {
     const noPermission = new NoPermissionEvent(
       req.user,
       `delete-post-${foundPost.id}`,
-      'Only the post author can delete the post'
+      'No permission to delete the post'
     )
     myEmitter.emit('error', noPermission)
     return sendMessageResponse(res, noPermission.code, noPermission.message)
@@ -658,6 +660,17 @@ const commentDeletePermission = (comment, user) => {
     user.role === 'ADMIN' ||
     comment.user.id === user.id ||
     comment.post.user.id === user.id
+  ) {
+    return true
+  }
+  return false
+}
+
+const postDeletePermission = (post, user) => {
+  if (
+    user.role === 'TEACHER' ||
+    user.role === 'ADMIN' ||
+    post.user.id === user.id
   ) {
     return true
   }
