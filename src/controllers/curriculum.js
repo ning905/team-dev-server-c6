@@ -638,7 +638,7 @@ export const createLessonPlan = async (req, res) => {
   }
 
   try {
-    const created = await dbClient.lessonPlan.create({
+    const createdLessonPlan = await dbClient.lessonPlan.create({
       data: {
         name,
         description,
@@ -648,8 +648,8 @@ export const createLessonPlan = async (req, res) => {
         createdForId
       }
     })
-
-    return sendDataResponse(res, 201, created)
+    myEmitter.emit('create-lesson-plan', createdLessonPlan, req.user)
+    return sendDataResponse(res, 201, createdLessonPlan)
   } catch (err) {
     const error = new ServerErrorEvent(req.user, 'create-lesson-plan')
     myEmitter.emit('error', error)
@@ -741,9 +741,13 @@ export const updateLessonPlanById = async (req, res) => {
       where: { id: lessonPlanId },
       data: { name, description, objectives }
     })
+    myEmitter.emit('update-lesson-plan', updateLessonPlan, req.user)
     return sendDataResponse(res, 201, updateLessonPlan)
   } catch (err) {
-    const error = new ServerErrorEvent(req.user, `edit-lesson-${lessonPlanId}`)
+    const error = new ServerErrorEvent(
+      req.user,
+      `update-lesson-plan-${lessonPlanId}`
+    )
     myEmitter.emit('error', error)
     sendMessageResponse(res, error.code, error.message)
     throw err
@@ -774,6 +778,6 @@ export const deleteLessonPlanById = async (req, res) => {
       id: lessonPlanId
     }
   })
-
+  myEmitter.emit('delete-lesson-plan', deleteLessonPlan, req.user)
   return sendDataResponse(res, 201, { deleteLessonPlan })
 }

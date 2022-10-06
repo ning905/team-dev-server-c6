@@ -24,7 +24,10 @@ import {
   createDeleteUnitEvent,
   createLessonCreatedEvent,
   createRenameLessonEvent,
-  createDeleteLessonEvent
+  createDeleteLessonEvent,
+  createLessonPlanCreatedEvent,
+  createRenameLessonPlanEvent,
+  createDeleteLessonPlanEvent
 } from './utils.js'
 
 class MyEventEmitter extends EventEmitter {}
@@ -104,5 +107,16 @@ myEmitter.on('update-lesson', (lesson, user, oldName, oldDescription) =>
 myEmitter.on('delete-lesson', (lesson, user) =>
   createDeleteLessonEvent(lesson, user)
 )
-
+// LESSON PLAN
+myEmitter.on('create-lesson-plan', (lessonPlan, user) =>
+  createLessonPlanCreatedEvent(lessonPlan, user)
+)
+myEmitter.on(
+  'update-lesson-plan',
+  (lessonPlan, user, oldName, oldDescription) =>
+    createRenameLessonPlanEvent(lessonPlan, user, oldName, oldDescription)
+)
+myEmitter.on('delete-lesson-plan', (lessonPlan, user) =>
+  createDeleteLessonPlanEvent(lessonPlan, user)
+)
 myEmitter.on('error', (error) => createErrorEvent(error))
