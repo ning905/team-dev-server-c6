@@ -272,6 +272,173 @@ async function seed() {
       }
     ]
   })
+
+  const iterator = 2
+
+  const curriculums = []
+  const createCurriculum = async () => {
+    const newCurriculum = await prisma.curriculum.create({
+      data: {
+        name: 'Javascript',
+        description:
+          'Learn the JavaScript fundamentals you will need for front-end or back-end development'
+      }
+    })
+    return newCurriculum
+  }
+
+  const modules = []
+  const createModule = async (curriculum, iterator) => {
+    const newModule = await prisma.module.create({
+      data: {
+        name: `Module ${iterator}`,
+        description: `Description for Module-${iterator}`,
+        objectives: [
+          `Objective 1 for module-${iterator} Curriculum-${curriculum.id}`,
+          `Objective 2 for module-${iterator} Curriculum-${curriculum.id}`,
+          `Objective 3 for module-${iterator} Curriculum-${curriculum.id}`,
+          `Objective 4 for module-${iterator} Curriculum-${curriculum.id}`,
+          `Objective 5 for module-${iterator} Curriculum-${curriculum.id}`
+        ],
+        curriculums: {
+          connect: {
+            id: curriculum.id
+          }
+        }
+      }
+    })
+    return newModule
+  }
+
+  const units = []
+  const createUnit = async (module, iterator) => {
+    const newUnit = await prisma.unit.create({
+      data: {
+        name: `Unit ${iterator}`,
+        description: `Description for Unit-${iterator}`,
+        objectives: [
+          `Objective 1 for Unit-${iterator} Module-${module.id} `,
+          `Objective 2 for Unit-${iterator} Module-${module.id} `,
+          `Objective 3 for Unit-${iterator} Module-${module.id} `,
+          `Objective 4 for Unit-${iterator} Module-${module.id} `,
+          `Objective 5 for Unit-${iterator} Module-${module.id}`
+        ],
+        moduleId: module.id
+      }
+    })
+    return newUnit
+  }
+
+  const lessons = []
+  const createLesson = async (unit, iterator) => {
+    const newLesson = await prisma.lesson.create({
+      data: {
+        dayNumber: 1,
+        name: `Lesson ${iterator}`,
+        description: `Lesson description for ${iterator}`,
+        objectives: [
+          `Objective 1 for lesson-${iterator} Unit-${unit.id}`,
+          `Objective 2 for lesson-${iterator} Unit-${unit.id} `,
+          `Objective 3 for lesson-${iterator} Unit-${unit.id} `,
+          `Objective 4 for lesson-${iterator} Unit-${unit.id} `,
+          `Objective 5 for lesson-${iterator} Unit-${unit.id}`
+        ],
+        unitId: unit.id
+      }
+    })
+    return newLesson
+  }
+
+  const exercises = []
+  const createExercise = async (lesson, iterator) => {
+    const newExercise = await prisma.exercise.create({
+      data: {
+        name: `Exercise ${iterator}`,
+        gitHubUrl: 'https://github.com/boolean-uk/html-scientific-paper',
+        readMeUrl:
+          'https://raw.githubusercontent.com/boolean-uk/html-scientific-paper/main/README.md',
+        objectives: [
+          `Objective 1 for exercise ${iterator} lesson-${lesson.id}`,
+          `Objective 2 for exercise ${iterator} lesson-${lesson.id}`,
+          `Objective 3 for exercise ${iterator} lesson-${lesson.id}`,
+          `Objective 4 for exercise ${iterator} lesson-${lesson.id}`,
+          `Objective 5 for exercise ${iterator} lesson-${lesson.id}`
+        ],
+        lessons: {
+          connect: {
+            id: lesson.id
+          }
+        }
+      }
+    })
+    return newExercise
+  }
+
+  const lessonPlans = []
+  const createLessonPLan = async (lesson, iterator) => {
+    const newLessonPlan = await prisma.lessonPlan.create({
+      data: {
+        name: `Lesson Plan ${iterator}`,
+        description: `Lesson plan ${iterator} description`,
+        objectives: [
+          `Objective 1 for lesson plan-${iterator} lesson-${lesson.id}`,
+          `Objective 2 for lesson plan-${iterator} lesson-${lesson.id}`,
+          `Objective 3 for lesson plan-${iterator} lesson-${lesson.id}`,
+          `Objective 4 for lesson plan-${iterator} lesson-${lesson.id}`,
+          `Objective 5 for lesson plan-${iterator} lesson-${lesson.id}`
+        ],
+        createdBy: {
+          connect: {
+            id: teacherUser.id
+          }
+        },
+        createdFor: {
+          connect: {
+            id: users[2].id
+          }
+        },
+        lessons: {
+          connect: {
+            id: lesson.id
+          }
+        }
+      }
+    })
+    return newLessonPlan
+  }
+  for (let i = 1; i <= iterator; i++) {
+    curriculums.push(await createCurriculum())
+  }
+
+  for (let i = 1; i <= iterator; i++) {
+    modules.push(await createModule(curriculums[i - 1], i))
+  }
+
+  for (let i = 1; i <= iterator; i++) {
+    units.push(await createUnit(modules[i - 1], i))
+  }
+
+  for (let i = 1; i <= iterator; i++) {
+    lessons.push(await createLesson(units[i - 1], i))
+  }
+
+  for (let i = 1; i <= iterator; i++) {
+    exercises.push(await createExercise(lessons[i - 1], i))
+  }
+
+  for (let i = 1; i <= iterator; i++) {
+    lessonPlans.push(await createLessonPLan(lessons[i - 1], i))
+  }
+
+  console.log(
+    'Curriculums, Modules, Units, Lessons, Exercises, Lesson Plans',
+    curriculums,
+    modules,
+    units,
+    lessons,
+    exercises,
+    lessonPlans
+  )
 }
 
 seed().catch(async (error) => {
