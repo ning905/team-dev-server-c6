@@ -138,20 +138,12 @@ const getQuery = (req) => {
     if (req.query.username) {
       query.where = {
         ...query.where,
-        AND: [
-          {
-            OR: searchByName
-          }
-        ]
+        AND: [{ OR: searchByName }]
       }
     } else {
       query.where = {
         ...query.where,
-        AND: [
-          {
-            OR: searchByRole
-          }
-        ]
+        AND: [{ OR: searchByRole }]
       }
     }
   }
