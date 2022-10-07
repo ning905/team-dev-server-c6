@@ -258,11 +258,13 @@ export const deletePost = async (req, res) => {
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
 
-  if (foundPost.user.id !== req.user.id) {
+  const hasDeletePermission = postDeletePermission(foundPost, req.user)
+
+  if (!hasDeletePermission) {
     const noPermission = new NoPermissionEvent(
       req.user,
       `delete-post-${foundPost.id}`,
-      'Only the post author can delete the post'
+      'No permission to delete the post'
     )
     myEmitter.emit('error', noPermission)
     return sendMessageResponse(res, noPermission.code, noPermission.message)
@@ -461,8 +463,7 @@ export const setIsPrivate = async (req, res) => {
     myEmitter.emit('error', notFound)
     return sendMessageResponse(res, notFound.code, notFound.message)
   }
-
-  if (foundPost.user.id !== req.user.id) {
+  if (foundPost.userId !== req.user.id) {
     const noPermission = new NoPermissionEvent(
       req.user,
       `update-post-${postId}-privacy`,
@@ -470,6 +471,17 @@ export const setIsPrivate = async (req, res) => {
     )
     myEmitter.emit('error', noPermission)
     return sendMessageResponse(res, noPermission.code, noPermission.message)
+  }
+
+  if (foundPost.isPinned) {
+    const error = new OtherErrorEvent(
+      req.user,
+      `update-post-${postId}-privacy`,
+      409,
+      "Pinned posts can't be private"
+    )
+    myEmitter.emit('error', error)
+    return sendMessageResponse(res, error.code, error.message)
   }
 
   try {
@@ -481,7 +493,6 @@ export const setIsPrivate = async (req, res) => {
         isPrivate: !foundPost.isPrivate
       }
     })
-
     return sendDataResponse(res, 201, updatedPost)
   } catch (err) {
     const error = new ServerErrorEvent(
@@ -726,14 +737,11 @@ export const deleteComment = async (req, res) => {
   }
 }
 
-const commentDeletePermission = (comment, user) => {
-  if (
-    user.role === 'TEACHER' ||
-    user.role === 'ADMIN' ||
-    comment.user.id === user.id ||
-    comment.post.user.id === user.id
-  ) {
-    return true
-  }
-  return false
-}
+const commentDeletePermission = (comment, user) =>
+  user.role === 'TEACHER' ||
+  user.role === 'ADMIN' ||
+  comment.user.id === user.id ||
+  comment.post.user.id === user.id
+
+const postDeletePermission = (post, user) =>
+  user.role === 'TEACHER' || user.role === 'ADMIN' || post.user.id === user.id

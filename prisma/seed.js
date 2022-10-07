@@ -71,12 +71,14 @@ async function seed() {
 
   for (let i = 0; i <= 9; i++) {
     let isActive = true
-    if (i <= 3) {
-      const cohort = await prisma.cohort.create({ data: {} })
+    if (i < 3) {
+      const cohort = await prisma.cohort.create({
+        data: { name: `Cohort ${i}` }
+      })
       myEmitter.emit('create-cohort', cohort, teacherUser)
       cohorts.push(cohort)
     }
-    if (i >= 6) {
+    if (i > 2 && i < 6) {
       isActive = false
     }
 
@@ -191,6 +193,13 @@ async function seed() {
     likes.push(like)
   }
 
+  await prisma.like.create({
+    data: {
+      userId: users[0].id,
+      postId: posts[3].id
+    }
+  })
+
   console.log('likes created', likes)
 
   const createdComments = await prisma.comment.createMany({
@@ -216,6 +225,11 @@ async function seed() {
         userId: users[3].id,
         postId: createdPost.id,
         parentId: 1
+      },
+      {
+        content: 'Comment on deactivated users post',
+        userId: createdUser.id,
+        postId: users[3].id
       }
     ]
   })
